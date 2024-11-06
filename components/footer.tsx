@@ -36,7 +36,7 @@ const socials = [
 
 export const Footer = () => {
   return (
-    <footer className='container max-w-xl py-8'>
+    <footer className='container max-w-2xl py-8'>
       <div className='md:flex md:items-center md:justify-between'>
         <div className='flex justify-center space-x-6 md:order-2'>
           {socials.map((social) => (
@@ -48,7 +48,7 @@ export const Footer = () => {
               className='text-muted-foreground hover:text-foreground'
             >
               <span className='sr-only'>{social.name}</span>
-              <social.icon />
+              <social.icon className='size-5' />
             </a>
           ))}
         </div>

@@ -31,11 +31,11 @@ export default function RootLayout({
     // It requires this to be set since, we don't really know the user theme preference on the server side.
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-xl flex-col px-2 antialiased sm:px-0`}
+        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-2xl flex-col px-2 antialiased sm:px-0`}
       >
         <Providers>
           <Navbar />
-          <main className='max-w-xl grow'>{children}</main>
+          <main className='max-w-2xl grow'>{children}</main>
           <Footer />
         </Providers>
       </body>
