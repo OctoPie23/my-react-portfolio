@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import localFont from 'next/font/local'
 import './globals.css'
 import Providers from '@/providers/providers'
@@ -31,12 +33,17 @@ export default function RootLayout({
     // It requires this to be set since, we don't really know the user theme preference on the server side.
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-2xl flex-col px-2 antialiased sm:px-0`}
+        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-2xl flex-col px-2 antialiased`}
       >
         <Providers>
           <Navbar />
-          <main className='max-w-2xl grow'>{children}</main>
+          <main className='mt-40 max-w-2xl grow'>{children}</main>
           <Footer />
+
+          {/* Vercel Analytics and Speed Insights */}
+          {/* NOTE: Don't edit/remove these components */}
+          <Analytics />
+          <SpeedInsights />
         </Providers>
       </body>
     </html>

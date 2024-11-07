@@ -20,7 +20,7 @@ export const Navbar = () => {
   }
 
   return (
-    <header className='container fixed inset-x-0 top-0 z-50 mx-auto max-w-2xl px-2 py-6 backdrop-blur-sm sm:px-0'>
+    <header className='container fixed inset-x-0 top-0 z-50 mx-auto max-w-2xl px-2 py-6 backdrop-blur-sm'>
       <nav className='flex items-center justify-between'>
         <div className='hidden sm:flex'>
           <Link
@@ -50,7 +50,8 @@ export const Navbar = () => {
             </li>
             <li className={getClassnameForLink(links.contact)}>
               <Link href={links.contact} className='capitalize'>
-                contact me
+                <span className='hidden sm:inline'>contact me</span>
+                <span className='inline sm:hidden'>contact</span>
               </Link>
             </li>
           </ul>

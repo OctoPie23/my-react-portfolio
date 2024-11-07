@@ -79,7 +79,7 @@ export const Socials = () => {
                 href={social.href}
                 name={social.name}
                 Icon={social.icon}
-                iconClassName='size-6'
+                iconClassName='size-5 md:size-6'
               />
             ))}
           </div>

@@ -2,8 +2,8 @@
 
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { Loader, SunIcon, MoonIcon } from '@/components/icons'
+import { Button } from './ui/button'
 
 export const ThemeToggle = () => {
   const { resolvedTheme, setTheme } = useTheme()
@@ -13,13 +13,14 @@ export const ThemeToggle = () => {
     setMounted(true)
   }, [])
 
-  if (!mounted)
+  if (!mounted) {
     return (
-      <Button size='sm' variant='ghost' disabled>
-        <Loader className='h-5 w-5 animate-spin text-zinc-400' />
+      <Button size='icon' variant='ghost'>
+        <Loader className='size-5 animate-spin text-zinc-400' />
         <span className='sr-only'>Loading...</span>
       </Button>
     )
+  }
 
   const ToggleThemeIcon =
     resolvedTheme === 'light' ? (
