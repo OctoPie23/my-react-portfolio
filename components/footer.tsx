@@ -36,7 +36,7 @@ const socials = [
 
 export const Footer = () => {
   return (
-    <footer className='container max-w-2xl py-8'>
+    <footer className='container max-w-3xl py-8'>
       <div className='md:flex md:items-center md:justify-between'>
         <div className='flex justify-center space-x-6 md:order-2'>
           {socials.map((social) => (

@@ -1,12 +1,12 @@
-import { getBlogPostsBySlug, getBlogPosts } from '@/lib/blogs'
+import { getBlogPostsBySlug, getBlogPostsMetadata } from '@/lib/blogs'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { MDXRemote } from 'next-mdx-remote/rsc'
 import Link from 'next/link'
 import { ArrowLeftIcon } from '@/components/icons'
 import { formatDate } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge, badgeVariants } from '@/components/ui/badge'
+import BlogContent from '@/components/blog-content'
 
 interface Params {
   params: {
@@ -16,8 +16,8 @@ interface Params {
 
 // Static Site Generation (SSG) to improve performance on static contents.
 export async function generateStaticParams() {
-  const blogPosts = await getBlogPosts()
-  const blogPostsSlugs = blogPosts.map((post) => ({ slug: post.slug }))
+  const blogPostsMetadata = await getBlogPostsMetadata()
+  const blogPostsSlugs = blogPostsMetadata.map((post) => ({ slug: post.slug }))
 
   return blogPostsSlugs
 }
@@ -27,13 +27,14 @@ export default async function Page({ params: { slug } }: Params) {
   if (!post) notFound()
 
   const { metadata, content } = post
-  const { title, cover, tags } = metadata
+
+  const { title, author, cover, tags } = metadata
 
   const postDate = formatDate(metadata.datePublished)
 
   return (
     <section className='pb-24'>
-      <div className='container max-w-2xl'>
+      <div className='container max-w-3xl'>
         <Link
           href='/blogs'
           className={buttonVariants({
@@ -55,11 +56,13 @@ export default async function Page({ params: { slug } }: Params) {
           <h1 className='text-3xl font-bold decoration-border/75 decoration-2'>
             {title}
           </h1>
+
           <p className='mt-3 text-sm text-muted-foreground'>
-            Shrijal Acharya
+            {author ? `${author}` : null}
             {postDate ? <> • {postDate}</> : null}
           </p>
-          {tags && (
+
+          {tags && tags.length > 0 ? (
             <div className='mt-4 flex flex-row flex-wrap gap-2'>
               {tags.map((tag) => (
                 <Badge
@@ -70,11 +73,11 @@ export default async function Page({ params: { slug } }: Params) {
                 </Badge>
               ))}
             </div>
-          )}
+          ) : null}
         </header>
 
-        <main className='prose dark:prose-invert mt-16'>
-          <MDXRemote source={content} />
+        <main className='prose mt-16 max-w-3xl px-4 dark:prose-invert'>
+          <BlogContent source={content} />
         </main>
       </div>
     </section>

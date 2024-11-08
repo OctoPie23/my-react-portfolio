@@ -3,7 +3,7 @@ import { Socials } from '@/components/socials'
 
 export default function Home() {
   return (
-    <section className='container max-w-2xl'>
+    <section className='container max-w-3xl'>
       <HeroIntro />
 
       <Socials />

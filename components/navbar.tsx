@@ -20,7 +20,7 @@ export const Navbar = () => {
   }
 
   return (
-    <header className='container fixed inset-x-0 top-0 z-50 mx-auto max-w-2xl px-2 py-6 backdrop-blur-sm'>
+    <header className='container fixed inset-x-0 top-0 z-50 mx-auto max-w-3xl px-2 py-6 backdrop-blur-sm'>
       <nav className='flex items-center justify-between'>
         <div className='hidden sm:flex'>
           <Link

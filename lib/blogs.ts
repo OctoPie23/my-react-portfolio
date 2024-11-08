@@ -15,11 +15,23 @@ export type BlogPostMetadata = {
   cuid: string
   slug: string
   cover?: string
+  // Hashnode does not provide the author field in their frontmatter
+  // This is a custom field that I have added myself.
+  author?: string
   ogImage?: string
   tags?: string[]
 }
 
 const blogPostsDirectory = path.resolve(process.cwd(), 'content', 'blog-posts')
+
+function parseTags(tags: string | string[]): string[] {
+  if (typeof tags === 'string' && tags.trim()) {
+    return tags.split(',').map((tag) => tag.trim())
+  }
+
+  if (Array.isArray(tags)) return tags
+  return []
+}
 
 function getMDXFiles(dir: string) {
   return fs
@@ -40,13 +52,20 @@ export async function getBlogPostsBySlug(
 
     const { data, content } = matter(blogFileContent)
 
-    return { metadata: data as BlogPostMetadata, content }
+    return {
+      metadata: {
+        ...data,
+        author: 'Shrijal Acharya',
+        tags: parseTags(data.tags),
+      } as BlogPostMetadata,
+      content,
+    }
   } catch {
     return null
   }
 }
 
-export async function getBlogPosts(
+export async function getBlogPostsMetadata(
   limit?: number,
 ): Promise<BlogPostMetadata[]> {
   const blogFiles = getMDXFiles(blogPostsDirectory)
@@ -69,5 +88,9 @@ export function getPostMetadata(blogFilePath: string): BlogPostMetadata {
   })
 
   const { data } = matter(blogFileContent)
-  return { ...data } as BlogPostMetadata
+  return {
+    ...data,
+    author: 'Shrijal Acharya',
+    tags: parseTags(data.tags),
+  } as BlogPostMetadata
 }

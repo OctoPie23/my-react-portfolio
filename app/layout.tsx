@@ -33,11 +33,11 @@ export default function RootLayout({
     // It requires this to be set since, we don't really know the user theme preference on the server side.
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-2xl flex-col px-2 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-3xl flex-col px-2 antialiased`}
       >
         <Providers>
           <Navbar />
-          <main className='mt-40 max-w-2xl grow'>{children}</main>
+          <main className='mt-40 max-w-3xl grow'>{children}</main>
           <Footer />
 
           {/* Vercel Analytics and Speed Insights */}

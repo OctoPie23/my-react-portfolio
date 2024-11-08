@@ -27,7 +27,7 @@ function timeAgo(date: Date): string {
   return 'just now'
 }
 
-export function formatDate(date: string): string | null {
+export function formatDate(date: string, short?: boolean): string | null {
   const parsedDate = new Date(date)
 
   if (isNaN(parsedDate.getTime())) return null
@@ -37,6 +37,8 @@ export function formatDate(date: string): string | null {
     month: 'long',
     day: 'numeric',
   })
+
+  if (short) return standardDate
 
   const timeAgoText = timeAgo(parsedDate)
   return `${standardDate} (${timeAgoText})`
