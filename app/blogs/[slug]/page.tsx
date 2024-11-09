@@ -7,6 +7,7 @@ import { formatDate } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge, badgeVariants } from '@/components/ui/badge'
 import BlogContent from '@/components/blog-content'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 interface Params {
   params: {
@@ -57,10 +58,20 @@ export default function Page({ params: { slug } }: Params) {
             {title}
           </h1>
 
-          <p className='mt-3 text-sm text-muted-foreground'>
-            {author ? `${author}` : null}
-            {postDate ? <> • {postDate}</> : null}
-          </p>
+          <div className='mt-3 flex items-center'>
+            <Avatar className='mr-2 size-8'>
+              <AvatarImage
+                src='https://github.com/shricodev.png'
+                alt='Shrijal Acharya @shricodev'
+              />
+              <AvatarFallback>SA</AvatarFallback>
+            </Avatar>
+
+            <p className='text-sm text-muted-foreground'>
+              {author ? `${author}` : null}
+              {postDate ? ` • ${postDate}` : null}
+            </p>
+          </div>
 
           {tags && tags.length > 0 ? (
             <div className='mt-4 flex flex-row flex-wrap gap-2'>

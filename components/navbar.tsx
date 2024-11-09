@@ -15,12 +15,13 @@ export const Navbar = () => {
   const links = {
     home: '/',
     blogs: '/blogs',
+    projects: '/projects',
     about: '/about',
     contact: '/contact-me',
   }
 
   return (
-    <header className='container fixed inset-x-0 top-0 z-50 mx-auto max-w-3xl px-2 py-6 backdrop-blur-sm'>
+    <header className='container fixed inset-x-0 top-0 z-50 mx-auto max-w-3xl px-4 py-6 backdrop-blur-sm'>
       <nav className='flex items-center justify-between'>
         <div className='hidden sm:flex'>
           <Link
@@ -41,6 +42,11 @@ export const Navbar = () => {
             <li className={getClassnameForLink(links.blogs)}>
               <Link href={links.blogs} className='capitalize'>
                 blogs
+              </Link>
+            </li>
+            <li className={getClassnameForLink(links.projects)}>
+              <Link href={links.projects} className='capitalize'>
+                projects
               </Link>
             </li>
             <li className={getClassnameForLink(links.about)}>
