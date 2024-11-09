@@ -6,7 +6,7 @@ export default function Page() {
 
   return (
     <section className='container max-w-3xl'>
-      <h1 className='mb-12 text-3xl font-bold'>Blogs</h1>
+      <h1 className='title'>Blogs</h1>
       <BlogsWithSearch blogsWithContent={blogsWithContent} />
     </section>
   )

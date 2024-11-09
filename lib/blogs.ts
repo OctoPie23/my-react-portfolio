@@ -7,7 +7,7 @@ const blogPostsDirectory = path.resolve(process.cwd(), 'content', 'blog-posts')
 
 function parseTags(tags: string | string[]): string[] {
   if (typeof tags === 'string' && tags.trim()) {
-    return tags.split(',').map((tag) => tag.trim())
+    return tags.split(',').map(tag => tag.trim())
   }
 
   if (Array.isArray(tags)) return tags
@@ -17,8 +17,8 @@ function parseTags(tags: string | string[]): string[] {
 function getMDXFiles(dir: string): string[] {
   return fs
     .readdirSync(dir, { withFileTypes: true })
-    .filter((dirent) => dirent.isFile() && path.extname(dirent.name) === '.mdx')
-    .map((dirent) => dirent.name)
+    .filter(dirent => dirent.isFile() && path.extname(dirent.name) === '.mdx')
+    .map(dirent => dirent.name)
 }
 
 export function getBlogPostBySlug(slug: string): BlogPost | null {
@@ -75,7 +75,7 @@ export function getBlogPostMetadata(blogFilePath: string): BlogPostMetadata {
 export function getBlogPostsWithContent(limit?: number) {
   const blogFiles = getMDXFiles(blogPostsDirectory)
 
-  const allBlogPosts = blogFiles.map((file) => {
+  const allBlogPosts = blogFiles.map(file => {
     const slug = file.replace(/\.mdx$/, '')
     return getBlogPostBySlug(slug)
   }) as BlogPost[]

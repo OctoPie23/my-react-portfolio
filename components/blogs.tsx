@@ -8,7 +8,7 @@ interface BlogsProps {
 export const Blogs = ({ blogsWithContent }: BlogsProps) => {
   return (
     <ul className='flex flex-col gap-8'>
-      {blogsWithContent.map((blogWithContent) => (
+      {blogsWithContent.map(blogWithContent => (
         <li
           key={`${blogWithContent.metadata.cuid}_${blogWithContent.metadata.slug}`}
         >

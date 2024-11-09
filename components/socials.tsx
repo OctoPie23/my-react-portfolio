@@ -66,14 +66,14 @@ const socialCategories = [
 export const Socials = () => {
   return (
     <div className='my-8 w-full space-y-5'>
-      {socialCategories.map((category) => (
+      {socialCategories.map(category => (
         <div key={category.name} className='space-y-2'>
           <h3 className='text-lg font-semibold capitalize text-muted-foreground'>
             {category.name}
           </h3>
 
           <div className='flex flex-row space-x-2 overflow-x-auto'>
-            {category.items.map((social) => (
+            {category.items.map(social => (
               <Social
                 key={social.name}
                 href={social.href}

@@ -13,9 +13,7 @@ export const HeroIntro = () => {
     <>
       <section className='flex flex-col items-center gap-y-4 md:flex-row md:items-center md:gap-x-10'>
         <div className='flex-1'>
-          <h1 className='mb-8 text-2xl font-medium tracking-tighter no-underline'>
-            Hey, I&#39;m Shrijal 👋
-          </h1>
+          <h1 className='title mb-8 no-underline'>Hey, I&#39;m Shrijal 👋</h1>
           <p className='mt-3 font-light text-muted-foreground'>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit,
             quam voluptas dolores autem consectetur voluptatem cum quia vero

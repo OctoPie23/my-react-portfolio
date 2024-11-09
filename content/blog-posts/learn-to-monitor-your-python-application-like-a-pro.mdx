@@ -1,37 +1,36 @@
 ---
-title: "Learn to monitor your Python Application Like a PRO! 🧙‍♂️🪄"
+title: 'Learn to monitor your Python Application Like a PRO! 🧙‍♂️🪄'
 datePublished: Fri Aug 16 2024 14:15:13 GMT+0000 (Coordinated Universal Time)
 cuid: clzwsk4qy00050am9cic1d0xb
 slug: learn-to-monitor-your-python-application-like-a-pro
 cover: https://cdn.hashnode.com/res/hashnode/image/upload/v1723815380491/08a7a287-b670-45d0-8711-c3ce6018f011.png
 tags: programming-blogs, docker, python, kubernetes, devops
-
 ---
 
 ## TL;DR
 
-In this easy-to-follow tutorial, you'll discover how to keep an eye on your Python application using **distributed tracing**.
+In this easy-to-follow tutorial, you'll discover how to keep an eye on your
+Python application using **distributed tracing**.
 
 **What you will learn: ✨**
 
-* How to build microservices in Python 🐍.
-    
-* Setting up Docker containers 📦 for microservices.
-    
-* Configuring Kubernetes for managing microservices.
-    
-* Integrating a tracing backend for visualizing the traces 🕵️‍♂️.
-    
+- How to build microservices in Python 🐍.
+- Setting up Docker containers 📦 for microservices.
+- Configuring Kubernetes for managing microservices.
+- Integrating a tracing backend for visualizing the traces 🕵️‍♂️.
 
 Ready to light up your Python application monitoring skills? 🔥
 
-![Fire GIF](https://media.giphy.com/media/3o72FfM5HJydzafgUE/giphy.gif align="left")
+![Fire GIF](https://media.giphy.com/media/3o72FfM5HJydzafgUE/giphy.gif
+align="left")
 
 ---
 
 ## Setup Instructions
 
-> 🚨 In this section of the blog, we'll be building a dummy Python microservices application. If you already have one and are following along, feel free to skip this part.
+> 🚨 In this section of the blog, we'll be building a dummy Python microservices
+> application. If you already have one and are following along, feel free to
+> skip this part.
 
 Create the initial folder structure for your application as shown below. 👇
 
@@ -43,13 +42,17 @@ mkdir microservice1 microservice2
 
 ### Setting Up the Server 🖥️
 
-> For demonstration purposes, I will create two microservices that will communicate with each other, and eventually, we can use that to visualize distributed tracing.
+> For demonstration purposes, I will create two microservices that will
+> communicate with each other, and eventually, we can use that to visualize
+> distributed tracing.
 
 #### Building and Dockerizing Microservice 1
 
-Inside the `/microservice1` directory, create a new Python virtual environment, install the necessary dependencies, and initialize a Flask application.
+Inside the `/microservice1` directory, create a new Python virtual environment,
+install the necessary dependencies, and initialize a Flask application.
 
-> 🚨 I assume you are following along on a Unix-based machine. If you are on a Windows machine, some commands will differ.
+> 🚨 I assume you are following along on a Unix-based machine. If you are on a
+> Windows machine, some commands will differ.
 
 ```bash
 cd microservice1
@@ -57,7 +60,8 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-> 💡 If you are on a fish shell, run the below command to activate the virtual environment.
+> 💡 If you are on a fish shell, run the below command to activate the virtual
+> environment.
 
 ```bash
 source .venv/bin/activate.fish
@@ -69,7 +73,8 @@ Install the required dependencies:
 pip install Flask requests
 ```
 
-Get the list of installed dependencies in the `requirements.txt` so that we can later use it in our container to install the dependencies.
+Get the list of installed dependencies in the `requirements.txt` so that we can
+later use it in our container to install the dependencies.
 
 ```bash
 pip freeze > requirements.txt
@@ -112,37 +117,52 @@ if __name__ == "__main__":
     app.run("0.0.0.0", 5000)
 ```
 
-> 💡 If you've noticed, we're requesting data from [`http://microservice2:5001/get-gh-users`](http://microservice2:5001/get-gh-users). You might be wondering, what is this microservice2? Well, we can use service names as host names within the same network in docker. We will build this service later once we finish writing and dockerizing this microservice.
+> 💡 If you've noticed, we're requesting data from
+> [`http://microservice2:5001/get-gh-users`](http://microservice2:5001/get-gh-users).
+> You might be wondering, what is this microservice2? Well, we can use service
+> names as host names within the same network in docker. We will build this
+> service later once we finish writing and dockerizing this microservice.
 
-As you can see, this is a very simple Flask application with a few endpoints. The `user_os_details()` function gets the **Hostname** and **IP address** of the machine.
+As you can see, this is a very simple Flask application with a few endpoints.
+The `user_os_details()` function gets the **Hostname** and **IP address** of the
+machine.
 
-The `@app.route("/")` and `@app.route("/health")` decorators define the root and "/health" endpoints of the Flask app. The "/health" endpoint will be used later to check the container health ❤️‍🩹 in the `Dockerfile`.
+The `@app.route("/")` and `@app.route("/health")` decorators define the root and
+"/health" endpoints of the Flask app. The "/health" endpoint will be used later
+to check the container health ❤️‍🩹 in the `Dockerfile`.
 
-The `@app.route("/get-users")` and `@app.route("/os-details")` decorators define the "/get-users" and "/os-details" endpoints. The "/get-users" endpoint fetches GitHub users from **microservice2** and passes them as props to the `index.html` file for rendering. Meanwhile, the "/os-details" endpoint displays system details. Finally, the application is run on port 5000.
+The `@app.route("/get-users")` and `@app.route("/os-details")` decorators define
+the "/get-users" and "/os-details" endpoints. The "/get-users" endpoint fetches
+GitHub users from **microservice2** and passes them as props to the `index.html`
+file for rendering. Meanwhile, the "/os-details" endpoint displays system
+details. Finally, the application is run on port 5000.
 
-Now, let's create the `index.html` file where we are rendering the received users from microservice2.
+Now, let's create the `index.html` file where we are rendering the received
+users from microservice2.
 
-Create a new folder `/templates` and add an `index.html` file with the following contents:
+Create a new folder `/templates` and add an `index.html` file with the following
+contents:
 
 ```html
 <!-- 👇 src/microservice1/templates/index.html -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Microservice 1</title>
-</head>
-<body>
-  <h1>Microservice 1</h1>
-  <h2>This is the data received from microservice2:</h2>
-  <p>{{ users }}</p>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Microservice 1</title>
+  </head>
+  <body>
+    <h1>Microservice 1</h1>
+    <h2>This is the data received from microservice2:</h2>
+    <p>{{ users }}</p>
+  </body>
 </html>
 ```
 
-Our first microservice is all ready. Let's dockerize it. Create a `Dockerfile` inside the `/microservice1` directory and add the following lines of code:
+Our first microservice is all ready. Let's dockerize it. Create a `Dockerfile`
+inside the `/microservice1` directory and add the following lines of code:
 
 > 🚨 Make sure to name it exactly `Dockerfile` with no extensions.
 
@@ -172,15 +192,16 @@ USER root
 RUN apk --no-cache add curl
 # Switch back to user lowkey
 USER lowkey
-# Check the health of the container. The "/health" endpoint is used 
+# Check the health of the container. The "/health" endpoint is used
 # to verify the container is up and running.
-HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=5 \ 
+HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=5 \
             CMD curl -f http://localhost:5000/health || exit 1
 # Finally, start the application.
 ENTRYPOINT [ "python", "app.py" ]
 ```
 
-Create a `.dockerignore` file with the names of the files we don't want to push to the container.
+Create a `.dockerignore` file with the names of the files we don't want to push
+to the container.
 
 ```plaintext
 __pycache__
@@ -194,9 +215,12 @@ Now, that is the entire setup for our first microservice. ✨
 
 #### Building and Dockerizing Microservice 2
 
-We will have a setup similar to **microservice1**, with just a few changes here and there.
+We will have a setup similar to **microservice1**, with just a few changes here
+and there.
 
-Do the exact initial setup as we did for the **microservice1**. After that, in the `/microservice2` folder, create an [`app.py`](http://app.py) file and add the following lines of code:
+Do the exact initial setup as we did for the **microservice1**. After that, in
+the `/microservice2` folder, create an [`app.py`](http://app.py) file and add
+the following lines of code:
 
 ```python
 # 👇 src/microservice2/app.py
@@ -256,35 +280,50 @@ if __name__ == "__main__":
     app.run("0.0.0.0", 5001)
 ```
 
-The `@app.route("/")` decorator defines the root endpoint of the Flask app, returning a welcome message. The `@app.route("/health")` decorator defines the "/health" endpoint, which can be used to check the health status of the container.
+The `@app.route("/")` decorator defines the root endpoint of the Flask app,
+returning a welcome message. The `@app.route("/health")` decorator defines the
+"/health" endpoint, which can be used to check the health status of the
+container.
 
-The `@app.route("/get-gh-users")` decorator defines the "/get-gh-users" endpoint, which uses the `get_gh_users()` function to fetch GitHub users and return them as a JSON response. Lastly, the `@app.route("/os-details")` decorator defines the "/os-details" endpoint, which retrieves operating system details from **microservice1** and renders them in the `index.html` file. Finally, the application runs on port 5001.
+The `@app.route("/get-gh-users")` decorator defines the "/get-gh-users"
+endpoint, which uses the `get_gh_users()` function to fetch GitHub users and
+return them as a JSON response. Lastly, the `@app.route("/os-details")`
+decorator defines the "/os-details" endpoint, which retrieves operating system
+details from **microservice1** and renders them in the `index.html` file.
+Finally, the application runs on port 5001.
 
-Now, let's create the `index.html` file where we are rendering the received users from **microservice2**.
+Now, let's create the `index.html` file where we are rendering the received
+users from **microservice2**.
 
-Create a new folder `/templates` and add an `index.html` file with the following contents:
+Create a new folder `/templates` and add an `index.html` file with the following
+contents:
 
 ```html
 <!-- 👇 src/microservice2/templates/index.html -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Microservice 2</title>
-</head>
-<body>
-  <h1>Microservice 2</h1>
-  <h2>This is the hostname and IP address received from the microservice1:</h2>
-  <p>{{ hostname }} - {{ hostip }}</p>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Microservice 2</title>
+  </head>
+  <body>
+    <h1>Microservice 2</h1>
+    <h2>
+      This is the hostname and IP address received from the microservice1:
+    </h2>
+    <p>{{ hostname }} - {{ hostip }}</p>
+  </body>
 </html>
 ```
 
-Now, it's time to dockerize this microservice as well. Copy and paste the entire `Dockerfile` content for **microservice1** and just change the port from 5000 to 5001.
+Now, it's time to dockerize this microservice as well. Copy and paste the entire
+`Dockerfile` content for **microservice1** and just change the port from 5000
+to 5001.
 
-Also, add a `.dockerignore` file and include the same files that we added when creating **microservice1**.
+Also, add a `.dockerignore` file and include the same files that we added when
+creating **microservice1**.
 
 Now, that is the entire setup for our second microservice as well. ✨
 
@@ -292,9 +331,13 @@ Now, that is the entire setup for our second microservice as well. ✨
 
 #### Building Dockerfiles with Docker Compose
 
-> We will follow the best practices of image building by using Docker Compose instead of building each image manually. Here we have only two images, but imagine if we had hundreds or thousands of Dockerfiles. Building each manually would be a tedious task. 😴
+> We will follow the best practices of image building by using Docker Compose
+> instead of building each image manually. Here we have only two images, but
+> imagine if we had hundreds or thousands of Dockerfiles. Building each manually
+> would be a tedious task. 😴
 
-In the root of the project, create a new file named `docker-compose.yaml` and add the following code:
+In the root of the project, create a new file named `docker-compose.yaml` and
+add the following code:
 
 ```yaml
 services:
@@ -304,7 +347,7 @@ services:
       dockerfile: Dockerfile
     image: microservice1-image:1.0
     ports:
-      - "5000:5000"
+      - '5000:5000'
     restart: always
 
   microservice2:
@@ -313,13 +356,18 @@ services:
       dockerfile: Dockerfile
     image: microservice2-image:1.0
     ports:
-      - "5001:5001"
+      - '5001:5001'
     restart: always
 ```
 
-This Docker Compose file defines two services, **microservice1** and **microservice2**. Each service is built using its respective `Dockerfile` located in the `/src` directory, with **microservice1** mapped to port 5000 and **microservice2** to port 5001.
+This Docker Compose file defines two services, **microservice1** and
+**microservice2**. Each service is built using its respective `Dockerfile`
+located in the `/src` directory, with **microservice1** mapped to port 5000 and
+**microservice2** to port 5001.
 
-The resulting images are tagged `microservice1-image:1.0` and `microservice2-image:1.0`, respectively. Both services are set to restart always, making sure if the container fails it restarts.
+The resulting images are tagged `microservice1-image:1.0` and
+`microservice2-image:1.0`, respectively. Both services are set to restart
+always, making sure if the container fails it restarts.
 
 Now, build the images using the following command:
 
@@ -327,15 +375,19 @@ Now, build the images using the following command:
 docker compose build
 ```
 
-![Docker Compose build output](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xhxtoziuxi62finv5hjc.png align="left")
+![Docker Compose build output](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xhxtoziuxi62finv5hjc.png
+align="left")
 
 ---
 
 ## Deployment on Kubernetes 🧑‍🚀
 
-> Make sure [**Minikube**](https://github.com/kubernetes/minikube) is installed, or follow [**this**](https://minikube.sigs.k8s.io/docs/start/) link for installation instructions. 👀
+> Make sure [**Minikube**](https://github.com/kubernetes/minikube) is installed,
+> or follow [**this**](https://minikube.sigs.k8s.io/docs/start/) link for
+> installation instructions. 👀
 
-Create a new local Kubernetes cluster, by running the following command. We will need it when setting up Odigos and Jaeger.
+Create a new local Kubernetes cluster, by running the following command. We will
+need it when setting up Odigos and Jaeger.
 
 **Start Minikube: 🚀**
 
@@ -343,9 +395,11 @@ Create a new local Kubernetes cluster, by running the following command. We will
 minikube start
 ```
 
-![Starting Minikube](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o6bbtf5jeu64dll2uzgj.png align="left")
+![Starting Minikube](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o6bbtf5jeu64dll2uzgj.png
+align="left")
 
-Since we are running on a local Kubernetes environment, we need to point our shell to use the minikube's docker-daemon.
+Since we are running on a local Kubernetes environment, we need to point our
+shell to use the minikube's docker-daemon.
 
 To point your shell to minikube's docker-daemon, run:
 
@@ -353,18 +407,24 @@ To point your shell to minikube's docker-daemon, run:
 minikube -p minikube docker-env | source
 ```
 
-And now, when running any Docker commands such as `docker images` or `docker ps`, you will see what is inside Minikube rather than what you have locally on your system.
+And now, when running any Docker commands such as `docker images` or
+`docker ps`, you will see what is inside Minikube rather than what you have
+locally on your system.
 
-Now that we have both of our microservices ready and dockerized, it's time to set up Kubernetes for managing these services.
+Now that we have both of our microservices ready and dockerized, it's time to
+set up Kubernetes for managing these services.
 
-At the root of the project, create a new folder `/k8s/manifests`. Inside this folder, we will add deployment and service configurations for both of our microservices.
+At the root of the project, create a new folder `/k8s/manifests`. Inside this
+folder, we will add deployment and service configurations for both of our
+microservices.
 
-* **Deployment Configuration 📜**: For actually deploying the containers on the Kubernetes Cluster.
-    
-* **Service Configuration 📄**: To expose the pods to both within the cluster and outside the cluster.
-    
+- **Deployment Configuration 📜**: For actually deploying the containers on the
+  Kubernetes Cluster.
+- **Service Configuration 📄**: To expose the pods to both within the cluster
+  and outside the cluster.
 
-First, let's create the manifest for the `microservice1`. Create a new file `microservice1-deployment-service.yaml` and add the following content:
+First, let's create the manifest for the `microservice1`. Create a new file
+`microservice1-deployment-service.yaml` and add the following content:
 
 ```yaml
 // 👇 k8s/manifests/microservice1-deployment-service.yaml
@@ -408,13 +468,22 @@ spec:
       nodePort: 30001
 ```
 
-This configuration deploys a microservice named **microservice1** with resource limits of **200MB memory** 🗃️ and **0.5 CPU cores**. It exposes the microservice internally on port 5000 through a Deployment and externally on **NodePort** 30001 through a Service.
+This configuration deploys a microservice named **microservice1** with resource
+limits of **200MB memory** 🗃️ and **0.5 CPU cores**. It exposes the microservice
+internally on port 5000 through a Deployment and externally on **NodePort**
+30001 through a Service.
 
-> 🤔 Remember the `docker-compose build` command we used when building our Dockerfiles, especially the image names? We are using the same images to create the containers.
+> 🤔 Remember the `docker-compose build` command we used when building our
+> Dockerfiles, especially the image names? We are using the same images to
+> create the containers.
 
-It is accessible on port 8080 within the cluster. We assume `microservice1-image:1.0` is locally available with `imagePullPolicy: Never`. If this is not in place, it would attempt to pull the image from the Docker Hub 🐋 and fail.
+It is accessible on port 8080 within the cluster. We assume
+`microservice1-image:1.0` is locally available with `imagePullPolicy: Never`. If
+this is not in place, it would attempt to pull the image from the Docker Hub 🐋
+and fail.
 
-Now, let's create the manifest for **microservice2**. Create a new file named `microservice2-deployment-service.yaml` and add the following content:
+Now, let's create the manifest for **microservice2**. Create a new file named
+`microservice2-deployment-service.yaml` and add the following content:
 
 ```yaml
 // 👇 k8s/manifests/microservice2-deployment-service.yaml
@@ -460,44 +529,60 @@ spec:
 
 It is similar to the manifest for `microservice1`, with just a few changes.
 
-This configuration deploys a microservice named **microservice2** and exposes it internally on port 5001 through a Deployment and externally on **NodePort** 30002 through a Service.
+This configuration deploys a microservice named **microservice2** and exposes it
+internally on port 5001 through a Deployment and externally on **NodePort**
+30002 through a Service.
 
-Accessible on port 8081 within the cluster, assuming the `microservice2-image:1.0` is locally available with `imagePullPolicy: Never`.
+Accessible on port 8081 within the cluster, assuming the
+`microservice2-image:1.0` is locally available with `imagePullPolicy: Never`.
 
-Once, this is all done, make sure to apply these configurations and start the Kubernetes cluster with these services. Change the directory to `/manifests` and execute the following commands:
+Once, this is all done, make sure to apply these configurations and start the
+Kubernetes cluster with these services. Change the directory to `/manifests` and
+execute the following commands:
 
 ```bash
 kubectl apply -f microservice1-deployment-service.yaml
 kubectl apply -f microservice2-deployment-service.yaml
 ```
 
-Check that both our deployments are **Running** by executing the following command:
+Check that both our deployments are **Running** by executing the following
+command:
 
 ```bash
 kubectl get pods
 ```
 
-![Kubernetes Pods](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/mad4wzglev0ur2f4rpsl.png align="left")
+![Kubernetes Pods](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/mad4wzglev0ur2f4rpsl.png
+align="left")
 
-Finally, our application is ready and deployed on Kubernetes with the necessary deployment configurations. 🎊
+Finally, our application is ready and deployed on Kubernetes with the necessary
+deployment configurations. 🎊
 
 ---
 
 ## Installing Odigos 🧑‍💻
 
-> 💡 [**Odigos**](https://odigos.io/) is an open-source observability control plane that enables organizations to create and maintain their observability pipeline. In short, we will use Odigos to auto-instrument our Python application.
+> 💡 [**Odigos**](https://odigos.io/) is an open-source observability control
+> plane that enables organizations to create and maintain their observability
+> pipeline. In short, we will use Odigos to auto-instrument our Python
+> application.
 
-![Odigos - Monitoring Tool](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/kinajglw5njvt49bda98.jpg align="left")
+![Odigos - Monitoring Tool](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/kinajglw5njvt49bda98.jpg
+align="left")
 
-> ℹ️ If you are running on a Mac run the following command to install Odigos locally.
+> ℹ️ If you are running on a Mac run the following command to install Odigos
+> locally.
 
 ```bash
 brew install keyval-dev/homebrew-odigos-cli/odigos
 ```
 
-> ℹ️ If you are on a Linux machine, consider installing it from GitHub releases by executing the following commands. Make sure to change the file according to your Linux distribution.
+> ℹ️ If you are on a Linux machine, consider installing it from GitHub releases
+> by executing the following commands. Make sure to change the file according to
+> your Linux distribution.
 
-> ℹ️ If the Odigos binary is not executable, run this command `chmod +x odigos` to make it executable before running the install command.
+> ℹ️ If the Odigos binary is not executable, run this command `chmod +x odigos`
+> to make it executable before running the install command.
 
 ```bash
 curl -LJO https://github.com/keyval-dev/odigos/releases/download/v1.0.15/cli_1.0.15_linux_amd64.tar.gz
@@ -505,25 +590,33 @@ tar -xvzf cli_1.0.15_linux_amd64.tar.gz
 ./odigos install
 ```
 
-![Odigos Installation](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/41v3a8n4b75v2enwaldr.png align="left")
+![Odigos Installation](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/41v3a8n4b75v2enwaldr.png
+align="left")
 
-> If you need more brief instructions on its installation, follow this [**link**](https://docs.odigos.io/installation).
+> If you need more brief instructions on its installation, follow this
+> [**link**](https://docs.odigos.io/installation).
 
-Now, Odigos is ready to run 🚀. We can execute its UI, configure the tracing backend, and send traces accordingly.
+Now, Odigos is ready to run 🚀. We can execute its UI, configure the tracing
+backend, and send traces accordingly.
 
 ---
 
 ## Connecting Odigos to a Tracing Backend ✨
 
-> 💡 [**Jaeger**](https://github.com/jaegertracing/jaeger) is an open source, end-to-end distributed tracing system.
+> 💡 [**Jaeger**](https://github.com/jaegertracing/jaeger) is an open source,
+> end-to-end distributed tracing system.
 
-![Jaeger - Distributed Tracing Platform](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/44r3z7w35hlib6yvuup3.jpg align="left")
+![Jaeger - Distributed Tracing Platform](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/44r3z7w35hlib6yvuup3.jpg
+align="left")
 
 ### Setting up Jaeger ✨
 
-For this tutorial, we will use **Jaeger** 🕵️‍♂️, a popular open-source platform for viewing distributed traces in a microservices application. We will use it to view the traces generated by Odigos.
+For this tutorial, we will use **Jaeger** 🕵️‍♂️, a popular open-source platform for
+viewing distributed traces in a microservices application. We will use it to
+view the traces generated by Odigos.
 
-> For Jaeger installation instructions, follow this [**link**](https://www.jaegertracing.io/download/). 👀
+> For Jaeger installation instructions, follow this
+> [**link**](https://www.jaegertracing.io/download/). 👀
 
 To deploy Jaeger on a Kubernetes cluster, run the following commands:
 
@@ -532,7 +625,8 @@ kubectl create ns tracing
 kubectl apply -f https://raw.githubusercontent.com/keyval-dev/opentelemetry-go-instrumentation/master/docs/getting-started/jaeger.yaml -n tracing
 ```
 
-Here, we are creating a `tracing` namespace and applying the deployment configuration 📃 for Jaeger in that namespace.
+Here, we are creating a `tracing` namespace and applying the deployment
+configuration 📃 for Jaeger in that namespace.
 
 This command sets up the self-hosted Jaeger instance and its service.
 
@@ -544,23 +638,30 @@ kubectl get pods -A -w
 
 Wait for all three pods to be **Running** before proceeding further.
 
-![Kubernetes Pods](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o7et78uptt1lmhekjvgv.png align="left")
+![Kubernetes Pods](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o7et78uptt1lmhekjvgv.png
+align="left")
 
-Now, to view the Jaeger Interface locally, we need to port forward. Forward traffic from port 16686 on the local machine to port 16686 on the selected pod within the Kubernetes cluster.
+Now, to view the Jaeger Interface locally, we need to port forward. Forward
+traffic from port 16686 on the local machine to port 16686 on the selected pod
+within the Kubernetes cluster.
 
 ```bash
 kubectl port-forward -n tracing svc/jaeger 16686:16686
 ```
 
-This command creates a tunnel between the local machine and the Jaeger pod, exposing the Jaeger UI so you can interact with it.
+This command creates a tunnel between the local machine and the Jaeger pod,
+exposing the Jaeger UI so you can interact with it.
 
-![Jaeger Port forwarding](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/root5frtl55cdnq6ap1h.png align="left")
+![Jaeger Port forwarding](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/root5frtl55cdnq6ap1h.png
+align="left")
 
-Now, on [`http://localhost:16686`](http://localhost:16686), you should be able to see the Jaeger instance running.
+Now, on [`http://localhost:16686`](http://localhost:16686), you should be able
+to see the Jaeger instance running.
 
 ### Configuring Odigos to Work with Jaeger 🌟
 
-> ℹ️ For Linux users, go to the folder where you downloaded the Odigos binaries from GitHub releases and run the following command to launch the Odigos UI.
+> ℹ️ For Linux users, go to the folder where you downloaded the Odigos binaries
+> from GitHub releases and run the following command to launch the Odigos UI.
 
 ```bash
 ./odigos ui
@@ -572,46 +673,58 @@ Now, on [`http://localhost:16686`](http://localhost:16686), you should be able t
 odigos ui
 ```
 
-Visit [`http://localhost:3000`](http://localhost:3000) and you will be presented with the Odigos interface where you will see both deployments in the `default` namespace.
+Visit [`http://localhost:3000`](http://localhost:3000) and you will be presented
+with the Odigos interface where you will see both deployments in the `default`
+namespace.
 
-![Odigos Initial UI](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/2fk7m0mizp0zl9g1j468.png align="left")
+![Odigos Initial UI](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/2fk7m0mizp0zl9g1j468.png
+align="left")
 
-Select both of these and click Next. On the next page, choose Jaeger as the backend, and add the following details when prompted:
+Select both of these and click Next. On the next page, choose Jaeger as the
+backend, and add the following details when prompted:
 
-* **Destination Name**: Give any name you want, let's say **python-tracing**.
-    
-* **Endpoint 🎯**: Add `jaeger.tracing:4317` for the endpoint.
-    
+- **Destination Name**: Give any name you want, let's say **python-tracing**.
+- **Endpoint 🎯**: Add `jaeger.tracing:4317` for the endpoint.
 
-And that's it — Odigos is all set to send traces to our Jaeger backend. It's that simple.
+And that's it — Odigos is all set to send traces to our Jaeger backend. It's
+that simple.
 
-![Odigos tool setup to send traces to Jaeger Tracing](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ot8wcuihqrsm9nmz2wcx.png align="left")
+![Odigos tool setup to send traces to Jaeger Tracing](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ot8wcuihqrsm9nmz2wcx.png
+align="left")
 
 ---
 
 ## Viewing Distributed Tracing 🧐
 
-Odigos has already begun sending traces of our application to Jaeger as soon as we set up Odigos to work with Jaeger as our tracing backend.
+Odigos has already begun sending traces of our application to Jaeger as soon as
+we set up Odigos to work with Jaeger as our tracing backend.
 
-Visit [`http://localhost:16686`](http://localhost:16686) and select both our microservices in the dropdown.
+Visit [`http://localhost:16686`](http://localhost:16686) and select both our
+microservices in the dropdown.
 
-![Jaeger UI dropdown for selecting microservices](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/9idl3pa7lcp5yz4uk36u.png align="left")
+![Jaeger UI dropdown for selecting microservices](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/9idl3pa7lcp5yz4uk36u.png
+align="left")
 
-Make a few requests to our endpoints, and eventually, Jaeger will begin to populate with traces.
+Make a few requests to our endpoints, and eventually, Jaeger will begin to
+populate with traces.
 
 Click on any of the requests and explore the traces.
 
-![Jaeger Request Traces](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rzmx6i9p476oj7nm6wj6.png align="left")
+![Jaeger Request Traces](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rzmx6i9p476oj7nm6wj6.png
+align="left")
 
 This was all done without changing a single line of code. 🔥
 
-![Wow GIF](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/yzjxzhoqamfdvr2lypqj.gif align="left")
+![Wow GIF](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/yzjxzhoqamfdvr2lypqj.gif
+align="left")
 
 ---
 
 ## Wrap-Up! ⚡
 
-So far, you've learned to closely monitor 👀 your Python application with distributed tracing, using **Odigos** as the **middleware** between your application and the tracing backend **Jaeger**.
+So far, you've learned to closely monitor 👀 your Python application with
+distributed tracing, using **Odigos** as the **middleware** between your
+application and the tracing backend **Jaeger**.
 
 The source code for this tutorial is available here:
 

@@ -24,24 +24,24 @@ export default function BlogsWithSearch({
 
   return (
     <>
-      <div className='mb-12 flex items-center gap-3'>
+      <div className='mb-10 flex items-center gap-3'>
         <Input
           autoFocus
           type='text'
           placeholder='Search blogs...'
-          className='h-9 w-full sm:w-96'
+          className='h-9 w-full sm:w-1/2'
           value={filterText}
           onChange={event => setFilterText(event.target.value)}
         />
         {filterText.length > 0 && (
           <Button
-            size='sm'
+            size='default'
             variant='secondary'
             onClick={resetFilter}
             className='h-8 px-2 lg:px-3'
           >
             Reset
-            <CrossIcon className='ml-2 size-6' />
+            <CrossIcon className='size-5' />
           </Button>
         )}
       </div>

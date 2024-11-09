@@ -17,7 +17,7 @@ interface Params {
 // Static Site Generation (SSG) to improve performance on static contents.
 export async function generateStaticParams() {
   const blogPostsMetadata = getBlogPostsMetadata()
-  const blogPostsSlugs = blogPostsMetadata.map((post) => ({ slug: post.slug }))
+  const blogPostsSlugs = blogPostsMetadata.map(post => ({ slug: post.slug }))
 
   return blogPostsSlugs
 }
@@ -64,7 +64,7 @@ export default function Page({ params: { slug } }: Params) {
 
           {tags && tags.length > 0 ? (
             <div className='mt-4 flex flex-row flex-wrap gap-2'>
-              {tags.map((tag) => (
+              {tags.map(tag => (
                 <Badge
                   key={tag}
                   className={badgeVariants({ variant: 'secondary' })}
