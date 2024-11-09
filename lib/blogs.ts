@@ -1,26 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import matter from 'gray-matter'
-
-export type BlogPost = {
-  metadata: BlogPostMetadata
-  content: string
-}
-
-export type BlogPostMetadata = {
-  title: string
-  seoTitle?: string
-  seoDescription?: string
-  datePublished: string
-  cuid: string
-  slug: string
-  cover?: string
-  // Hashnode does not provide the author field in their frontmatter
-  // This is a custom field that I have added myself.
-  author?: string
-  ogImage?: string
-  tags?: string[]
-}
+import { BlogPost, BlogPostMetadata } from '@/types/blogs'
 
 const blogPostsDirectory = path.resolve(process.cwd(), 'content', 'blog-posts')
 
@@ -33,16 +14,14 @@ function parseTags(tags: string | string[]): string[] {
   return []
 }
 
-function getMDXFiles(dir: string) {
+function getMDXFiles(dir: string): string[] {
   return fs
     .readdirSync(dir, { withFileTypes: true })
     .filter((dirent) => dirent.isFile() && path.extname(dirent.name) === '.mdx')
     .map((dirent) => dirent.name)
 }
 
-export async function getBlogPostsBySlug(
-  slug: string,
-): Promise<BlogPost | null> {
+export function getBlogPostBySlug(slug: string): BlogPost | null {
   const blogPostFilePath = path.join(blogPostsDirectory, `${slug}.mdx`)
 
   try {
@@ -57,34 +36,32 @@ export async function getBlogPostsBySlug(
         ...data,
         author: 'Shrijal Acharya',
         tags: parseTags(data.tags),
-      } as BlogPostMetadata,
+      },
       content,
-    }
+    } as BlogPost
   } catch {
     return null
   }
 }
 
-export async function getBlogPostsMetadata(
-  limit?: number,
-): Promise<BlogPostMetadata[]> {
+export function getBlogPostsMetadata(limit?: number): BlogPostMetadata[] {
   const blogFiles = getMDXFiles(blogPostsDirectory)
 
-  const blogPosts = blogFiles
-    .map(getPostMetadata)
+  const blogPostsMetadata = blogFiles
+    .map(getBlogPostMetadata)
     .sort(
       (a, b) =>
         new Date(b.datePublished ?? '').getTime() -
         new Date(a.datePublished ?? '').getTime(),
     )
 
-  return limit ? blogPosts.slice(0, limit) : blogPosts
+  return limit ? blogPostsMetadata.slice(0, limit) : blogPostsMetadata
 }
 
-export function getPostMetadata(blogFilePath: string): BlogPostMetadata {
+export function getBlogPostMetadata(blogFilePath: string): BlogPostMetadata {
   const blogPostAbsFilePath = path.join(blogPostsDirectory, blogFilePath)
   const blogFileContent = fs.readFileSync(blogPostAbsFilePath, {
-    encoding: 'utf8',
+    encoding: 'utf-8',
   })
 
   const { data } = matter(blogFileContent)
@@ -93,4 +70,15 @@ export function getPostMetadata(blogFilePath: string): BlogPostMetadata {
     author: 'Shrijal Acharya',
     tags: parseTags(data.tags),
   } as BlogPostMetadata
+}
+
+export function getBlogPostsWithContent(limit?: number) {
+  const blogFiles = getMDXFiles(blogPostsDirectory)
+
+  const allBlogPosts = blogFiles.map((file) => {
+    const slug = file.replace(/\.mdx$/, '')
+    return getBlogPostBySlug(slug)
+  }) as BlogPost[]
+
+  return limit ? allBlogPosts.slice(0, limit) : allBlogPosts
 }

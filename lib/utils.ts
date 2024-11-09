@@ -43,3 +43,11 @@ export function formatDate(date: string, short?: boolean): string | null {
   const timeAgoText = timeAgo(parsedDate)
   return `${standardDate} (${timeAgoText})`
 }
+
+export function wordsCount(text: string) {
+  return text.trim().split(/\s+/).length
+}
+
+export function minRead(wordCount: number, wordsPerMinute: number) {
+  return Math.floor(wordCount / wordsPerMinute)
+}

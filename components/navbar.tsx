@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ThemeToggle } from './theme-toggle'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { usePathname } from 'next/navigation'
 
 export const Navbar = () => {

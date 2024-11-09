@@ -3,7 +3,7 @@
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { Loader, SunIcon, MoonIcon } from '@/components/icons'
-import { Button } from './ui/button'
+import { Button } from '@/components/ui/button'
 
 export const ThemeToggle = () => {
   const { resolvedTheme, setTheme } = useTheme()

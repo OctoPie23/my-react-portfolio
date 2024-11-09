@@ -1,4 +1,4 @@
-import { getBlogPostsBySlug, getBlogPostsMetadata } from '@/lib/blogs'
+import { getBlogPostBySlug, getBlogPostsMetadata } from '@/lib/blogs'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,14 +16,14 @@ interface Params {
 
 // Static Site Generation (SSG) to improve performance on static contents.
 export async function generateStaticParams() {
-  const blogPostsMetadata = await getBlogPostsMetadata()
+  const blogPostsMetadata = getBlogPostsMetadata()
   const blogPostsSlugs = blogPostsMetadata.map((post) => ({ slug: post.slug }))
 
   return blogPostsSlugs
 }
 
-export default async function Page({ params: { slug } }: Params) {
-  const post = await getBlogPostsBySlug(slug)
+export default function Page({ params: { slug } }: Params) {
+  const post = getBlogPostBySlug(slug)
   if (!post) notFound()
 
   const { metadata, content } = post

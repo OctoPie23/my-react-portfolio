@@ -1,30 +1,18 @@
-import Link from 'next/link'
+import { BlogPost } from '@/types/blogs'
+import { BlogCard } from '@/components/blog-card'
 
-import { BlogPostMetadata } from '@/lib/blogs'
-import { formatDate } from '@/lib/utils'
+interface BlogsProps {
+  blogsWithContent: BlogPost[]
+}
 
-export const Blogs = ({
-  blogsMetadata,
-}: {
-  blogsMetadata: BlogPostMetadata[]
-}) => {
+export const Blogs = ({ blogsWithContent }: BlogsProps) => {
   return (
     <ul className='flex flex-col gap-8'>
-      {blogsMetadata.map((blogMetadata) => (
-        <li key={blogMetadata.slug}>
-          <Link
-            href={`/blogs/${blogMetadata.slug}`}
-            className='flex flex-col justify-between gap-x-4 gap-y-1 sm:flex-row'
-          >
-            {blogMetadata.datePublished ? (
-              <p className='mt-1 text-sm font-light text-muted-foreground'>
-                {formatDate(blogMetadata.datePublished, true)}
-              </p>
-            ) : null}
-            <p className='max-w-lg text-lg font-semibold'>
-              {blogMetadata.title}
-            </p>
-          </Link>
+      {blogsWithContent.map((blogWithContent) => (
+        <li
+          key={`${blogWithContent.metadata.cuid}_${blogWithContent.metadata.slug}`}
+        >
+          <BlogCard blogWithContent={blogWithContent} />
         </li>
       ))}
     </ul>
