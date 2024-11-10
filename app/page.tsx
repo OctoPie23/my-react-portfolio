@@ -1,4 +1,5 @@
 import { HeroIntro } from '@/components/hero-intro'
+import { NewsletterForm } from '@/components/newsletter-form'
 import RecentPosts from '@/components/recent-blogs'
 import { Socials } from '@/components/socials'
 import { getBlogPostsWithContent } from '@/lib/blogs'
@@ -13,6 +14,8 @@ export default function Home() {
       <RecentPosts blogsWithContent={blogsWithContent} />
 
       <Socials />
+
+      <NewsletterForm />
     </section>
   )
 }

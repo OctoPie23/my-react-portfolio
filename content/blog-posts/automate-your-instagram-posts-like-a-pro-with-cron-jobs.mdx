@@ -1,0 +1,1295 @@
+---
+title: "Automate your Instagram Posts like a PRO with Cron jobs! 🚀"
+datePublished: Sat Aug 10 2024 14:24:27 GMT+0000 (Coordinated Universal Time)
+cuid: clztwb9q2001c09md96lbegfh
+slug: automate-your-instagram-posts-like-a-pro-with-cron-jobs
+cover: https://cdn.hashnode.com/res/hashnode/image/upload/v1723642617520/487ee2a7-7618-4242-9439-e3f87004fdc2.png
+
+---
+
+## TL;DR ✨
+
+In this easy-to-follow tutorial, you will learn how to build your own Instagram Automation tool from scratch with cron jobs. 😎
+
+**What you will learn: 👀**
+
+- Learn how to set up **logging** in a Python project.
+- Learn to add cron jobs in Unix based OS using the **python-crontab** module.
+- Learn how to post on Instagram with the **instagrapi** module.
+
+So, are you ready to build the coolest Instagram automation tool? 😉
+
+![Ready GIF](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExenA5eDcwZGdzYW1rOHVldnZ1dGplMTdhZXdxMXJkMnpmdW9qenc2ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/t3sZxY5zS5B0z5zMIz/giphy-downsized-large.gif)
+
+***
+
+## Setting Up the Environment ⚙️
+
+Before we dive any deeper into building the project, take a look at the project architecture to get a brief idea of the layout.
+
+![Project Architecture](https://cdn.hashnode.com/res/hashnode/image/upload/v1723642614089/07788018-30b9-481a-8f3b-4ba0c7b679a6.png)
+
+> 💁 We are going to build this project from scratch, making it production-ready with logging support and everything structured in classes and functions.
+
+### Initializing the Project 🛠️
+
+Create a folder to keep all your source code for the project:
+
+```bash
+mkdir insta-cron-post-automation
+cd insta-cron-post-automation
+```
+
+Create a few new subfolders where we will store the post data, logs, and shell scripts:
+
+```bash
+mkdir -p data logs src/scripts
+```
+
+Now that the initial folder structure is set up, it's time to create a new virtual environment and install all the modules we will be using in our project.
+
+Run these commands to create and activate a new virtual environment in the root of our project:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate # If you are using fish shell, change the activate binary to activate.fish
+```
+
+Run this command to install all the necessary modules we will be using in our project:
+
+```bash
+pip3 install instagrapi python-crontab python-dotenv lorem numpy pillow
+```
+
+Here is what each module is used for:
+
+- `instagrapi`: Login and post to Instagram.
+- `python-crontab`: Create and edit the user's crontable.
+- `python-dotenv`: Read environment variables from the `.env` file.
+
+**Optional Modules**
+
+- `lorem`: Generate dummy description for creating sample posts.
+- `numpy`: Generate random pixel data for creating images for our sample posts.
+- `pillow`: Create sample images using the pixel data from NumPy.
+
+## Let's Code It 💻
+
+![Fire GIF](https://cdn.hashnode.com/res/hashnode/image/upload/v1723642615950/94ca7118-8e33-4866-9423-515d29225e2b.gif)
+
+### Setting Up Logging 📋
+
+> 💡 Since our tool operates at specific times provided by the user with a cron job, we can’t rely on print statements to log the output. Everything happens in the background, so we need a central place to view the logs of our program such as a log file.
+
+For logging support, we will use our old Python friend, the `logging` module.
+
+Inside the `src` directory, add a file named `logger_config.py` with the following code:
+
+> 💡 Note that I am using the `typing` module to set types for variables. After working with TypeScript for so long, I can't resist using type definitions 🫠.
+
+```python
+# 👇 insta-cron-post-automation/src/logger_config.py
+import logging
+
+
+def get_logger(log_file: str) -> logging.Logger:
+    """
+    Creates and configures a logger to log messages to a specified file.
+
+    This function sets up a logger with an INFO logging level, adds a file handler
+    to direct log messages to the specified log file, and applies a specific log
+    message format.
+
+    Args:
+        log_file (str): The path to the log file where log messages will be saved.
+
+    Returns:
+        logging.Logger: Configured logger instance.
+    """
+
+    # Create a logger instance
+    logger = logging.getLogger()
+
+    # Set the logging level to INFO
+    logger.setLevel(logging.INFO)
+
+    # Create a file handler to write log messages to the specified file
+    file_handler = logging.FileHandler(log_file)
+
+    # Define the format for log messages
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    file_handler.setFormatter(formatter)
+
+    # Add the file handler to the logger
+    logger.addHandler(file_handler)
+
+    return logger
+```
+
+So, this `get_logger()` function takes a path to the log file where it needs to store all the logs instead of logging them to the console. It then creates a logger instance and returns it.
+
+Now, with this function set up, we can call it anywhere in our project, and it will maintain the same logging configuration. 😎
+
+### Implementing Instagram Login 🔑
+
+Create a new file called `setup.py` inside the `src` directory with the following code:
+
+```python
+# 👇 insta-cron-post-automation/src/setup.py
+import logging
+import os
+import sys
+from typing import NoReturn, Tuple
+
+from dotenv import load_dotenv
+from instagrapi import Client
+
+
+def log_and_exit(logger: logging.Logger, message: str) -> NoReturn:
+    """
+    Log an error message and exit the program.
+
+    Args:
+    - logger (logging.Logger): The logger to use.
+    - message (str): The error message to log.
+    """
+    logger.error(message)
+    sys.exit(1)
+
+
+def get_credentials(logger: logging.Logger) -> Tuple[str, str]:
+    """
+    Retrieve the username and password from environment variables.
+
+    This function loads the environment variables from a .env file using dotenv,
+    then retrieves the username and password from the environment variables.
+
+    Args:
+    - logger (logging.Logger): The logger instance to use for logging.
+
+    Returns:
+    - Tuple[str, str]: A tuple containing the username and password retrieved from the environment variables.
+
+    Raises:
+    - SystemExit: If the username or password environment variable is missing.
+    """
+
+    load_dotenv()
+
+    # Get the username and password from the environment variables:
+    username: str | None = os.getenv("INSTA_USERNAME")
+    password: str | None = os.getenv("INSTA_PASSWORD")
+
+    # Check if username or password is None, and raise an exception if so.
+    if username is None or password is None:
+        log_and_exit(
+            logger=logger,
+            message="Username or password environment variable is missing",
+        )
+
+    return username, password
+
+
+def setup_instagrapi(logger: logging.Logger) -> Client:
+    """
+    Set up the instagrapi client with the provided username and password.
+
+    This function uses the get_credentials() function to retrieve the username and password,
+    then initializes the instagrapi client with the credentials.
+
+    Args:
+    - logger (logging.Logger): The logger instance to use for logging.
+
+    Returns:
+    - client (instagrapi.Client): The instagrapi client with the provided credentials.
+
+    Raises:
+    - SystemExit: If an error occurs while logging in to Instagram.
+    """
+    username, password = get_credentials(logger=logger)
+    client = Client()
+
+    try:
+        login_success = client.login(username=username, password=password)
+
+        if not login_success:
+            log_and_exit(logger=logger, message="Instagram Login failed")
+
+        logger.info("Instagram Login successful")
+
+    except Exception as e:
+        log_and_exit(
+            logger=logger, message=f"An error occurred while trying to login: {e}"
+        )
+
+    return client
+``` 
+
+The `get_credentials()` function reads the user environment variables and returns them. As you might have guessed, the function requires you to have the `INSTA_USERNAME` and `INSTA_PASSWORD` environment variables set up.
+
+Create a new `.env` file in the root of the project with both variables defined.
+
+```env
+INSTA_USERNAME=<your-insta-username>
+INSTA_PASSWORD=<your-insta-password>
+```
+
+The `setup_instagrapi()` function creates a new Instagrapi client, logs in to Instagram, and returns the client.
+
+### Defining Classes 🧩
+
+We will set up two different classes: `Post` and `PostList`. The `PostList` class will hold multiple `Post` objects.
+
+Create a new file named `post.py` inside the `src` directory with the following code:
+
+```python
+# 👇 insta-cron-post-automation/src/post.py
+from typing import Any, Dict, Optional
+
+
+class Post:
+    """
+    Initializes a new instance of the Post class.
+
+    Args:
+    - description (str): The description for the post.
+    - image_path (str): The path to the image file.
+    - post_date (str): The date and time of the post.
+    - extra_data (Optional[Dict[str, Any]]): Additional data for the post. Defaults to None.
+    """
+
+    ALLOWED_EXTRA_DATA_FIELDS = {
+        "custom_accessibility_caption",
+        "like_and_view_counts_disabled",
+        "disable_comments",
+    }
+
+    def __init__(
+        self,
+        description: str,
+        image_path: str,
+        post_date: str,
+        extra_data: Optional[Dict[str, Any]] = None,
+    ):
+        self.image_path = image_path
+        self.description = description
+        self.post_date = post_date
+        self.extra_data = self.validate_extra_data(extra_data=extra_data)
+
+    def validate_extra_data(
+        self, extra_data: Optional[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Validates and filters the extra_data dictionary to ensure it contains only allowed fields.
+
+        Args:
+        - extra_data (Optional[Dict[str, Any]]): The extra data dictionary to validate.
+
+        Returns:
+        - Optional[Dict[str, Any]]: The validated extra data dictionary, or None if input is None or invalid.
+        """
+        if extra_data is None:
+            return None
+
+        validated_data = {
+            key: extra_data[key]
+            for key in extra_data
+            if key in self.ALLOWED_EXTRA_DATA_FIELDS
+        }
+
+        return validated_data if validated_data else None
+
+    def serialize(self) -> Dict[str, Any]:
+        """
+        Serialize the object into a dictionary representation.
+
+        Returns:
+        - dict: A dictionary containing the serialized data of the object.
+                The dictionary has the following keys:
+                - "image_path" (str): The path to the image file.
+                - "description" (str): The description for the post.
+                - "post_date" (str): The date and time of the post.
+                If the object has extra data, it is added to the dictionary under the key "extra_data".
+        """
+        data: Dict[str, Any] = {
+            "image_path": self.image_path,
+            "description": self.description,
+            "post_date": self.post_date,
+        }
+
+        if self.extra_data is not None:
+            data["extra_data"] = self.extra_data
+
+        return data
+```
+
+The class takes a few parameters, such as **description** for the post, **image path**, **post date**, and an optional **extra field** property, which can be used to pass additional metadata for the post, like this:
+
+```json
+  "extra_data": {
+    "custom_accessibility_caption": "An astronaut in the ocean!",
+    "like_and_view_counts_disabled": 0,
+    "disable_comments": 1
+  },
+```
+
+Here, the binary values 1 and 0 represent **True** and **False**, respectively.
+
+The `validate_extra_data()` method checks if the provided `extra_data` field contains only valid keys and removes any other keys provided by the user.
+
+The `serialize()` method checks if the `extra_data` parameter was passed to the constructor. If it was, it adds it to the dictionary and returns the dictionary; otherwise, it returns the dictionary without the `extra_data` key.
+
+Now that the `Post` class is ready, let's create another class, `PostList`, that holds the `Post` objects.
+
+Create a new file called `post_list.py` inside the `src` directory and add the following lines of code:
+
+```python
+# 👇 insta-cron-post-automation/src/post_list.py
+import json
+import sys
+from datetime import datetime
+from typing import List, NoReturn, Optional
+
+from logger_config import get_logger
+from post import Post
+
+
+class PostList:
+    """
+    A class to manage/represent a list of posts.
+    """
+
+    def __init__(self, log_path: str):
+        self.posts = []
+        self.logger = get_logger(log_path)
+
+    def _log_and_exit(self, message: str) -> NoReturn:
+        """
+        Log an error message and exit the program.
+
+        Args:
+        - message (str): The error message to log.
+        """
+        self.logger.error(message)
+        sys.exit(1)
+
+    def to_json(self) -> str:
+        """
+        Serialize the list of posts into a JSON string.
+        Use this method to write the content in the `self.posts` array to a JSON file.
+
+        Returns:
+        - str: JSON string representing the serialized posts.
+        """
+        serialized_posts = [post.serialize() for post in self.posts]
+        return json.dumps({"posts": serialized_posts}, default=str)
+
+    # Custom function to parse the date without seconds
+    def parse_post_date(self, post_date: str) -> str:
+        """
+        Custom function to parse the date without seconds.
+
+        Args:
+        - post_date (str): The date string to parse.
+
+        Returns:
+        - str: The parsed date string without seconds.
+        """
+        date_format = "%Y-%m-%d %H:%M"
+
+        # Parse the date
+        parsed_date = datetime.strptime(post_date, date_format)
+
+        # Return the date formatted without seconds
+        return parsed_date.strftime("%Y-%m-%d %H:%M")
+
+    def get_posts_from_json_file(self, posts_file_path: str) -> List[Post]:
+        """
+        Load posts from a JSON file and populate the list.
+
+        Args:
+        - posts_file_path (str): The path to the JSON file containing post data.
+
+        Returns:
+        - List[Post]: List of Post objects loaded from the JSON file.
+
+        Raises:
+        - FileNotFoundError: If the JSON file is not found.
+        - PermissionError: If the JSON file cannot be accessed.
+        - json.JSONDecodeError: If the JSON file is not valid JSON.
+        """
+        try:
+            with open(posts_file_path, "r") as posts_json_file:
+                data = json.load(posts_json_file)
+
+                if "posts" not in data:
+                    self._log_and_exit(message="No 'posts' key found in the json file")
+
+                for post in data["posts"]:
+                    if not all(
+                        key in post
+                        for key in ["image_path", "description", "post_date"]
+                    ):
+                        self._log_and_exit(
+                            message="Missing required keys in the post object"
+                        )
+
+                    extra_data: Optional[dict] = post.get("extra_data")
+
+                    post_obj = Post(
+                        image_path=post["image_path"],
+                        description=post["description"],
+                        post_date=self.parse_post_date(post_date=post["post_date"]),
+                        extra_data=extra_data,
+                    )
+                    self.posts.append(post_obj)
+
+        except FileNotFoundError:
+            self._log_and_exit(message=f"File not found: {posts_file_path}")
+
+        except PermissionError:
+            self._log_and_exit(message=f"Permission denied: {posts_file_path}")
+
+        except json.JSONDecodeError:
+            self._log_and_exit(message=f"Invalid JSON file: {posts_file_path}")
+
+        except ValueError as ve:
+            self._log_and_exit(
+                message=f"Invalid date format provided in the post object: {ve}"
+            )
+
+        except Exception as e:
+            self._log_and_exit(message=f"Unexpected error: {e}")
+
+        return self.posts
+```
+
+The `_log_and_exit()` method, as the name suggests, is a private method that logs the message to the file and exits the program.
+
+The `to_json()` method, as the name suggests, returns the list of posts in the form of a JSON string.
+
+The `parse_post_date()` method takes a `post_date` variable and returns the date in string format without the seconds portion, as we don't need seconds in cron jobs.
+
+The `get_posts_from_json_file()` method reads a JSON file, populates the posts array with each post as a `Post` object, and handles various exceptions that can occur when reading the file contents.
+
+### Coding the Media Post Script 📝
+
+Now that we have all the classes set up, it's time to code the main Python script responsible for posting on Instagram.
+
+Create a new file called `media_post.py` inside the `src` directory. This file will be quite long, so we'll split the code into each function, and I'll explain it along the way.
+
+```python
+# 👇 insta-cron-post-automation/src/media_post.py
+import json
+import logging
+import os
+import sys
+from datetime import datetime
+from typing import Any, Dict, List, NoReturn, Optional
+
+from instagrapi import Client
+
+from logger_config import get_logger
+from setup import setup_instagrapi
+
+
+def log_and_exit(logger: logging.Logger, message: str) -> NoReturn:
+    """
+    Log an error message and exit the program.
+
+    Args:
+    - logger (logging.Logger): The logger to use.
+    - message (str): The error message to log.
+    """
+    logger.error(message)
+    sys.exit(1)
+
+
+def is_valid_image_extension(file_name: str) -> bool:
+    """
+    Check if the given file name has a valid image extension.
+
+    Valid extensions are: .jpg, .jpeg, .png.
+
+    Args:
+    - file_name (str): The name of the file to check.
+
+    Returns:
+    - bool: True if the file has a valid image extension, False otherwise.
+    """
+    valid_extensions = {".jpg", ".jpeg", ".png"}
+    return any(file_name.endswith(ext) for ext in valid_extensions)
+```
+
+These are fairly straightforward functions. The `log_and_exit()` function logs the message to the file and exits the program.
+
+The `is_valid_image_extension()` function checks if the image has a valid extension allowed for posting on Instagram.
+
+> 💁 I am not entirely sure if there are other extensions that are allowed, but these seem to be the standard ones. If there are additional extensions, feel free to update them accordingly.
+
+Once we try to upload the post to Instagram, we need to remove it from the `to-post.json` file in the `data` directory, where we add all the posts that we want to schedule. Regardless of whether the upload was successful, we add the post to either the `error.json` or `success.json` file inside the `data` directory.
+
+Create a new function that handles this process.
+
+```python
+# 👇 insta-cron-post-automation/src/media_post.py
+
+# Rest of the code...
+
+def handle_post_update(
+    success: bool, json_post_content: Dict[str, Any], logger: logging.Logger
+) -> None:
+    """
+    Update the post error file based on the success of the upload.
+
+    Args:
+    - success (bool): True if the upload was successful, False otherwise.
+    - json_post_content (dict): The content of the post.
+
+    Returns:
+    - Return the content of the post file if the read is successful; otherwise, return the default value if provided, or None.
+    """
+
+    def load_json_file(file_path: str, default: Optional[Any] = None) -> Any:
+        """Helper function to load JSON data from a file."""
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, "r") as file:
+                    return json.load(file)
+            except Exception:
+                log_and_exit(
+                    logger=logger, message=f"Failed to load post file: {file_path}"
+                )
+        else:
+            # Create the file with default content if it does not exist
+            write_json_file(file_path, default if default is not None else [])
+            return default if default is not None else []
+
+    def write_json_file(file_path: str, posts: List[Dict[str, Any]]) -> None:
+        """Helper function to save JSON data to a file."""
+        for post in posts:
+            if "post_date" in post:
+                try:
+                    post_date = datetime.strptime(
+                        post["post_date"], "%Y-%m-%d %H:%M:%S"
+                    )
+                    post["post_date"] = post_date.strftime("%Y-%m-%d %H:%M")
+                except ValueError:
+                    post_date = datetime.strptime(post["post_date"], "%Y-%m-%d %H:%M")
+                    post["post_date"] = post_date.strftime("%Y-%m-%d %H:%M")
+                except Exception as e:
+                    log_and_exit(
+                        logger=logger, message=f"Failed to parse post date: {e}"
+                    )
+
+        try:
+            with open(file_path, "w") as file:
+                json.dump(posts, file, indent=2)
+            logger.info(f"Post file updated: {file_path}")
+
+        except (IOError, json.JSONDecodeError) as e:
+            log_and_exit(logger=logger, message=f"Failed to write post file: {e}")
+
+    # Get the directory of the current script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Define the directory where the data files are located
+    data_dir = os.path.join(current_dir, "..", "data")
+
+    # Define paths to the success, error, and to-post files
+    success_file = os.path.join(data_dir, "success.json")
+    error_file = os.path.join(data_dir, "error.json")
+    to_post_file = os.path.join(data_dir, "to-post.json")
+
+    # Ensure the success and error files exist
+    if not os.path.exists(success_file):
+        write_json_file(success_file, [])
+
+    if not os.path.exists(error_file):
+        write_json_file(error_file, [])
+
+    # Load the current 'to-post' data if it exists, otherwise initialize an empty list
+    to_post_data = load_json_file(file_path=to_post_file, default={"posts": []})
+
+    # Determine which file to write to based on the success of the upload
+    target_file = success_file if success else error_file
+
+    # Load the current content of the target file if it exists, otherwise initialize an empty list
+    target_data = load_json_file(file_path=target_file, default=[])
+
+    # Append the current post content to the target data
+    target_data.append(json_post_content)
+
+    # Write the updated target data back to the target file
+    write_json_file(file_path=target_file, posts=target_data)
+
+    user_posts = to_post_data["posts"]
+
+    # Filter the posted post from the 'to-post' data
+    if any(post == json_post_content for post in user_posts):
+        user_posts = [item for item in user_posts if item != json_post_content]
+        to_post_data["posts"] = user_posts
+        write_json_file(file_path=to_post_file, posts=to_post_data)
+```
+
+The `handle_post_update()` function manages the process of updating files that track the success or failure of post uploads. Depending on whether a post upload was successful or not, the function updates either a success file or an error file with the content of the post.
+
+The function uses nested helper functions, `load_json_file()` and `write_json_file()`, to handle the loading and saving of JSON data to and from files. `load_json_file()` reads data from a file, while `write_json_file()` saves data back to a file, ensuring that the data format is correct.
+
+Finally, the function updates the relevant files by appending the new post content to either `data/success.json` or `data/error.json` and removes the posted content from the `data/to-post.json` file.
+
+Now, we need a function to parse the file content into JSON. If parsing fails, we need a way to handle the error as well.
+
+```python
+# 👇 insta-cron-post-automation/src/media_post.py
+
+# Rest of the code...
+
+def parse_post_file_to_json(post_path: str, logger: logging.Logger) -> Dict[str, Any]:
+    """
+    Parses the content of a post file into a JSON dictionary.
+
+    Args:
+    - post_path (str): The path to the post file.
+    - logger (logging.Logger): The logger instance to use for logging errors.
+
+    Returns:
+    - Dict[str, Any]: The content of the post file parsed as a JSON dictionary.
+
+    Raises:
+    - SystemExit: Exits the program with an error status if the file does not exist,
+                  if permission is denied, if JSON decoding fails, or if any other
+                  exception occurs during file reading.
+    """
+    try:
+        with open(post_path, "r") as post_file:
+            content = post_file.read()
+        return json.loads(content)
+
+    except FileNotFoundError:
+        log_and_exit(logger=logger, message=f"Post file '{post_path}' does not exist")
+
+    except PermissionError:
+        log_and_exit(
+            logger=logger,
+            message=f"Permission denied when trying to access post file '{post_path}'",
+        )
+
+    except json.JSONDecodeError:
+        log_and_exit(
+            logger=logger, message=f"Failed to decode JSON from post file '{post_path}'"
+        )
+
+    except Exception as e:
+        log_and_exit(
+            logger=logger, message=f"Failed to read post file '{post_path}': {e}"
+        )
+
+
+def handle_post_error(
+    error_message: str, json_post_content: Dict[str, Any], logger: logging.Logger
+) -> None:
+    """
+    This function logs an error message, updates the post files to indicate failure,
+    and terminates the program with an exit status of 1.
+
+    Args:
+    - error_message (str): The error message to be logged.
+    - json_post_content (Dict[str, Any]): The content of the post file in JSON format.
+    - logger (logging.Logger): The logger instance to use for logging the error.
+
+    Returns:
+    - None
+
+    Raises:
+    - SystemExit: The program will exit with an exit status of 1.
+    """
+    handle_post_update(
+        success=False, json_post_content=json_post_content, logger=logger
+    )
+    log_and_exit(logger=logger, message=error_message)
+```
+
+The `parse_post_file_to_json()` function takes a path to a JSON file and tries to parse its content into JSON. If parsing fails, the `handle_invalid_post_file()` function is used to handle the failure. It sets the success boolean to `false`, updates the `data/error.json` file, and removes the specific post from the `data/to-post.json` file.
+
+Now that all of this is done, we are finally ready to compute the final upload parameters and upload the post to Instagram.
+
+Add these two functions:
+
+```python
+# 👇 insta-cron-post-automation/src/media_post.py
+
+# Rest of the code...
+
+def prepare_upload_params(
+    json_post_content: Dict[str, Any], logger: logging.Logger
+) -> Dict[str, Any]:
+    # Initial needed upload parameters
+    upload_params = {
+        "path": json_post_content.get("image_path"),
+        "caption": json_post_content.get("description"),
+    }
+
+    # If the optional field is provided
+    if "extra_data" in json_post_content:
+        extra_data = json_post_content["extra_data"]
+        try:
+            extra_data["custom_accessibility_caption"] = str(
+                extra_data.get("custom_accessibility_caption", "")
+            )
+            extra_data["like_and_view_counts_disabled"] = int(
+                extra_data.get("like_and_view_counts_disabled", 0)
+            )
+            extra_data["disable_comments"] = int(extra_data.get("disable_comments", 0))
+
+        except (ValueError, TypeError):
+            handle_post_error(
+                error_message=f"Failed to parse 'extra_data' field: {json_post_content}",
+                json_post_content=json_post_content,
+                logger=logger,
+            )
+
+        extra_data["like_and_view_counts_disabled"] = max(
+            0, min(1, extra_data["like_and_view_counts_disabled"])
+        )
+        extra_data["disable_comments"] = max(0, min(1, extra_data["disable_comments"]))
+        upload_params["extra_data"] = extra_data
+
+    return upload_params
+
+
+def upload_to_instagram(
+    client: Client,
+    upload_params: Dict[str, Any],
+    json_post_content: Dict[str, Any],
+    logger: logging.Logger,
+) -> None:
+    """
+    Uploads media to Instagram and handles logging and updating post files based on the result.
+
+    Args:
+    - client: The Instagram client used for uploading media.
+    - upload_params (Dict[str, Any]): The parameters for the media upload.
+    - json_post_content (Dict[str, Any]): The content of the post file in JSON format.
+    - logger (logging.Logger): The logger instance to use for logging errors and success messages.
+
+    Returns:
+    - None
+
+    Raises:
+    - SystemExit: Exits the program with an error status if the upload fails.
+    """
+    try:
+        # Upload the media to Instagram
+        upload_media = client.photo_upload(**upload_params)
+
+        # Get the uploaded post ID
+        uploaded_post_id = upload_media.model_dump().get("id", None)
+        logger.info(
+            f"Successfully uploaded the post on Instagram. ID: {uploaded_post_id}"
+        )
+        handle_post_update(
+            success=True, json_post_content=json_post_content, logger=logger
+        )
+    except Exception as e:
+        handle_post_error(
+            error_message=f"Failed to upload the post: {e}",
+            json_post_content=json_post_content,
+            logger=logger,
+        )
+```
+
+The `prepare_upload_params()` function takes the post content and prepares the upload parameters. It includes explicit validation for the `extra_data` fields to ensure that all keys are of the expected type, and finally returns the entire set of upload parameters.
+
+The `upload_to_instagram()` function uploads media to Instagram using the provided client and `upload_params`. If the upload is successful, it logs the post ID and updates the post status using the `handle_post_update()` function.
+
+If an error occurs during the upload, it logs the error and calls `handle_post_error()` to handle the failure.
+
+Now, finally, write the main function for the `src/media_post.py` file:
+
+```python
+# 👇 insta-cron-post-automation/src/media_post.py
+
+# Rest of the code...
+
+def main() -> None:
+    """
+    Main function to handle the posting process.
+
+    - Sets up logging.
+    - Checks if a post file path is provided and valid.
+    - Reads and parses the post file.
+    - Validates the image file extension.
+    - Prepares upload parameters.
+    - Logs the upload parameters and response.
+    """
+
+    # Get the current directory of this script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Path to the log file, assuming 'logs' is one level up from the current directory
+    log_path = os.path.join(current_dir, "..", "logs", "post-activity.log")
+    logger = get_logger(log_file=log_path)
+
+    if len(sys.argv) > 1:
+        post_path = sys.argv[1]
+
+        # Set up the instagrapi client
+        client = setup_instagrapi(logger=logger)
+
+        json_post_content: Dict[str, Any] = parse_post_file_to_json(
+            post_path=post_path, logger=logger
+        )
+
+        # If the path does not exist or the path is not a file
+        if (not os.path.exists(post_path)) or (not os.path.isfile(post_path)):
+            return handle_post_error(
+                error_message=f"'{post_path}' does not exist or is not a file",
+                json_post_content=json_post_content,
+                logger=logger,
+            )
+
+        image_path = json_post_content["image_path"]
+
+        # Validate image file extension
+        if not is_valid_image_extension(image_path):
+            return handle_post_error(
+                error_message=f"'{image_path}' is not a valid image",
+                json_post_content=json_post_content,
+                logger=logger,
+            )
+
+        upload_params: Dict[str, Any] = prepare_upload_params(
+            json_post_content=json_post_content, logger=logger
+        )
+
+        # Log the final upload parameters
+        logger.info(f"Posting to Instagram with the following details: {upload_params}")
+
+        upload_to_instagram(
+            client=client,
+            upload_params=upload_params,
+            json_post_content=json_post_content,
+            logger=logger,
+        )
+
+    else:
+        log_and_exit(logger=logger, message="Please provide the path to the post file")
+
+
+if __name__ == "__main__":
+  main()
+```
+
+We begin by setting up logging and verifying that the post file path exists. We then initialize the Instagrapi client and read the post file's content, checking for validity in both the file path and image extension.
+
+If any issues are detected, such as an invalid file path or unsupported image type, we log them to the log file.
+
+Once validation is complete, the function prepares the upload parameters and uploads them to Instagram. ✨
+
+### Building the Shell Script 🧰
+
+🤔 **Why is there a need to write a shell script?**
+
+> We will use a shell script within the Cron job to execute `media_post.py`, as we need to source the virtual environment before running the Python script since all the modules are installed there. If we didn't need to source our virtual environment, we could directly run the Python script as a Cron job command without writing this shell script.
+
+Create a new file called `run_media_post.sh` inside the `src/scripts` directory with the following lines of code:
+
+> 💁 If you are using the fish shell, you can find the same code with the fish syntax [here](https://github.com/shricodev/insta-cron-post-automation/blob/main/src/scripts/run_media_post.fish). Create a new file called `run_media_post.fish` inside the `src/scripts` directory, and add the code from the link.
+
+```bash
+#!/usr/bin/env bash
+# Using this above way of writing shebang can have some security concerns.
+# See this stackoverflow thread: https://stackoverflow.com/a/21614603
+# Since, I want this script to be portable for most of the users, instead of hardcoding like '#!/usr/bin/bash', I am using this way.
+
+# 👇 insta-cron-post-automation/src/scripts/run_media_post.sh
+
+# Constants for error messages
+ERROR_USAGE="ERROR: Usage: bash {media_post_path} {post_file_path}"
+ERROR_FILE_NOT_FOUND="ERROR: One or both of the files do not exist or are not valid files."
+ERROR_PYTHON_NOT_FOUND="ERROR: No suitable Python executable found."
+ERROR_BASH_NOT_INSTALLED="ERROR: Bash shell is not installed. Please install Bash."
+ERROR_ACTIVATE_NOT_FOUND="ERROR: activate file not found in '$VENV_DIR/bin'"
+ERROR_UNSUPPORTED_SHELL="ERROR: Unsupported shell: '$SHELL'"
+
+# Determine the script directory and virtual environment directory
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+VENV_DIR="$(realpath "$SCRIPT_DIR/../../.venv")"
+LOG_FILE="$(realpath "$SCRIPT_DIR/../../logs/shell-error.log")"
+
+log_and_exit() {
+  local message="$1"
+
+  echo "[$(date +"%Y-%m-%d %H:%M:%S")] $message" | tee -a $LOG_FILE
+  exit 1
+}
+
+# Check if both arguments are provided
+if [ $# -ne 2 ]; then
+  log_and_exit "$ERROR_USAGE"
+fi
+
+# Function to check if a file exists and has the correct extension
+check_file() {
+    local file_path="$1"
+    local expected_extension="$2"
+
+    if [ ! -f "$file_path" ]; then
+        log_and_exit "$ERROR_FILE_NOT_FOUND"
+    fi
+
+    if ! [[ "$file_path" == *".$expected_extension" ]]; then
+        log_and_exit "The file '$file_path' must be a '.$expected_extension' file."
+    fi
+}
+
+# Validate the provided files
+check_file "$1" "py"
+check_file "$2" "json"
+
+# Extract and validate arguments
+MEDIA_POST_PATH="$(realpath "$1")"
+POST_FILE_PATH="$(realpath "$2")"
+
+# Find the appropriate Python executable
+PYTHON_EXEC="$(command -v python3 || command -v python)"
+
+# Ensure that the Python executable is available before creating the virtual environment
+if [ ! -d "$VENV_DIR" ]; then
+    if [ -z "$PYTHON_EXEC" ]; then
+        log_and_exit "$ERROR_PYTHON_NOT_FOUND"
+    fi
+    "$PYTHON_EXEC" -m venv "$VENV_DIR"
+fi
+
+if ! command -v bash &> /dev/null; then
+    log_and_exit "$ERROR_BASH_NOT_INSTALLED"
+fi
+
+# Activate the virtual environment based on the shell type
+if [[ "$SHELL" == *"/bash" ]]; then
+    # Check if the activate file exists before sourcing it
+    if [ -f "$VENV_DIR/bin/activate" ]; then
+        source "$VENV_DIR/bin/activate"
+    else
+        log_and_exit "$ERROR_ACTIVATE_NOT_FOUND"
+    fi
+else
+    log_and_exit "$ERROR_UNSUPPORTED_SHELL"
+fi
+
+# Set the python executable to the one from the virtual environment
+PYTHON_EXEC="$(command -v python)"
+
+"$PYTHON_EXEC" "$MEDIA_POST_PATH" "$POST_FILE_PATH"
+
+# Remove the cron job after running the script
+crontab -l | grep -v "$POST_FILE_PATH" | crontab -
+```
+
+This script is designed to automate the execution of the Python script `media_post.py`, which is responsible for uploading content to Instagram with specified arguments, while ensuring that the environment is correctly set up beforehand.
+
+It first checks if the correct number of arguments (two file paths) are provided, then validates that these files exist and have the correct extensions (**.py** for the Python script and **.json** for the post data file).
+
+The script also checks if **Python** and **Bash** are installed on the system and sets up a virtual environment. It supports only the Bash shell and will activate the virtual environment before running the Python script.
+
+After execution, the script removes the cron job that triggered its execution by invert-matching with the `grep` command.
+
+### Writing the `main.py` File 🧑‍💻
+
+This is the only Python script that we need to run manually after populating the `data/to-post.json` file.
+
+We'll write this file in chunks and explain it along the way. Create a new file called `main.py` inside the root of the project and add the following lines of code:
+
+```python
+# 👇 insta-cron-post-automation/main.py
+import json
+import logging
+import os
+import secrets
+import string
+import sys
+from datetime import datetime
+from os import environ
+from typing import Dict, NoReturn
+
+from dateutil import tz
+
+# Add the src directory to the module search path
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
+
+from crontab import CronTab
+
+from src import logger_config, post_list
+
+
+def log_and_exit(logger: logging.Logger, message: str) -> NoReturn:
+    """
+    Log an error message and exit the program.
+
+    Args:
+    - logger (logging.Logger): The logger to use.
+    - message (str): The error message to log.
+    """
+    logger.error(message)
+    sys.exit(1)
+
+
+def get_shell_script_to_run(
+    user_shell: str, current_dir: str, logger: logging.Logger
+) -> str:
+    """
+    Determine the script to run based on the user's shell.
+
+    Args:
+    - user_shell (str): The user's shell.
+    - current_dir (str): The current directory of the script.
+    - logger (logging.Logger): The logger to use.
+
+    Returns:
+    - str: The path to the appropriate shell script for the user's shell.
+
+    Raises:
+    - SystemExit: If the user's shell is unsupported.
+    """
+
+    shell_script_map: Dict[str, str] = {
+        "bash": os.path.join(current_dir, "src", "scripts", "run_media_post.sh"),
+        "fish": os.path.join(current_dir, "src", "scripts", "run_media_post.fish"),
+    }
+
+    run_media_post_path = shell_script_map.get(user_shell, None)
+    if run_media_post_path is None:
+        log_and_exit(logger=logger, message=f"Unsupported shell: {user_shell}")
+
+    return run_media_post_path
+```
+
+> 👀 Notice that we are inserting the path to our `src` directory using the `sys.path.insert()` method to ensure that Python can locate and import modules from the `src` directory.
+
+The `log_and_exit()` function is the same as before—if something goes wrong, it logs the error and exits the program. The `get_shell_script_to_run()` function returns the path to the shell script that should be run in the cron job based on whether the user's shell is either **Bash** or **Fish**. If the user's shell is not one of these, the program will exit.
+
+Now, let's add a helper function to validate the post date and add a cron job with the provided arguments.
+
+```python
+# 👇 insta-cron-post-automation/main.py
+
+# Rest of the code...
+
+def validate_post_date(post_date: str, logger: logging.Logger) -> datetime:
+    """
+    Validate the post date to ensure it is in the future.
+
+    Args:
+    - post_date (string): The date and time of the post.
+    - logger (logging.Logger): The logger to use.
+
+    Returns:
+    - datetime: The validated and parsed datetime object.
+
+    Raises:
+    - SystemExit: If the post date is not valid or not in the future.
+    """
+
+    # Define the expected format for parsing
+    date_format = "%Y-%m-%d %H:%M"
+
+    try:
+        # Attempt to parse the post_date string into a datetime object
+        parsed_date = datetime.strptime(post_date, date_format)
+    except ValueError:
+        log_and_exit(
+            logger=logger,
+            message=f"The post_date is not in the correct format: {post_date}",
+        )
+
+    # Check if the parsed date is in the future
+    if parsed_date.astimezone(tz.UTC) <= datetime.now(tz=tz.UTC):
+        log_and_exit(
+            logger=logger, message=f"The post_date `{post_date}` is in the past."
+        )
+
+    return parsed_date
+
+
+def create_cron_job(
+    cron: CronTab,
+    user_shell: str,
+    run_media_post_path: str,
+    media_post_path: str,
+    scheduled_post_file_path: str,
+    post_date: datetime,
+    logger: logging.Logger,
+) -> None:
+    """
+    Create a cron job for a scheduled post.
+
+    Args:
+    - cron (CronTab): The crontab object for the current user.
+    - user_shell (str): The user's shell.
+    - run_media_post_path (str): The path to the shell script to run.
+    - media_post_path (str): The path to the media post script.
+    - scheduled_post_file_path (str): The path to the scheduled post file.
+    - post_date (datetime): The date and time to run the job.
+    - logger (logging.Logger): The logger to use.
+
+    Raises:
+    - SystemExit: If the cron job creation fails.
+    """
+    try:
+        # Conditionally add semicolon
+        command = (
+            f"SHELL=$(command -v {user_shell})"
+            + (";" if user_shell == "bash" else "")
+            + f" {user_shell} {run_media_post_path} {media_post_path} {scheduled_post_file_path}"
+        )
+        job = cron.new(command=command)
+        job.setall(post_date.strftime("%M %H %d %m *"))
+    except Exception as e:
+        log_and_exit(logger=logger, message=f"Failed to create cron job: {e}")
+```
+
+The `validate_post_date()` function checks whether the datetime string is in the expected format (without seconds) and ensures that the specified post date for Instagram isn’t in the past.
+
+The `create_cron_job()` function takes a configured **Crontab** object, the path to the shell script, the path to `media_post.py`, and the path to the file containing the scheduled post content. It then creates a cron job with the **SHELL variable** set to the user's shell, because the cron environment may use a shell different from the current user's shell, and schedules the job to execute at the specified time.
+
+If any exception occurs during the scheduling of the cron job, the function logs the error and exits the program.
+
+Now, it's time to code the main function responsible for setting everything up:
+
+```python
+# 👇 insta-cron-post-automation/main.py
+
+# Rest of the code...
+
+def main() -> None:
+    """
+    Main function to schedule Instagram posts using cron jobs.
+
+    This function performs the following tasks:
+    1. Sets up logging to a file.
+    2. Loads a list of posts from a JSON file.
+    3. Creates a temporary JSON file for each post to be scheduled.
+    4. Schedules a cron job to execute a script for each post at the specified date and time.
+    5. Writes the cron jobs to the user's crontab.
+
+    The cron job will execute the script `media_post.py` with the path to the temporary JSON file as an argument.
+    """
+
+    # Determine the current directory of the script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Define paths for log file and posts JSON file
+    log_path = os.path.join(current_dir, "logs", "post-activity.log")
+    to_post_path = os.path.join(current_dir, "data", "to-post.json")
+    media_post_path = os.path.join(current_dir, "src", "media_post.py")
+
+    # Initialize logger
+    logger = logger_config.get_logger(log_file=log_path)
+
+    post_data_dir = os.path.join(current_dir, "data", "scheduled_posts")
+    os.makedirs(post_data_dir, exist_ok=True)
+
+    # Initialize PostList object and load posts from JSON file
+    posts_list = post_list.PostList(log_path)
+
+    posts_list.get_posts_from_json_file(posts_file_path=to_post_path)
+    logger.info(f"Number of posts loaded: {len(posts_list.posts)}")
+
+    user_shell = os.path.basename(environ.get("SHELL", "/bin/bash"))
+    run_media_post_path = get_shell_script_to_run(
+        user_shell=user_shell, current_dir=current_dir, logger=logger
+    )
+
+    # Access the current user's CronTab object.
+    cron = CronTab(user=True)
+
+    for post in posts_list.posts:
+        # Create a unique identifier for each post file
+        unique_id = "".join(
+            secrets.choice(string.ascii_lowercase + string.digits) for _ in range(6)
+        )
+
+        post.post_date = validate_post_date(post_date=post.post_date, logger=logger)
+
+        # Create a unique suffix for the temporary file based on the post date
+        post_date_suffix = post.post_date.strftime("%Y-%m-%d-%H-%M")
+
+        scheduled_post_file_path = os.path.join(
+            post_data_dir, f"insta_post_{unique_id}_{post_date_suffix}.json"
+        )
+
+        # Write the post data to the temporary file
+        try:
+            with open(scheduled_post_file_path, "w") as f:
+                json.dump(post.serialize(), f, default=str)
+        except (IOError, json.JSONDecodeError) as e:
+            log_and_exit(logger=logger, message=f"Failed to write post file: {e}")
+
+        # Create a new cron job to run the Instagram post script with the temp file as an argument
+        create_cron_job(
+            cron=cron,
+            user_shell=user_shell,
+            run_media_post_path=run_media_post_path,
+            media_post_path=media_post_path,
+            scheduled_post_file_path=scheduled_post_file_path,
+            post_date=post.post_date,
+            logger=logger,
+        )
+
+    # Write the cron jobs to the user's crontab
+    try:
+        cron.write()
+        logger.info(f"Cronjob added to the CronTab for the current user: {cron.user}")
+    except Exception as e:
+        log_and_exit(logger=logger, message=f"Failed to write to CronTab: {e}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+The `main()` function sets up a scheduling system for Instagram posts using cron jobs. It begins by configuring logging and loading a list of posts from a JSON file (`data/to-post.json`). For each post, it creates a JSON file inside the `data/scheduled-posts` directory with the post content and schedules a cron job to run a script that handles posting at the specified date and time.
+
+It also determines the user's shell and sets up the appropriate script to execute. After creating unique temporary files and scheduling the jobs, it writes all the cron jobs to the user's crontab. If any errors occur during these processes, they are logged, and the program exits.
+
+***
+
+## Testing the Program 🧪
+
+If you’re curious about how this program works, I’ve prepared a sample script called `populate_sample_posts.py` that will populate the `data/to-post.json` file with a sample post, including a description, post date, and an image. You can find it [here](https://github.com/shricodev/insta-cron-post-automation/blob/main/src/populate_sample_posts.py).
+
+After you populate the `data/to-post.json` file and are inside a virtual environment, run this command:
+
+```bash
+python3 main.py
+```
+
+It’s recommended to test this with a new Instagram account first before using it with your main account. Once you are satisfied, it's time to schedule your own Instagram posts! 😉
+
+> **DISCLAIMER ⚠️**
+This script uses Cron jobs, so it will only be able to schedule your posts if the system is running. Therefore, it's best to run it on a cloud-based VM that is online nearly 24/7.
+
+***
+
+## Wrap-Up! ⚡
+
+Whoof, 😮‍💨 what a journey it has been! If you've made it this far, give yourself a well-deserved pat on the back. By now, you’ve successfully built a Python application to automate Instagram posting using Cron jobs. 🤯
+
+This has to be one of the coolest and most unique scripts you’ve built with Python.
+
+And I’m pretty sure this is not something you’ll find easily on the Internet. 🥱
+
+The entire documented source code for this article is available here:
+
+https://github.com/shricodev/insta-cron-post-automation
+
+Thank you so much for reading! 🎉 🫡
+
+> Drop down your thoughts in the comment section below. 👇
+
+
+

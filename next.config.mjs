@@ -2,12 +2,11 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      // TODO: Remove this after having a self photo to put
       {
         protocol: 'https',
-        hostname: 'placehold.jp',
+        hostname: 'github.com',
         port: '',
-        pathname: '/**',
+        pathname: '/shricodev.png',
       },
       // These are where images are hosted on Hashnode and Dev.to
       // NOTE: These needs to be updated in the future if they change.

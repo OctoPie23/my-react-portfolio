@@ -80,5 +80,11 @@ export function getBlogPostsWithContent(limit?: number) {
     return getBlogPostBySlug(slug)
   }) as BlogPost[]
 
-  return limit ? allBlogPosts.slice(0, limit) : allBlogPosts
+  const sortedBlogPosts = allBlogPosts.sort(
+    (a, b) =>
+      new Date(b.metadata.datePublished ?? '').getTime() -
+      new Date(a.metadata.datePublished ?? '').getTime(),
+  )
+
+  return limit ? sortedBlogPosts.slice(0, limit) : allBlogPosts
 }

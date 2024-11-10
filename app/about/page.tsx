@@ -1,3 +1,10 @@
+import { NewsletterForm } from '@/components/newsletter-form'
+
 export default function Page() {
-  return <div>About Page</div>
+  return (
+    <section>
+      About Page
+      <NewsletterForm />
+    </section>
+  )
 }

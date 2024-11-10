@@ -9,8 +9,8 @@ export const Navbar = () => {
 
   const getClassnameForLink = (path: string) =>
     pathName === path
-      ? 'underline underline-offset-4 text-foreground'
-      : 'text-muted-foreground'
+      ? 'underline underline-offset-4 text-foreground capitalize'
+      : 'text-muted-foreground capitalize hover:text-zinc-600 dark:hover:text-zinc-500'
 
   const links = {
     home: '/',
@@ -34,32 +34,20 @@ export const Navbar = () => {
 
         <div className='ml-0 flex items-center justify-between gap-6 font-semibold text-muted-foreground sm:ml-auto'>
           <ul className='flex items-center gap-6'>
-            <li className={getClassnameForLink(links.home)}>
-              <Link href={links.home} className='capitalize'>
-                home
-              </Link>
-            </li>
-            <li className={getClassnameForLink(links.blogs)}>
-              <Link href={links.blogs} className='capitalize'>
-                blogs
-              </Link>
-            </li>
-            <li className={getClassnameForLink(links.projects)}>
-              <Link href={links.projects} className='capitalize'>
-                projects
-              </Link>
-            </li>
-            <li className={getClassnameForLink(links.about)}>
-              <Link href={links.about} className='capitalize'>
-                about
-              </Link>
-            </li>
-            <li className={getClassnameForLink(links.contact)}>
-              <Link href={links.contact} className='capitalize'>
-                <span className='hidden sm:inline'>contact me</span>
-                <span className='inline sm:hidden'>contact</span>
-              </Link>
-            </li>
+            {Object.entries(links).map(([key, value]) => (
+              <li key={key}>
+                <Link href={value} className={getClassnameForLink(value)}>
+                  {key === 'contact' ? (
+                    <>
+                      <span className='hidden sm:inline'>contact me</span>
+                      <span className='inline sm:hidden'>contact</span>
+                    </>
+                  ) : (
+                    key
+                  )}
+                </Link>
+              </li>
+            ))}
           </ul>
 
           <ThemeToggle />

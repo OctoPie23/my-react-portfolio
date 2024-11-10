@@ -31,7 +31,7 @@ const socialCategories = [
       },
       {
         name: 'Hashnode',
-        href: 'https://hashnode.com/@shricodev',
+        href: 'https://shricodev.hashnode.dev',
         icon: HashnodeIcon,
       },
       {

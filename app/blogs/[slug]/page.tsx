@@ -61,7 +61,7 @@ export default function Page({ params: { slug } }: Params) {
           <div className='mt-3 flex items-center'>
             <Avatar className='mr-2 size-8'>
               <AvatarImage
-                src='https://github.com/shricodev.png'
+                src='/images/shricodev.jpg'
                 alt='Shrijal Acharya @shricodev'
               />
               <AvatarFallback>SA</AvatarFallback>

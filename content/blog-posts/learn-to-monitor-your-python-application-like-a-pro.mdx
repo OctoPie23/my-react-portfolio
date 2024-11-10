@@ -21,8 +21,7 @@ Python application using **distributed tracing**.
 
 Ready to light up your Python application monitoring skills? 🔥
 
-![Fire GIF](https://media.giphy.com/media/3o72FfM5HJydzafgUE/giphy.gif
-align="left")
+![Fire GIF](https://media.giphy.com/media/3o72FfM5HJydzafgUE/giphy.gif)
 
 ---
 
@@ -375,8 +374,7 @@ Now, build the images using the following command:
 docker compose build
 ```
 
-![Docker Compose build output](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xhxtoziuxi62finv5hjc.png
-align="left")
+![Docker Compose build output](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xhxtoziuxi62finv5hjc.png)
 
 ---
 
@@ -395,8 +393,7 @@ need it when setting up Odigos and Jaeger.
 minikube start
 ```
 
-![Starting Minikube](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o6bbtf5jeu64dll2uzgj.png
-align="left")
+![Starting Minikube](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o6bbtf5jeu64dll2uzgj.png)
 
 Since we are running on a local Kubernetes environment, we need to point our
 shell to use the minikube's docker-daemon.
@@ -552,8 +549,7 @@ command:
 kubectl get pods
 ```
 
-![Kubernetes Pods](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/mad4wzglev0ur2f4rpsl.png
-align="left")
+![Kubernetes Pods](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/mad4wzglev0ur2f4rpsl.png)
 
 Finally, our application is ready and deployed on Kubernetes with the necessary
 deployment configurations. 🎊
@@ -567,8 +563,7 @@ deployment configurations. 🎊
 > pipeline. In short, we will use Odigos to auto-instrument our Python
 > application.
 
-![Odigos - Monitoring Tool](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/kinajglw5njvt49bda98.jpg
-align="left")
+![Odigos - Monitoring Tool](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/kinajglw5njvt49bda98.jpg)
 
 > ℹ️ If you are running on a Mac run the following command to install Odigos
 > locally.
@@ -590,8 +585,7 @@ tar -xvzf cli_1.0.15_linux_amd64.tar.gz
 ./odigos install
 ```
 
-![Odigos Installation](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/41v3a8n4b75v2enwaldr.png
-align="left")
+![Odigos Installation](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/41v3a8n4b75v2enwaldr.png)
 
 > If you need more brief instructions on its installation, follow this
 > [**link**](https://docs.odigos.io/installation).
@@ -606,8 +600,7 @@ backend, and send traces accordingly.
 > 💡 [**Jaeger**](https://github.com/jaegertracing/jaeger) is an open source,
 > end-to-end distributed tracing system.
 
-![Jaeger - Distributed Tracing Platform](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/44r3z7w35hlib6yvuup3.jpg
-align="left")
+![Jaeger - Distributed Tracing Platform](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/44r3z7w35hlib6yvuup3.jpg)
 
 ### Setting up Jaeger ✨
 
@@ -638,8 +631,7 @@ kubectl get pods -A -w
 
 Wait for all three pods to be **Running** before proceeding further.
 
-![Kubernetes Pods](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o7et78uptt1lmhekjvgv.png
-align="left")
+![Kubernetes Pods](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o7et78uptt1lmhekjvgv.png)
 
 Now, to view the Jaeger Interface locally, we need to port forward. Forward
 traffic from port 16686 on the local machine to port 16686 on the selected pod
@@ -652,8 +644,7 @@ kubectl port-forward -n tracing svc/jaeger 16686:16686
 This command creates a tunnel between the local machine and the Jaeger pod,
 exposing the Jaeger UI so you can interact with it.
 
-![Jaeger Port forwarding](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/root5frtl55cdnq6ap1h.png
-align="left")
+![Jaeger Port forwarding](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/root5frtl55cdnq6ap1h.png)
 
 Now, on [`http://localhost:16686`](http://localhost:16686), you should be able
 to see the Jaeger instance running.
@@ -677,8 +668,7 @@ Visit [`http://localhost:3000`](http://localhost:3000) and you will be presented
 with the Odigos interface where you will see both deployments in the `default`
 namespace.
 
-![Odigos Initial UI](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/2fk7m0mizp0zl9g1j468.png
-align="left")
+![Odigos Initial UI](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/2fk7m0mizp0zl9g1j468.png)
 
 Select both of these and click Next. On the next page, choose Jaeger as the
 backend, and add the following details when prompted:
@@ -689,8 +679,7 @@ backend, and add the following details when prompted:
 And that's it — Odigos is all set to send traces to our Jaeger backend. It's
 that simple.
 
-![Odigos tool setup to send traces to Jaeger Tracing](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ot8wcuihqrsm9nmz2wcx.png
-align="left")
+![Odigos tool setup to send traces to Jaeger Tracing](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ot8wcuihqrsm9nmz2wcx.png)
 
 ---
 
@@ -702,21 +691,18 @@ we set up Odigos to work with Jaeger as our tracing backend.
 Visit [`http://localhost:16686`](http://localhost:16686) and select both our
 microservices in the dropdown.
 
-![Jaeger UI dropdown for selecting microservices](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/9idl3pa7lcp5yz4uk36u.png
-align="left")
+![Jaeger UI dropdown for selecting microservices](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/9idl3pa7lcp5yz4uk36u.png)
 
 Make a few requests to our endpoints, and eventually, Jaeger will begin to
 populate with traces.
 
 Click on any of the requests and explore the traces.
 
-![Jaeger Request Traces](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rzmx6i9p476oj7nm6wj6.png
-align="left")
+![Jaeger Request Traces](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rzmx6i9p476oj7nm6wj6.png)
 
 This was all done without changing a single line of code. 🔥
 
-![Wow GIF](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/yzjxzhoqamfdvr2lypqj.gif
-align="left")
+![Wow GIF](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/yzjxzhoqamfdvr2lypqj.gif)
 
 ---
 

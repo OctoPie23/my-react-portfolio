@@ -22,8 +22,8 @@ export const HeroIntro = () => {
           </p>
         </div>
         <Image
-          className='hidden rounded-full grayscale md:block'
-          src={'https://placehold.jp/175x175.png'}
+          className='hidden rounded-full md:block'
+          src={'/images/shricodev.jpg'}
           alt='Shrijal Acharya'
           width={175}
           height={175}
@@ -34,11 +34,11 @@ export const HeroIntro = () => {
       <Card className='mt-6 p-4 md:flex md:items-center'>
         <div className='md:hidden md:flex-shrink-0'>
           <Image
-            src={'https://placehold.jp/175x175.png'}
+            src={'/images/shricodev.jpg'}
             alt='Shrijal Acharya'
             width={175}
             height={175}
-            className='rounded-full grayscale'
+            className='rounded-full'
           />
         </div>
 
