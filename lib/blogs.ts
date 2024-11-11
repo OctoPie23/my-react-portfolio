@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import matter from 'gray-matter'
-import { BlogPost, BlogPostMetadata } from '@/types/blogs'
+import { TBlogPost, TBlogPostMetadata } from '@/types/blogs'
 
 const blogPostsDirectory = path.resolve(process.cwd(), 'content', 'blog-posts')
 
@@ -21,7 +21,7 @@ function getMDXFiles(dir: string): string[] {
     .map(dirent => dirent.name)
 }
 
-export function getBlogPostBySlug(slug: string): BlogPost | null {
+export function getBlogPostBySlug(slug: string): TBlogPost | null {
   const blogPostFilePath = path.join(blogPostsDirectory, `${slug}.mdx`)
 
   try {
@@ -38,13 +38,13 @@ export function getBlogPostBySlug(slug: string): BlogPost | null {
         tags: parseTags(data.tags),
       },
       content,
-    } as BlogPost
+    } as TBlogPost
   } catch {
     return null
   }
 }
 
-export function getBlogPostsMetadata(limit?: number): BlogPostMetadata[] {
+export function getBlogPostsMetadata(limit?: number): TBlogPostMetadata[] {
   const blogFiles = getMDXFiles(blogPostsDirectory)
 
   const blogPostsMetadata = blogFiles
@@ -58,7 +58,7 @@ export function getBlogPostsMetadata(limit?: number): BlogPostMetadata[] {
   return limit ? blogPostsMetadata.slice(0, limit) : blogPostsMetadata
 }
 
-export function getBlogPostMetadata(blogFilePath: string): BlogPostMetadata {
+export function getBlogPostMetadata(blogFilePath: string): TBlogPostMetadata {
   const blogPostAbsFilePath = path.join(blogPostsDirectory, blogFilePath)
   const blogFileContent = fs.readFileSync(blogPostAbsFilePath, {
     encoding: 'utf-8',
@@ -69,7 +69,7 @@ export function getBlogPostMetadata(blogFilePath: string): BlogPostMetadata {
     ...data,
     author: 'Shrijal Acharya',
     tags: parseTags(data.tags),
-  } as BlogPostMetadata
+  } as TBlogPostMetadata
 }
 
 export function getBlogPostsWithContent(limit?: number) {
@@ -78,7 +78,7 @@ export function getBlogPostsWithContent(limit?: number) {
   const allBlogPosts = blogFiles.map(file => {
     const slug = file.replace(/\.mdx$/, '')
     return getBlogPostBySlug(slug)
-  }) as BlogPost[]
+  }) as TBlogPost[]
 
   const sortedBlogPosts = allBlogPosts.sort(
     (a, b) =>

@@ -16,7 +16,7 @@ export const Navbar = () => {
     home: '/',
     blogs: '/blogs',
     projects: '/projects',
-    about: '/about',
+    work: '/work',
     contact: '/contact-me',
   }
 

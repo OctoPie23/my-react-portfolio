@@ -1,4 +1,4 @@
-import { BlogPost } from '@/types/blogs'
+import { TBlogPost } from '@/types/blogs'
 import { minRead, wordsCount } from '@/lib/utils'
 import Link from 'next/link'
 import React from 'react'
@@ -13,7 +13,7 @@ import {
 import { formatDate } from '@/lib/utils'
 
 interface BlogCardProps {
-  blogWithContent: BlogPost
+  blogWithContent: TBlogPost
 }
 
 export const BlogCard = ({ blogWithContent }: BlogCardProps) => {

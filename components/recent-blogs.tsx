@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { Blogs } from '@/components/blogs'
-import { BlogPost } from '@/types/blogs'
+import { TBlogPost } from '@/types/blogs'
 
 interface RecentPostsProps {
-  blogsWithContent: BlogPost[]
+  blogsWithContent: TBlogPost[]
 }
 
 export default function RecentPosts({ blogsWithContent }: RecentPostsProps) {

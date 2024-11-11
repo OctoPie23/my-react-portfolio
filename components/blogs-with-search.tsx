@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { BlogPost } from '@/types/blogs'
+import { TBlogPost } from '@/types/blogs'
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,7 @@ import { CrossIcon } from '@/components/icons'
 import { Blogs } from '@/components/blogs'
 
 interface PostsWithSearchProps {
-  blogsWithContent: BlogPost[]
+  blogsWithContent: TBlogPost[]
 }
 
 export default function BlogsWithSearch({

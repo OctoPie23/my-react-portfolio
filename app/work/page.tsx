@@ -3,7 +3,7 @@ import { NewsletterForm } from '@/components/newsletter-form'
 export default function Page() {
   return (
     <section>
-      About Page
+      Work Page
       <NewsletterForm />
     </section>
   )

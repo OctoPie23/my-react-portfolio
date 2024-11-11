@@ -1,8 +1,8 @@
-import { BlogPost } from '@/types/blogs'
+import { TBlogPost } from '@/types/blogs'
 import { BlogCard } from '@/components/blog-card'
 
 interface BlogsProps {
-  blogsWithContent: BlogPost[]
+  blogsWithContent: TBlogPost[]
 }
 
 export const Blogs = ({ blogsWithContent }: BlogsProps) => {

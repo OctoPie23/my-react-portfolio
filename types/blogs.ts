@@ -1,9 +1,9 @@
-export type BlogPost = {
-  metadata: BlogPostMetadata
+export type TBlogPost = {
+  metadata: TBlogPostMetadata
   content: string
 }
 
-export type BlogPostMetadata = {
+export type TBlogPostMetadata = {
   title: string
   seoTitle?: string
   seoDescription?: string
