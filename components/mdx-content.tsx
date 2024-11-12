@@ -12,7 +12,7 @@ const components = {
   code: Code,
 }
 
-export default function BlogContent(
+export default function MDXContent(
   props: JSX.IntrinsicAttributes & MDXRemoteProps,
 ) {
   return (

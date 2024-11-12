@@ -1,10 +1,26 @@
-import BlogsWithSearch from '@/components/blogs-with-search'
+import { Blogs } from '@/components/blogs'
 import { AlertIcon } from '@/components/icons'
+import { Search } from '@/components/search'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { getBlogPostsWithContent } from '@/lib/blogs'
 
-export default function Page() {
+export default function Page({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined }
+}) {
   const blogsWithContent = getBlogPostsWithContent()
+
+  const searchQuery =
+    typeof searchParams?.q === 'string' ? searchParams?.q : undefined
+
+  const filteredBlogsWithContent = searchQuery
+    ? blogsWithContent.filter(blogWithContent =>
+        blogWithContent.metadata.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()),
+      )
+    : blogsWithContent
 
   return (
     <section className='container max-w-3xl'>
@@ -36,7 +52,13 @@ export default function Page() {
           for full engagement.
         </AlertDescription>
       </Alert>
-      <BlogsWithSearch blogsWithContent={blogsWithContent} />
+
+      <Search
+        query={searchQuery}
+        endpoint='blogs'
+        placeholder='Search blogs...'
+      />
+      <Blogs blogsWithContent={filteredBlogsWithContent} />
     </section>
   )
 }

@@ -1,18 +1,26 @@
 import { TProjectMetadata } from '@/types/projects'
-import { ProjectCard } from './project-card'
+import { ProjectCard } from '@/components/project-card'
 
 interface ProjectsProps {
-  projectsMetadata: TProjectMetadata[]
+  projectsMeta: TProjectMetadata[]
 }
 
-export const Projects = ({ projectsMetadata }: ProjectsProps) => {
+export const Projects = ({ projectsMeta }: ProjectsProps) => {
   return (
-    <ul className='flex flex-col gap-8'>
-      {projectsMetadata.map(projectMetadata => (
-        <li key={`${projectMetadata.title}_${projectMetadata.created_at}`}>
-          <ProjectCard projectMetadata={projectMetadata} />
-        </li>
-      ))}
-    </ul>
+    <>
+      {projectsMeta.length === 0 ? (
+        <p className='text-sm font-medium text-muted-foreground'>
+          No results found
+        </p>
+      ) : (
+        <ul className='flex flex-col gap-8'>
+          {projectsMeta.map(projectMeta => (
+            <li key={`${projectMeta.title}_${projectMeta.created_at}`}>
+              <ProjectCard projectMetadata={projectMeta} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   )
 }

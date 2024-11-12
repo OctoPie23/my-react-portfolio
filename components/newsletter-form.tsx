@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/icons'
-import { subscribeNewsletter } from '@/lib/actions'
 
 export const NewsletterForm = () => {
   const { toast } = useToast()
@@ -36,8 +35,8 @@ export const NewsletterForm = () => {
     data: TNewsletterFormSchema,
   ) => {
     const { email } = data
-    const { success, error } = await subscribeNewsletter({ email })
-    console.log(error, success)
+    //const { success, error } = await subscribeNewsletter({ email })
+    console.log(email)
     toast({
       title: 'Subscribed!',
       description: 'You are now subscribed to the newsletter.',
