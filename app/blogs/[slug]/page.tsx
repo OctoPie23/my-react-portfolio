@@ -7,7 +7,6 @@ import { formatDate } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge, badgeVariants } from '@/components/ui/badge'
 import MDXContent from '@/components/mdx-content'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { UserAvatar } from '@/components/user-avatar'
 
 interface Props {
@@ -18,21 +17,21 @@ interface Props {
 
 // Static Site Generation (SSG) to improve performance on static contents.
 export async function generateStaticParams() {
-  const blogPostsMetadata = getBlogPostsMetadata()
+  const blogPostsMetadata = getBlogPostsMetadata({ all: true })
   const blogPostsSlugs = blogPostsMetadata.map(post => ({ slug: post.slug }))
 
   return blogPostsSlugs
 }
 
 export default function Page({ params: { slug } }: Props) {
-  const post = getBlogPostBySlug(slug)
+  const post = getBlogPostBySlug({ slug })
   if (!post) notFound()
 
   const { metadata, content } = post
 
   const { title, author, cover, tags } = metadata
 
-  const postDate = formatDate(metadata.datePublished)
+  const postDate = formatDate({ date: metadata.datePublished })
 
   return (
     <section className='pb-24'>

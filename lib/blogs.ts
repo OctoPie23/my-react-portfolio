@@ -2,10 +2,11 @@ import path from 'path'
 import fs from 'fs'
 import matter from 'gray-matter'
 import { TBlogPost, TBlogPostMetadata } from '@/types/blogs'
+import { BLOGS_PER_PAGE_DEFAULT, PAGE_INDEX_DEFAULT } from '@/lib/constants'
 
 const blogPostsDirectory = path.resolve(process.cwd(), 'content', 'blog-posts')
 
-function parseTags(tags: string | string[]): string[] {
+function parseTags({ tags }: { tags: string | string[] }): string[] {
   if (typeof tags === 'string' && tags.trim()) {
     return tags.split(',').map(tag => tag.trim())
   }
@@ -14,14 +15,23 @@ function parseTags(tags: string | string[]): string[] {
   return []
 }
 
-function getMDXFiles(dir: string): string[] {
+export function getBlogPostsLength(): number {
+  const blogPostFiles = getMDXFiles({ dir: blogPostsDirectory })
+  return blogPostFiles.length
+}
+
+function getMDXFiles({ dir }: { dir: string }): string[] {
   return fs
     .readdirSync(dir, { withFileTypes: true })
     .filter(dirent => dirent.isFile() && path.extname(dirent.name) === '.mdx')
     .map(dirent => dirent.name)
 }
 
-export function getBlogPostBySlug(slug: string): TBlogPost | null {
+export function getBlogPostBySlug({
+  slug,
+}: {
+  slug: string
+}): TBlogPost | null {
   const blogPostFilePath = path.join(blogPostsDirectory, `${slug}.mdx`)
 
   try {
@@ -35,56 +45,111 @@ export function getBlogPostBySlug(slug: string): TBlogPost | null {
       metadata: {
         ...data,
         author: 'Shrijal Acharya',
-        tags: parseTags(data.tags),
+        tags: parseTags({ tags: data.tags }),
       },
       content,
     } as TBlogPost
-  } catch {
+  } catch (error) {
+    console.error(`Error reading blog file: ${blogPostFilePath}`, error)
     return null
   }
 }
 
-export function getBlogPostsMetadata(limit?: number): TBlogPostMetadata[] {
-  const blogFiles = getMDXFiles(blogPostsDirectory)
+export function getBlogPostMetadata({
+  blogFilePath,
+}: {
+  blogFilePath: string
+}): TBlogPostMetadata | null {
+  const blogPostAbsFilePath = path.join(blogPostsDirectory, blogFilePath)
+  try {
+    const blogFileContent = fs.readFileSync(blogPostAbsFilePath, {
+      encoding: 'utf-8',
+    })
 
-  const blogPostsMetadata = blogFiles
-    .map(getBlogPostMetadata)
+    const { data } = matter(blogFileContent)
+    return {
+      ...data,
+      author: 'Shrijal Acharya',
+      tags: parseTags({ tags: data.tags }),
+    } as TBlogPostMetadata
+  } catch (error) {
+    console.error(
+      `Error reading metadata for file: ${blogPostAbsFilePath}`,
+      error,
+    )
+    return null
+  }
+}
+
+export function getBlogPostsMetadata({
+  page = PAGE_INDEX_DEFAULT,
+  perPage = BLOGS_PER_PAGE_DEFAULT,
+  all = false,
+}: {
+  page?: number
+  perPage?: number
+  all?: boolean
+}): TBlogPostMetadata[] {
+  const blogFiles = getMDXFiles({ dir: blogPostsDirectory })
+
+  if (all) {
+    return blogFiles
+      .map(file => getBlogPostMetadata({ blogFilePath: file }))
+      .filter((metadata): metadata is TBlogPostMetadata => metadata !== null)
+      .sort(
+        (a, b) =>
+          new Date(b.datePublished ?? '').getTime() -
+          new Date(a.datePublished ?? '').getTime(),
+      )
+  }
+
+  const start = (page - 1) * perPage
+
+  return blogFiles
+    .map(file => getBlogPostMetadata({ blogFilePath: file }))
+    .filter((metadata): metadata is TBlogPostMetadata => metadata !== null)
     .sort(
       (a, b) =>
-        new Date(b.datePublished ?? '').getTime() -
-        new Date(a.datePublished ?? '').getTime(),
+        new Date(b?.datePublished ?? '').getTime() -
+        new Date(a?.datePublished ?? '').getTime(),
     )
-
-  return limit ? blogPostsMetadata.slice(0, limit) : blogPostsMetadata
+    .slice(start, start + perPage)
 }
 
-export function getBlogPostMetadata(blogFilePath: string): TBlogPostMetadata {
-  const blogPostAbsFilePath = path.join(blogPostsDirectory, blogFilePath)
-  const blogFileContent = fs.readFileSync(blogPostAbsFilePath, {
-    encoding: 'utf-8',
-  })
+export function getBlogPostsWithContent({
+  page = PAGE_INDEX_DEFAULT,
+  perPage = BLOGS_PER_PAGE_DEFAULT,
+  all = false,
+}: {
+  page?: number
+  perPage?: number
+  all?: boolean
+}) {
+  const blogFiles = getMDXFiles({ dir: blogPostsDirectory })
 
-  const { data } = matter(blogFileContent)
-  return {
-    ...data,
-    author: 'Shrijal Acharya',
-    tags: parseTags(data.tags),
-  } as TBlogPostMetadata
-}
+  if (all) {
+    return blogFiles
+      .map(file => getBlogPostBySlug({ slug: file.replace(/\.mdx$/, '') }))
+      .filter((post): post is TBlogPost => post !== null)
+      .sort(
+        (a, b) =>
+          new Date(b.metadata.datePublished ?? '').getTime() -
+          new Date(a.metadata.datePublished ?? '').getTime(),
+      )
+  }
 
-export function getBlogPostsWithContent(limit?: number) {
-  const blogFiles = getMDXFiles(blogPostsDirectory)
+  const start = (page - 1) * perPage
+  const paginatedFiles = blogFiles.slice(start, start + perPage)
 
-  const allBlogPosts = blogFiles.map(file => {
-    const slug = file.replace(/\.mdx$/, '')
-    return getBlogPostBySlug(slug)
-  }) as TBlogPost[]
-
-  const sortedBlogPosts = allBlogPosts.sort(
-    (a, b) =>
-      new Date(b.metadata.datePublished ?? '').getTime() -
-      new Date(a.metadata.datePublished ?? '').getTime(),
-  )
-
-  return limit ? sortedBlogPosts.slice(0, limit) : allBlogPosts
+  return paginatedFiles
+    .map(file => {
+      const slug = file.replace(/\.mdx$/, '')
+      return getBlogPostBySlug({ slug })
+    })
+    .filter((blog): blog is TBlogPost => blog !== null)
+    .sort(
+      (a, b) =>
+        new Date(b.metadata.datePublished ?? '').getTime() -
+        new Date(a.metadata.datePublished ?? '').getTime(),
+    )
 }

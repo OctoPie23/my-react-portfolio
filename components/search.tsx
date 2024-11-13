@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useDebounce } from 'use-debounce'
 import { Button } from '@/components/ui/button'
 import { CrossIcon } from '@/components/icons'
@@ -15,16 +15,22 @@ interface SearchProps {
 
 export const Search = ({ endpoint, placeholder, query }: SearchProps) => {
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const [filterText, setFilterText] = useState<string>(query ?? '')
 
   const [userQuery] = useDebounce(filterText, 250)
 
   useEffect(() => {
-    if (!userQuery) return router.push(`/${endpoint}`)
-    const encodedUrl = `/${endpoint}?q=${encodeURIComponent(userQuery)}`
-    router.push(encodedUrl)
-  }, [router, endpoint, userQuery])
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+
+    if (userQuery) newSearchParams.set('q', userQuery)
+    else {
+      newSearchParams.delete('q')
+    }
+
+    router.push(`/${endpoint}?${newSearchParams.toString()}`)
+  }, [router, userQuery, searchParams, endpoint])
 
   const resetFilter = () => setFilterText('')
 
@@ -38,6 +44,7 @@ export const Search = ({ endpoint, placeholder, query }: SearchProps) => {
         value={filterText}
         onChange={event => setFilterText(event.target.value)}
       />
+
       {filterText.length > 0 ? (
         <Button
           size='default'

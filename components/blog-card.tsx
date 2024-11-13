@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { formatDate } from '@/lib/utils'
+import { WORDS_PER_MINUTE_DEFAULT } from '@/lib/constants'
 
 interface BlogCardProps {
   blogWithContent: TBlogPost
@@ -22,8 +23,11 @@ export const BlogCard = ({ blogWithContent }: BlogCardProps) => {
     content,
   } = blogWithContent
 
-  const blogWordsCount = wordsCount(content)
-  const readingTime = minRead(blogWordsCount, 250)
+  const blogWordsCount = wordsCount({ text: content })
+  const readingTime = minRead({
+    wordCount: blogWordsCount,
+    wordsPerMinute: WORDS_PER_MINUTE_DEFAULT,
+  })
 
   return (
     <Link href={`/blogs/${slug}`} className='block'>
@@ -52,7 +56,9 @@ export const BlogCard = ({ blogWithContent }: BlogCardProps) => {
           </CardContent>
 
           <CardFooter className='mt-2 p-0 text-xs font-light text-zinc-400'>
-            {datePublished ? formatDate(datePublished, true) : null}
+            {datePublished
+              ? formatDate({ date: datePublished, short: true })
+              : null}
           </CardFooter>
         </div>
       </Card>

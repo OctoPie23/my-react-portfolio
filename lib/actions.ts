@@ -13,13 +13,13 @@ import {
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-type TResonse = {
+type TResponse = {
   error: Error | null
   success: boolean
 }
 
-type TSendEmailResponse = TResonse
-type TSubscribeNewsletterResponse = TResonse
+type TSendEmailResponse = TResponse
+type TSubscribeNewsletterResponse = TResponse
 
 async function subscribeNewsletterHashnode(
   data: TNewsletterFormSchema,

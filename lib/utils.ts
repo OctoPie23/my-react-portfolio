@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-function timeAgo(date: Date): string {
+function timeAgo({ date }: { date: Date }): string {
   const now = new Date()
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
 
@@ -27,7 +27,13 @@ function timeAgo(date: Date): string {
   return 'just now'
 }
 
-export function formatDate(date: string, short?: boolean): string | null {
+export function formatDate({
+  date,
+  short,
+}: {
+  date: string
+  short?: boolean
+}): string | null {
   const parsedDate = new Date(date)
 
   if (isNaN(parsedDate.getTime())) return null
@@ -40,14 +46,20 @@ export function formatDate(date: string, short?: boolean): string | null {
 
   if (short) return standardDate
 
-  const timeAgoText = timeAgo(parsedDate)
+  const timeAgoText = timeAgo({ date: parsedDate })
   return `${standardDate} (${timeAgoText})`
 }
 
-export function wordsCount(text: string) {
+export function wordsCount({ text }: { text: string }) {
   return text.trim().split(/\s+/).length
 }
 
-export function minRead(wordCount: number, wordsPerMinute: number) {
+export function minRead({
+  wordCount,
+  wordsPerMinute,
+}: {
+  wordCount: number
+  wordsPerMinute: number
+}) {
   return Math.floor(wordCount / wordsPerMinute)
 }

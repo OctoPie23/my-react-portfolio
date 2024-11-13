@@ -14,7 +14,7 @@ export default function RecentPosts({ projectsMeta }: RecentProjectsProps) {
 
       <Link
         href='/projects'
-        className='mt-8 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground'
+        className='mt-8 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-zinc-500'
       >
         <span>All projects</span>
       </Link>
