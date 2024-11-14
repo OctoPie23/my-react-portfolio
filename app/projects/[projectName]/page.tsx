@@ -4,7 +4,7 @@ import MDXContent from '@/components/mdx-content'
 import { Badge, badgeVariants } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { UserAvatar } from '@/components/user-avatar'
-import { STARS_COUNT_TO_SHOW_ICON } from '@/lib/constants'
+import { PROJECT_FILTER_TOPIC, STARS_COUNT_TO_SHOW_ICON } from '@/lib/constants'
 import { getProjectByTitle, getProjectsMetadata } from '@/lib/projects'
 import { formatDate } from '@/lib/utils'
 import Link from 'next/link'
@@ -72,7 +72,6 @@ export default function Page({ params: { projectName } }: Props) {
               </InfoTooltip>
             ) : null}
           </h1>
-
           <div className='mt-3 flex items-center'>
             <Link href='/contact-me' className='flex items-center'>
               <UserAvatar className='mr-0 size-8 sm:mr-2' />
@@ -89,17 +88,20 @@ export default function Page({ params: { projectName } }: Props) {
               </span>
             ) : null}
           </div>
-
-          {topics && topics.length > 0 ? (
+          {topics &&
+          Array.isArray(topics) &&
+          topics.filter(topic => topic !== PROJECT_FILTER_TOPIC).length > 0 ? (
             <div className='mt-4 flex flex-row flex-wrap gap-2'>
-              {topics.map(topic => (
-                <Badge
-                  key={topic}
-                  className={badgeVariants({ variant: 'secondary' })}
-                >
-                  {topic}
-                </Badge>
-              ))}
+              {topics
+                .filter(topic => topic !== PROJECT_FILTER_TOPIC)
+                .map(topic => (
+                  <Badge
+                    key={topic}
+                    className={badgeVariants({ variant: 'secondary' })}
+                  >
+                    {topic}
+                  </Badge>
+                ))}
             </div>
           ) : null}
         </header>

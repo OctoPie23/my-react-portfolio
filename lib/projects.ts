@@ -2,7 +2,11 @@ import path from 'path'
 import fs from 'fs'
 import { TProject, TProjectMetadata } from '@/types/projects'
 import matter from 'gray-matter'
-import { PAGE_INDEX_DEFAULT, PROJECTS_PER_PAGE_DEFAULT } from './constants'
+import {
+  PAGE_INDEX_DEFAULT,
+  PROJECT_FILTER_TOPIC,
+  PROJECTS_PER_PAGE_DEFAULT,
+} from '@/lib/constants'
 
 const projectsDirectory = path.resolve(process.cwd(), 'content', 'projects')
 
@@ -15,7 +19,13 @@ function getMDXFiles({ dir }: { dir: string }): string[] {
 
 export function getProjectsLength(): number {
   const projectFiles = getMDXFiles({ dir: projectsDirectory })
-  return projectFiles.length
+  return projectFiles.filter(file => {
+    const metadata = getProjectMetadata({ projectFilePath: file })
+    return (
+      metadata !== null &&
+      metadata.topics?.includes(PROJECT_FILTER_TOPIC) === true
+    )
+  }).length
 }
 
 export function getProjectByTitle({
@@ -79,26 +89,22 @@ export function getProjectsMetadata({
 }): TProjectMetadata[] {
   const projectFiles = getMDXFiles({ dir: projectsDirectory })
 
-  if (all) {
-    return projectFiles
-      .map(file => getProjectMetadata({ projectFilePath: file }))
-      .filter((metadata): metadata is TProjectMetadata => metadata !== null)
-      .sort(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-      )
-  }
-
-  const start = (page - 1) * perPage
-
-  return projectFiles
+  const projectsWithMetadata = projectFiles
     .map(file => getProjectMetadata({ projectFilePath: file }))
-    .filter((metadata): metadata is TProjectMetadata => metadata !== null)
+    .filter(
+      (metadata): metadata is TProjectMetadata =>
+        metadata !== null &&
+        metadata.topics?.includes(PROJECT_FILTER_TOPIC) === true,
+    )
     .sort(
       (a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     )
-    .slice(start, start + perPage)
+
+  if (all) return projectsWithMetadata
+
+  const start = (page - 1) * perPage
+  return projectsWithMetadata.slice(start, start + perPage)
 }
 
 export function getProjectsWithContent({
@@ -112,32 +118,24 @@ export function getProjectsWithContent({
 }) {
   const projectFiles = getMDXFiles({ dir: projectsDirectory })
 
-  if (all) {
-    return projectFiles
-      .map(file => {
-        const slug = file.replace(/_README\.mdx$/, '')
-        return getProjectByTitle({ title: slug })
-      })
-      .filter((project): project is TProject => project !== null)
-      .sort(
-        (a, b) =>
-          new Date(b.metadata.created_at ?? '').getTime() -
-          new Date(a.metadata.created_at ?? '').getTime(),
-      )
-  }
-
-  const start = (page - 1) * perPage
-  const paginatedFiles = projectFiles.slice(start, start + perPage)
-
-  return paginatedFiles
+  const projectsWithContent = projectFiles
     .map(file => {
       const slug = file.replace(/_README\.mdx$/, '')
       return getProjectByTitle({ title: slug })
     })
-    .filter((project): project is TProject => project !== null)
+    .filter(
+      (project): project is TProject =>
+        project !== null &&
+        project.metadata.topics?.includes(PROJECT_FILTER_TOPIC) === true,
+    )
     .sort(
       (a, b) =>
         new Date(b.metadata.created_at ?? '').getTime() -
         new Date(a.metadata.created_at ?? '').getTime(),
     )
+
+  if (all) return projectsWithContent
+
+  const start = (page - 1) * perPage
+  return projectsWithContent.slice(start, start + perPage)
 }
