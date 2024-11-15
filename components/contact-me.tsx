@@ -9,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useToast } from '@/hooks/use-toast'
 import { sendEmail } from '@/lib/actions'
 import Link from 'next/link'
 import { Loader } from '@/components/icons'
@@ -21,10 +20,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { toast } from 'sonner'
 
 export const ContactMe = () => {
-  const { toast } = useToast()
-
   const form = useForm<TContactFormSchema>({
     resolver: zodResolver(ContactFormSchema),
     defaultValues: {
@@ -39,17 +37,9 @@ export const ContactMe = () => {
   ) => {
     const { success, error } = await sendEmail(data)
 
-    if (!success || error) {
-      return toast({
-        title: 'Something went wrong!',
-        variant: 'destructive',
-      })
-    }
+    if (!success || error) return toast.error('Something went wrong!')
 
-    toast({
-      title: 'Success!',
-      description: 'Your message has been sent.',
-    })
+    toast.success('Message sent successfully!')
 
     form.reset()
   }
@@ -145,7 +135,11 @@ export const ContactMe = () => {
           </div>
           <p className='mt-4 text-xs text-muted-foreground'>
             By submitting this form, I agree to the{' '}
-            <Link href='/privacy' className='font-bold' target='_blank'>
+            <Link
+              href='/privacy'
+              className='font-bold hover:underline hover:underline-offset-2'
+              target='_blank'
+            >
               privacy&nbsp;policy.
             </Link>
           </p>

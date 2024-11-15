@@ -1,26 +1,25 @@
-import { TBlogPost } from '@/types/blogs'
 import { BlogCard } from '@/components/blog-card'
+import { TBlogCardMetadata } from '@/types/blogs'
 
 interface BlogsProps {
-  blogsWithContent: TBlogPost[]
+  blogsWithMeta: TBlogCardMetadata[]
 }
 
-export const Blogs = ({ blogsWithContent }: BlogsProps) => {
+export const Blogs = ({ blogsWithMeta }: BlogsProps) => {
   return (
     <>
-      {blogsWithContent.length === 0 ? (
+      {blogsWithMeta && blogsWithMeta.length === 0 ? (
         <p className='text-sm font-medium text-muted-foreground'>
           No results found
         </p>
       ) : (
         <ul className='flex flex-col gap-8'>
-          {blogsWithContent.map(blogWithContent => (
-            <li
-              key={`${blogWithContent.metadata.cuid}_${blogWithContent.metadata.slug}`}
-            >
-              <BlogCard blogWithContent={blogWithContent} />
-            </li>
-          ))}
+          {blogsWithMeta?.length &&
+            blogsWithMeta.map(blogMeta => (
+              <li key={`${blogMeta.slug}_${blogMeta.readTimeInMinutes}`}>
+                <BlogCard blogWithMeta={blogMeta} />
+              </li>
+            ))}
         </ul>
       )}
     </>

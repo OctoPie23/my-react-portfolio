@@ -1,19 +1,111 @@
-export type TBlogPost = {
-  metadata: TBlogPostMetadata
-  content: string
+export type TBlogCardMetadata = {
+  id: string
+  title: string
+  readTimeInMinutes: number
+  brief: string
+  publication: {
+    id: string
+  }
+  publishedAt: string
+  slug: string
+  tags?: {
+    name: string
+  }[]
+  author: {
+    name: string
+  }
 }
 
-export type TBlogPostMetadata = {
+export type TGetBlogsLength = {
+  publication: {
+    posts: {
+      totalDocuments: number
+    }
+  }
+}
+
+export type TPostMetadata = {
+  id: string
   title: string
-  seoTitle?: string
-  seoDescription?: string
-  datePublished: string
-  cuid: string
+  readTimeInMinutes: number
+  publishedAt: string
+  brief: string
   slug: string
-  cover?: string
-  // Hashnode does not provide the author field in their frontmatter
-  // This is a custom field that I have added myself.
-  author?: string
-  ogImage?: string
-  tags?: string[]
+  tags: { name: string }[]
+  author: { name: string }
+}
+
+export type TGetPostsResponse = {
+  publication: {
+    posts: {
+      edges: {
+        node: TPostMetadata
+        cursor: string
+      }[]
+    }
+  }
+}
+
+export type TGetBlogsMetadata = {
+  user: {
+    posts: {
+      edges: {
+        node: TBlogCardMetadata
+      }[]
+      pageInfo: {
+        hasNextPage: boolean
+        hasPreviousPage: boolean
+        previousPage: number
+        nextPage: number
+      }
+    }
+  }
+}
+
+export type TGetBlogsMetadataArgs = {
+  pageSize?: number
+  page?: number
+  all?: boolean
+}
+
+export type TSubscribeToNewsletterResponse = {
+  data?: {
+    subscribeToNewsletter: {
+      status: string
+    }
+  }
+
+  errors?: { message: string }[]
+}
+
+export type TGetBlogPostIDBySlugResponse = {
+  publication: {
+    post: {
+      id: string
+    }
+  }
+}
+
+export type TGetBlogByIDResponse = {
+  post: {
+    title: string
+    subtitle?: string
+    readTimeInMinutes: number
+    publishedAt: string
+    seo: {
+      description?: string
+    }
+    tags?: {
+      name: string
+    }[]
+    coverImage: {
+      url?: string
+    }
+    content: {
+      markdown: string
+    }
+    author: {
+      name: string
+    }
+  }
 }

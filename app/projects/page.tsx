@@ -3,8 +3,19 @@ import { PaginationControls } from '@/components/pagination-controls'
 import { Projects } from '@/components/projects'
 import { Search } from '@/components/search'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { PAGE_INDEX_DEFAULT, PROJECTS_PER_PAGE_DEFAULT } from '@/lib/constants'
+import {
+  DEBOUNCE_TIME_PROJECTS,
+  PAGE_INDEX_DEFAULT,
+  PROJECTS_PER_PAGE_DEFAULT,
+} from '@/lib/constants'
 import { getProjectsLength, getProjectsMetadata } from '@/lib/projects'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Projects',
+  description:
+    'Collection of my selected public repositories fetched through GitHub Actions.',
+}
 
 export default function Page({
   searchParams,
@@ -13,12 +24,12 @@ export default function Page({
 }) {
   const pageQuery =
     typeof searchParams?.page === 'string'
-      ? Number(searchParams?.page)
+      ? Math.max(Number(searchParams?.page), 1)
       : PAGE_INDEX_DEFAULT
 
   const perPageQuery =
     typeof searchParams?.perPage === 'string'
-      ? Number(searchParams?.perPage)
+      ? Math.max(Number(searchParams?.perPage), 1)
       : PROJECTS_PER_PAGE_DEFAULT
 
   const searchQuery =
@@ -83,6 +94,7 @@ export default function Page({
 
       <Search
         query={searchQuery}
+        debounceTime={DEBOUNCE_TIME_PROJECTS}
         endpoint='projects'
         placeholder='Search projects by name or language...'
       />

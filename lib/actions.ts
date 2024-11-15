@@ -10,8 +10,9 @@ import {
   NewsletterFormSchema,
   TNewsletterFormSchema,
 } from '@/lib/validators/newsletter-form'
+import { env } from './env'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(env.RESEND_API_KEY)
 
 type TResponse = {
   error: Error | null
@@ -36,13 +37,12 @@ async function saveContactsResend(
   const { email } = data
   return await resend.contacts.create({
     email,
-    audienceId: process.env.RESEND_AUDIENCE_ID as string,
+    audienceId: env.RESEND_AUDIENCE_ID,
   })
 }
 
 async function sendEmailResend(data: TContactFormSchema) {
-  const senderEmail =
-    process.env.RESEND_FROM_EMAIL ?? 'shrijal.acharya@gmail.com'
+  const senderEmail = env.RESEND_FROM_EMAIL
 
   const { email, name, message } = data
   return await resend.emails.send({

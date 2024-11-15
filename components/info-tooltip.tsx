@@ -25,12 +25,10 @@ export const InfoTooltip = ({
 }: InfoTooltipProps) => {
   return (
     <TooltipProvider>
-      <Tooltip delayDuration={50}>
+      <Tooltip delayDuration={100}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
         <TooltipContent side={side} align={align}>
-          <p className={cn('text-sm font-semibold capitalize', className)}>
-            {label.toLowerCase()}
-          </p>
+          <p className={cn('text-sm font-semibold', className)}>{label}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

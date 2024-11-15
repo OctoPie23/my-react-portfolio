@@ -1,18 +1,24 @@
 import {
   CodingNinjasIcon,
+  CourseraIcon,
   DevToIcon,
+  DiscordIcon,
   GeeksForGeeksIcon,
   GitHubIcon,
+  GmailIcon,
   HashnodeIcon,
+  InstagramIcon,
   LeetCodeIcon,
   LinkedInIcon,
   TwitterIcon,
 } from '@/components/icons'
 import { Social } from '@/components/social'
+import { InfoTooltip } from '@/components/info-tooltip'
+import { PUBLIC_GMAIL } from '@/lib/constants'
 
 const socialCategories = [
   {
-    name: 'socials',
+    name: 'Social Media',
     items: [
       {
         name: 'LinkedIn',
@@ -39,10 +45,35 @@ const socialCategories = [
         href: 'https://x.com/shricodev',
         icon: TwitterIcon,
       },
+      {
+        name: 'Instagram',
+        href: 'https://instagram.com/itspiyush.ach',
+        icon: InstagramIcon,
+      },
     ],
   },
   {
-    name: 'coding profiles',
+    name: 'Additional Platforms',
+    items: [
+      {
+        name: 'Discord',
+        href: 'https://discordapp.com/users/1082700727220183151',
+        icon: DiscordIcon,
+      },
+      {
+        name: 'Gmail',
+        href: `mailto:${PUBLIC_GMAIL}`,
+        icon: GmailIcon,
+      },
+      {
+        name: 'Coursera',
+        href: 'https://www.coursera.org/user/6f7698d69fb4ee325093383f88d8d2ff',
+        icon: CourseraIcon,
+      },
+    ],
+  },
+  {
+    name: 'Coding Profiles',
     items: [
       {
         name: 'LeetCode',
@@ -74,13 +105,20 @@ export const Socials = () => {
 
           <div className='flex flex-row space-x-2 overflow-x-auto'>
             {category.items.map(social => (
-              <Social
+              <InfoTooltip
                 key={social.name}
-                href={social.href}
-                name={social.name}
-                Icon={social.icon}
-                iconClassName='size-5 md:size-6'
-              />
+                label={social.name}
+                side='bottom'
+                className='text-xs'
+              >
+                <Social
+                  key={social.name}
+                  href={social.href}
+                  name={social.name}
+                  Icon={social.icon}
+                  iconClassName='size-5 md:size-6'
+                />
+              </InfoTooltip>
             ))}
           </div>
         </div>

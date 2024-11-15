@@ -50,16 +50,26 @@ export function formatDate({
   return `${standardDate} (${timeAgoText})`
 }
 
-export function wordsCount({ text }: { text: string }) {
-  return text.trim().split(/\s+/).length
+export function parseMDX({ markdown }: { markdown: string }): string {
+  let parsedMarkdown = removeMDXAcorns({ markdown })
+  parsedMarkdown = removeAlignProperty({ markdown: parsedMarkdown })
+
+  return parsedMarkdown
 }
 
-export function minRead({
-  wordCount,
-  wordsPerMinute,
-}: {
-  wordCount: number
-  wordsPerMinute: number
-}) {
-  return Math.floor(wordCount / wordsPerMinute)
+function removeMDXAcorns({ markdown }: { markdown: string }): string {
+  const acornLineRegex = /^(.*%\[.*?\].*)$/gm
+  const acornBlockRegex = /{%.*?%}/g
+
+  markdown = markdown.replace(acornLineRegex, '').replace(acornBlockRegex, '')
+
+  return markdown
+}
+
+function removeAlignProperty({ markdown }: { markdown: string }): string {
+  const regex = /(!\[.*?\]\(.*?\s+align=".*?"\))/g
+
+  return markdown.replace(regex, match => {
+    return match.replace(/\s+align=".*?"/, '')
+  })
 }

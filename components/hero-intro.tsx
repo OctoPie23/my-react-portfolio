@@ -1,12 +1,5 @@
 import Image from 'next/image'
-import {
-  Card,
-  //CardHeader,
-  //CardTitle,
-  //CardDescription,
-  //CardContent,
-  //CardFooter,
-} from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 
 export const HeroIntro = () => {
   return (
@@ -14,7 +7,7 @@ export const HeroIntro = () => {
       <section className='flex flex-col items-center gap-y-4 md:flex-row md:items-center md:gap-x-10'>
         <div className='flex-1'>
           <h1 className='title mb-8 no-underline'>Hey, I&#39;m Shrijal 👋</h1>
-          <p className='mt-3 font-light text-muted-foreground'>
+          <p className='prose my-2 font-medium text-zinc-800 dark:text-zinc-300'>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit,
             quam voluptas dolores autem consectetur voluptatem cum quia vero
             voluptatibus iste odit necessitatibus quaerat beatae enim tempora.
@@ -23,7 +16,7 @@ export const HeroIntro = () => {
         </div>
         <Image
           className='hidden rounded-full md:block'
-          src={'/images/shricodev.jpg'}
+          src='/images/shrijal-acharya.jpg'
           alt='Shrijal Acharya'
           width={175}
           height={175}
@@ -31,21 +24,30 @@ export const HeroIntro = () => {
         />
       </section>
 
-      <Card className='mt-6 p-4 md:flex md:items-center'>
-        <div className='md:hidden md:flex-shrink-0'>
+      <Card className='my-6 p-4 shadow-none md:flex md:items-center'>
+        <div className='flex items-center md:flex-shrink-0'>
           <Image
-            src={'/images/shricodev.jpg'}
+            src='/images/shrijal-acharya.jpg'
             alt='Shrijal Acharya'
-            width={175}
-            height={175}
+            width={120}
+            height={120}
             className='rounded-full'
           />
-        </div>
-
-        <div className='hidden md:flex md:w-1/3 md:items-center'>
-          <p className='text-lg font-medium'>Additional Information</p>
+          <div className='ml-4'>
+            <ul className='mt-2 space-y-1 font-light text-muted-foreground'>
+              <li>1000+ blog posts</li>
+              <li>10,000+ tweets all time</li>
+            </ul>
+          </div>
         </div>
       </Card>
+
+      <p className='prose mt-3 max-w-full font-medium text-zinc-800 dark:text-zinc-300'>
+        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione quo
+        ducimus asperiores eveniet consectetur velit mollitia unde minus
+        molestias, quisquam cupiditate, doloribus animi itaque corrupti maxime
+        dolorum non soluta nam.
+      </p>
     </>
   )
 }

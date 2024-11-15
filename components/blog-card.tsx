@@ -1,8 +1,6 @@
-import { TBlogPost } from '@/types/blogs'
-import { minRead, wordsCount } from '@/lib/utils'
+'use client'
+
 import Link from 'next/link'
-import React from 'react'
-import Image from 'next/image'
 import {
   Card,
   CardContent,
@@ -11,57 +9,84 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { formatDate } from '@/lib/utils'
-import { WORDS_PER_MINUTE_DEFAULT } from '@/lib/constants'
+import { TBlogCardMetadata } from '@/types/blogs'
+import { UserAvatar } from '@/components/user-avatar'
+import { Badge } from '@/components/ui/badge'
+import { BookIcon } from '@/components/icons'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface BlogCardProps {
-  blogWithContent: TBlogPost
+  blogWithMeta: TBlogCardMetadata
 }
 
-export const BlogCard = ({ blogWithContent }: BlogCardProps) => {
-  const {
-    metadata: { title, author, cover, datePublished, slug },
-    content,
-  } = blogWithContent
+export const BlogCard = ({ blogWithMeta }: BlogCardProps) => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const blogWordsCount = wordsCount({ text: content })
-  const readingTime = minRead({
-    wordCount: blogWordsCount,
-    wordsPerMinute: WORDS_PER_MINUTE_DEFAULT,
-  })
+  const { title, author, tags, brief, slug, readTimeInMinutes, publishedAt } =
+    blogWithMeta
+
+  const handleBadgeClick = (tag: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    // There is no need to encode the tag, router.push does ist for us.
+    params.set('q', tag)
+
+    router.push(`/blogs?${params.toString()}`)
+  }
 
   return (
-    <Link href={`/blogs/${slug}`} className='block'>
-      <Card className='flex max-w-3xl flex-row gap-5 border-none p-4 shadow-sm'>
-        {cover ? (
-          <Image
-            src={cover}
-            alt={title}
-            width={135}
-            height={80}
-            className='hidden rounded object-cover sm:block'
-          />
-        ) : (
-          <div className='h-[80px] w-[135px] rounded bg-zinc-200 dark:bg-zinc-800' />
-        )}
+    <Card className='w-full max-w-3xl border-none bg-zinc-50 dark:bg-zinc-900'>
+      <div className='flex flex-1 flex-col justify-between'>
+        <CardHeader>
+          <Link className='flex flex-col' href={`/blogs/${slug}`}>
+            <CardTitle className='text-lg font-semibold hover:underline hover:underline-offset-4'>
+              {title}
+            </CardTitle>
+          </Link>
+          {tags && tags.length > 0 ? (
+            <div className='flex flex-wrap gap-2 py-2'>
+              {tags.map(tag => (
+                <Badge
+                  key={tag.name}
+                  variant='secondary'
+                  className='cursor-pointer text-zinc-500 hover:text-zinc-600 dark:text-zinc-300 dark:hover:text-zinc-400'
+                  onClick={() => handleBadgeClick(tag.name)}
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
+        </CardHeader>
 
-        <div className='flex flex-1 flex-col justify-between'>
-          <CardHeader className='mb-2 p-0'>
-            <CardTitle className='text-lg font-semibold'>{title}</CardTitle>
-          </CardHeader>
-
-          <CardContent className='p-0 text-sm text-muted-foreground'>
-            <span>{author ? `${author} • ` : null}</span>
-            <span>{`${blogWordsCount} words • `}</span>
-            <span>{`${readingTime} min read`}</span>
+        <Link className='flex flex-col' href={`/blogs/${slug}`}>
+          <CardContent className='prose max-w-full text-zinc-700 dark:text-zinc-400'>
+            {brief}
           </CardContent>
+        </Link>
 
-          <CardFooter className='mt-2 p-0 text-xs font-light text-zinc-400'>
-            {datePublished
-              ? formatDate({ date: datePublished, short: true })
-              : null}
-          </CardFooter>
-        </div>
-      </Card>
-    </Link>
+        <CardFooter className='text-sm text-muted-foreground'>
+          <Link href='/contact-me' className='flex items-center'>
+            <UserAvatar className='size-7 sm:mr-2' />
+            {author ? (
+              <span className='hidden text-sm hover:underline hover:underline-offset-2 sm:inline'>
+                {author.name}
+              </span>
+            ) : null}
+          </Link>
+
+          <span className='mx-1'>•</span>
+
+          <span className='flex items-center gap-1'>
+            <BookIcon className='size-4' />
+            {`${readTimeInMinutes} min read`}
+          </span>
+
+          <span className='mx-1 text-muted-foreground'>•</span>
+
+          <span>{formatDate({ date: publishedAt, short: true })}</span>
+        </CardFooter>
+      </div>
+    </Card>
   )
 }

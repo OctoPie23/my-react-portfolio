@@ -26,7 +26,7 @@ export const ThemeToggle = () => {
     resolvedTheme === 'light' ? (
       <MoonIcon className='size-5 text-zinc-900' />
     ) : (
-      <SunIcon className='size-5 text-orange-300' />
+      <SunIcon className='size-5 text-foreground' />
     )
 
   return (

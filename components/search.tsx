@@ -1,36 +1,46 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useDebounce } from 'use-debounce'
 import { Button } from '@/components/ui/button'
 import { CrossIcon } from '@/components/icons'
+import { DEBOUNCE_TIME_DEFAULT } from '@/lib/constants'
 
 interface SearchProps {
   endpoint: 'projects' | 'blogs'
   query?: string
   placeholder: string
+  debounceTime?: number
 }
 
-export const Search = ({ endpoint, placeholder, query }: SearchProps) => {
+export const Search = ({
+  endpoint,
+  placeholder,
+  query,
+  debounceTime = DEBOUNCE_TIME_DEFAULT,
+}: SearchProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
 
   const [filterText, setFilterText] = useState<string>(query ?? '')
 
-  const [userQuery] = useDebounce(filterText, 250)
+  const [userQuery] = useDebounce(filterText, debounceTime)
 
   useEffect(() => {
-    const newSearchParams = new URLSearchParams(searchParams.toString())
+    if (query === userQuery) return
 
-    if (userQuery) newSearchParams.set('q', userQuery)
-    else {
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+    if (userQuery) {
+      newSearchParams.set('q', userQuery)
+    } else {
       newSearchParams.delete('q')
     }
 
     router.push(`/${endpoint}?${newSearchParams.toString()}`)
-  }, [router, userQuery, searchParams, endpoint])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, userQuery, endpoint])
 
   const resetFilter = () => setFilterText('')
 

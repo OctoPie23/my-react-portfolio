@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import {
   Card,
@@ -14,13 +16,17 @@ import { buttonVariants } from '@/components/ui/button'
 import { GitHubIcon, StarIcon } from '@/components/icons'
 import { UserAvatar } from './user-avatar'
 import { STARS_COUNT_TO_SHOW_ICON } from '@/lib/constants'
-import { InfoTooltip } from './info-tooltip'
+import { InfoTooltip } from '@/components/info-tooltip'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface ProjectCardProps {
   projectMetadata: TProjectMetadata
 }
 
 export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   const {
     title,
     author,
@@ -36,8 +42,16 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
 
   const formattedCreatedDate = formatDate({ date: created_at, short: true })
 
+  const handleBadgeClick = (language: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    // There is no need to encode the language, router.push does ist for us.
+    params.set('q', language)
+
+    router.push(`/projects?${params.toString()}`)
+  }
+
   return (
-    <Card className='w-full max-w-3xl'>
+    <Card className='w-full max-w-3xl border-none bg-zinc-50 dark:bg-zinc-900'>
       <CardHeader>
         <CardTitle className='flex items-center justify-between text-lg font-semibold'>
           <div className='flex items-center gap-2'>
@@ -51,19 +65,23 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
             {starsCount > STARS_COUNT_TO_SHOW_ICON ? (
               <InfoTooltip
                 side='top'
-                label={`Loved by the community`}
+                label='Loved by the community'
                 className='text-xs'
               >
-                <StarIcon className='size-5 shrink-0 text-orange-300' />
+                {/* As this is a client component, the tooltip required the children to accept the ref property*/}
+                {/* So we have to wrap it inside a html tag. */}
+                <span>
+                  <StarIcon className='size-5 shrink-0 text-orange-300' />
+                </span>
               </InfoTooltip>
             ) : null}
           </div>
 
-          <span className='hidden text-xs font-light text-muted-foreground sm:inline'>
+          <span className='hidden text-sm font-light text-muted-foreground sm:inline'>
             {formattedCreatedDate}
           </span>
         </CardTitle>
-        <CardDescription className='flex text-sm text-muted-foreground'>
+        <CardDescription className='flex text-sm text-zinc-700 dark:text-zinc-400'>
           <div className='mt-3 flex items-center'>
             <Link href='/contact-me' className='flex items-center'>
               <UserAvatar className='mr-2 size-8' />
@@ -77,10 +95,11 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
             <div className='flex items-center text-sm'>
               {language ? (
                 <>
-                  <span className='mr-1 sm:mx-1'>•</span>
+                  <span className='mr-1 text-muted-foreground sm:mx-1'>•</span>
                   <Badge
                     variant='outline'
-                    className='ml-1 text-muted-foreground'
+                    className='ml-1 cursor-pointer text-muted-foreground hover:text-zinc-600 dark:hover:text-zinc-400'
+                    onClick={() => handleBadgeClick(language)}
                   >
                     {language}
                   </Badge>
@@ -90,9 +109,11 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
           </div>
         </CardDescription>
       </CardHeader>
-      <CardContent className='text-muted-foreground'>
-        {description ? `${description}` : null}
-      </CardContent>
+      {description ? (
+        <CardContent className='prose max-w-full text-zinc-700 dark:text-zinc-400'>
+          {description}
+        </CardContent>
+      ) : null}
       <CardFooter className='flex justify-between'>
         <a
           href={clone_url}

@@ -1,6 +1,5 @@
 'use client'
 
-import { useToast } from '@/hooks/use-toast'
 import {
   NewsletterFormSchema,
   TNewsletterFormSchema,
@@ -20,10 +19,10 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/icons'
+import { subscribeToNewsletter } from '@/lib/blogs'
+import { toast } from 'sonner'
 
 export const NewsletterForm = () => {
-  const { toast } = useToast()
-
   const form = useForm<TNewsletterFormSchema>({
     resolver: zodResolver(NewsletterFormSchema),
     defaultValues: {
@@ -35,29 +34,37 @@ export const NewsletterForm = () => {
     data: TNewsletterFormSchema,
   ) => {
     const { email } = data
-    //const { success, error } = await subscribeNewsletter({ email })
-    console.log(email)
-    toast({
-      title: 'Subscribed!',
-      description: 'You are now subscribed to the newsletter.',
-    })
+
+    try {
+      await subscribeToNewsletter({ email })
+
+      toast.success('Check your email to confirm your subscription!', {
+        description: 'Make sure to check your spam folder.',
+      })
+
+      form.reset()
+    } catch {
+      return toast.error('Something went wrong!', {
+        description: 'You might already be subscribed.',
+      })
+    }
   }
 
   return (
     <section className='mb-10 mt-24'>
       <Card className='rounded-lg border-0 dark:border'>
         <CardContent className='flex flex-col gap-8 pt-6 md:flex-row md:justify-between md:pt-8'>
-          <div>
+          <div className='flex-grow'>
             <h2 className='text-2xl font-bold'>Subscribe to my newsletter</h2>
             <p className='text-muted-foreground'>
-              Get updates on my projects and blogs
+              Get recent projects &amp; blog updates to your inbox.
             </p>
           </div>
 
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleFormSubmit)}
-              className='flex flex-col items-start gap-3'
+              className='flex flex-grow flex-col items-start gap-3'
               noValidate
             >
               <div className='w-full'>
@@ -99,8 +106,12 @@ export const NewsletterForm = () => {
               </div>
 
               <p className='text-xs text-muted-foreground'>
-                We care about your data. Read our{' '}
-                <Link href='/privacy' className='font-bold' target='_blank'>
+                I never share your email. Read our{' '}
+                <Link
+                  href='/privacy'
+                  className='font-bold hover:underline hover:underline-offset-2'
+                  target='_blank'
+                >
                   privacy&nbsp;policy.
                 </Link>
               </p>

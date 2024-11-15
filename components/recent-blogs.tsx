@@ -1,22 +1,24 @@
 import Link from 'next/link'
 import { Blogs } from '@/components/blogs'
-import { TBlogPost } from '@/types/blogs'
+import { TBlogCardMetadata } from '@/types/blogs'
 
 interface RecentPostsProps {
-  blogsWithContent: TBlogPost[]
+  blogPosts: TBlogCardMetadata[]
 }
 
-export default function RecentBlogs({ blogsWithContent }: RecentPostsProps) {
+export default function RecentBlogs({ blogPosts }: RecentPostsProps) {
   return (
     <section className='my-16'>
       <h2 className='title'>Recent blogs</h2>
-      <Blogs blogsWithContent={blogsWithContent} />
+      <Blogs blogsWithMeta={blogPosts} />
 
       <Link
         href='/blogs'
-        className='mt-8 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-zinc-500'
+        className='mt-8 inline-flex items-center gap-2 text-sm font-semibold'
       >
-        <span>All blogs</span>
+        <span className='text-muted-foreground underline underline-offset-4 hover:text-zinc-600 dark:hover:text-zinc-500'>
+          All blogs
+        </span>
       </Link>
     </section>
   )

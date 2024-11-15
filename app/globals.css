@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -92,7 +88,7 @@ body {
   }
 
   .title {
-    @apply mb-10 text-3xl font-bold underline decoration-border/75 decoration-2 underline-offset-8;
+    @apply mb-10 text-balance text-3xl font-bold underline decoration-border/75 decoration-2 underline-offset-8;
   }
 
   .prose pre {

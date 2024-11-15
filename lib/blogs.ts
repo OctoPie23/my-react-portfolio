@@ -1,155 +1,215 @@
-import path from 'path'
-import fs from 'fs'
-import matter from 'gray-matter'
-import { TBlogPost, TBlogPostMetadata } from '@/types/blogs'
-import { BLOGS_PER_PAGE_DEFAULT, PAGE_INDEX_DEFAULT } from '@/lib/constants'
+import request, { gql } from 'graphql-request'
+import { env } from './env'
+import {
+  TGetBlogsMetadataArgs,
+  TGetBlogsLength,
+  TSubscribeToNewsletterResponse,
+  TGetBlogPostIDBySlugResponse,
+  TGetBlogsMetadata,
+  TGetBlogByIDResponse,
+} from '@/types/blogs'
+import {
+  BLOGS_PER_PAGE_DEFAULT,
+  HASHNODE_POSTS_FETCH_LIMIT,
+  HASHNODE_USERNAME,
+  PAGE_INDEX_DEFAULT,
+} from '@/lib/constants'
 
-const blogPostsDirectory = path.resolve(process.cwd(), 'content', 'blog-posts')
+const endpoint = env.NEXT_PUBLIC_HASHNODE_GQL_ENDPOINT
+const publicationId = env.NEXT_PUBLIC_HASHNODE_PUBLICATION_ID
+const publicationHost = env.NEXT_PUBLIC_HASHNODE_PUBLICATION_HOST
 
-function parseTags({ tags }: { tags: string | string[] }): string[] {
-  if (typeof tags === 'string' && tags.trim()) {
-    return tags.split(',').map(tag => tag.trim())
-  }
+export async function getBlogPostsLength(): Promise<number> {
+  const query = gql`
+    query getBlogPostsLength($publicationHost: String!) {
+      publication(host: $publicationHost) {
+        posts(first: 0) {
+          totalDocuments
+        }
+      }
+    }
+  `
 
-  if (Array.isArray(tags)) return tags
-  return []
+  const response = await request<TGetBlogsLength>(endpoint, query, {
+    publicationHost,
+  })
+
+  return response.publication.posts.totalDocuments ?? 0
 }
 
-export function getBlogPostsLength(): number {
-  const blogPostFiles = getMDXFiles({ dir: blogPostsDirectory })
-  return blogPostFiles.length
+export async function getBlogPostByID({
+  id,
+}: {
+  id: string
+}): Promise<TGetBlogByIDResponse> {
+  const query = gql`
+    query getPostByID($id: ID!) {
+      post(id: $id) {
+        title
+        subtitle
+        readTimeInMinutes
+        publishedAt
+        seo {
+          description
+        }
+        tags {
+          name
+        }
+        coverImage {
+          url
+        }
+        content {
+          markdown
+        }
+        author {
+          name
+        }
+      }
+    }
+  `
+
+  const response = await request<TGetBlogByIDResponse>(endpoint, query, {
+    id,
+  })
+  return response
 }
 
-function getMDXFiles({ dir }: { dir: string }): string[] {
-  return fs
-    .readdirSync(dir, { withFileTypes: true })
-    .filter(dirent => dirent.isFile() && path.extname(dirent.name) === '.mdx')
-    .map(dirent => dirent.name)
-}
-
-export function getBlogPostBySlug({
+export async function getBlogPostIDBySlug({
   slug,
 }: {
   slug: string
-}): TBlogPost | null {
-  const blogPostFilePath = path.join(blogPostsDirectory, `${slug}.mdx`)
+}): Promise<string> {
+  const query = gql`
+    query getPostBySlug($publicationHost: String!, $slug: String!) {
+      publication(host: $publicationHost) {
+        post(slug: $slug) {
+          id
+        }
+      }
+    }
+  `
+  const response = await request<TGetBlogPostIDBySlugResponse>(
+    endpoint,
+    query,
+    {
+      publicationHost,
+      slug,
+    },
+  )
 
-  try {
-    const blogFileContent = fs.readFileSync(blogPostFilePath, {
-      encoding: 'utf-8',
-    })
-
-    const { data, content } = matter(blogFileContent)
-
-    return {
-      metadata: {
-        ...data,
-        author: 'Shrijal Acharya',
-        tags: parseTags({ tags: data.tags }),
-      },
-      content,
-    } as TBlogPost
-  } catch (error) {
-    console.error(`Error reading blog file: ${blogPostFilePath}`, error)
-    return null
-  }
+  return response.publication.post.id
 }
 
-export function getBlogPostMetadata({
-  blogFilePath,
-}: {
-  blogFilePath: string
-}): TBlogPostMetadata | null {
-  const blogPostAbsFilePath = path.join(blogPostsDirectory, blogFilePath)
-  try {
-    const blogFileContent = fs.readFileSync(blogPostAbsFilePath, {
-      encoding: 'utf-8',
-    })
-
-    const { data } = matter(blogFileContent)
-    return {
-      ...data,
-      author: 'Shrijal Acharya',
-      tags: parseTags({ tags: data.tags }),
-    } as TBlogPostMetadata
-  } catch (error) {
-    console.error(
-      `Error reading metadata for file: ${blogPostAbsFilePath}`,
-      error,
-    )
-    return null
-  }
-}
-
-export function getBlogPostsMetadata({
+export async function getBlogPostsCardMeta({
+  pageSize = BLOGS_PER_PAGE_DEFAULT,
   page = PAGE_INDEX_DEFAULT,
-  perPage = BLOGS_PER_PAGE_DEFAULT,
   all = false,
-}: {
-  page?: number
-  perPage?: number
-  all?: boolean
-}): TBlogPostMetadata[] {
-  const blogFiles = getMDXFiles({ dir: blogPostsDirectory })
+}: TGetBlogsMetadataArgs) {
+  const query = gql`
+    query getPosts($username: String!, $pageSize: Int!, $page: Int!) {
+      user(username: $username) {
+        posts(pageSize: $pageSize, page: $page, sortBy: DATE_PUBLISHED_DESC) {
+          edges {
+            node {
+              id
+              title
+              readTimeInMinutes
+              publishedAt
+              publication {
+                id
+              }
+              brief
+              slug
+              tags {
+                name
+              }
+              author {
+                name
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            previousPage
+            nextPage
+          }
+        }
+      }
+    }
+  `
 
   if (all) {
-    return blogFiles
-      .map(file => getBlogPostMetadata({ blogFilePath: file }))
-      .filter((metadata): metadata is TBlogPostMetadata => metadata !== null)
-      .sort(
-        (a, b) =>
-          new Date(b.datePublished ?? '').getTime() -
-          new Date(a.datePublished ?? '').getTime(),
-      )
+    const allPosts = []
+    let currentPage = page
+    let hasNextPage = true
+
+    while (hasNextPage) {
+      // Fetch all posts in the chunk of 10. NOTE: The upper limit from hashnode is 20
+      // Don't pass the pageSizeQuery in the pageSize field to this function. If the user
+      // requests for more than 20 posts, the API will throw an error
+      const response = await request<TGetBlogsMetadata>(endpoint, query, {
+        username: HASHNODE_USERNAME,
+        pageSize:
+          pageSize < HASHNODE_POSTS_FETCH_LIMIT
+            ? pageSize
+            : HASHNODE_POSTS_FETCH_LIMIT,
+        page: currentPage,
+      })
+
+      const posts = response.user.posts.edges.map(edge => edge.node)
+      allPosts.push(...posts)
+
+      hasNextPage = response.user.posts.pageInfo.hasNextPage
+      currentPage = response.user.posts.pageInfo.nextPage ?? currentPage + 1
+    }
+
+    return {
+      posts: allPosts.filter(post => post.publication.id === publicationId),
+      pageInfo: null,
+    }
   }
 
-  const start = (page - 1) * perPage
+  const response = await request<TGetBlogsMetadata>(endpoint, query, {
+    username: HASHNODE_USERNAME,
+    pageSize:
+      pageSize < HASHNODE_POSTS_FETCH_LIMIT
+        ? pageSize
+        : HASHNODE_POSTS_FETCH_LIMIT,
+    page,
+  })
 
-  return blogFiles
-    .map(file => getBlogPostMetadata({ blogFilePath: file }))
-    .filter((metadata): metadata is TBlogPostMetadata => metadata !== null)
-    .sort(
-      (a, b) =>
-        new Date(b?.datePublished ?? '').getTime() -
-        new Date(a?.datePublished ?? '').getTime(),
-    )
-    .slice(start, start + perPage)
+  const posts = response.user.posts.edges.map(edge => edge.node)
+
+  return {
+    posts: posts.filter(post => post.publication.id === publicationId),
+    pageInfo: response.user.posts.pageInfo,
+  }
 }
 
-export function getBlogPostsWithContent({
-  page = PAGE_INDEX_DEFAULT,
-  perPage = BLOGS_PER_PAGE_DEFAULT,
-  all = false,
+export async function subscribeToNewsletter({
+  email,
 }: {
-  page?: number
-  perPage?: number
-  all?: boolean
-}) {
-  const blogFiles = getMDXFiles({ dir: blogPostsDirectory })
+  email: string
+}): Promise<TSubscribeToNewsletterResponse> {
+  const mutation = gql`
+    mutation subscribeToNewsletter($publicationId: ObjectId!, $email: String!) {
+      subscribeToNewsletter(
+        input: { email: $email, publicationId: $publicationId }
+      ) {
+        status
+      }
+    }
+  `
 
-  if (all) {
-    return blogFiles
-      .map(file => getBlogPostBySlug({ slug: file.replace(/\.mdx$/, '') }))
-      .filter((post): post is TBlogPost => post !== null)
-      .sort(
-        (a, b) =>
-          new Date(b.metadata.datePublished ?? '').getTime() -
-          new Date(a.metadata.datePublished ?? '').getTime(),
-      )
-  }
+  const response = await request<TSubscribeToNewsletterResponse>(
+    endpoint,
+    mutation,
+    {
+      publicationId,
+      email,
+    },
+  )
 
-  const start = (page - 1) * perPage
-  const paginatedFiles = blogFiles.slice(start, start + perPage)
-
-  return paginatedFiles
-    .map(file => {
-      const slug = file.replace(/\.mdx$/, '')
-      return getBlogPostBySlug({ slug })
-    })
-    .filter((blog): blog is TBlogPost => blog !== null)
-    .sort(
-      (a, b) =>
-        new Date(b.metadata.datePublished ?? '').getTime() -
-        new Date(a.metadata.datePublished ?? '').getTime(),
-    )
+  return response
 }

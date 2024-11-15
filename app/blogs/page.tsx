@@ -3,51 +3,68 @@ import { AlertIcon } from '@/components/icons'
 import { PaginationControls } from '@/components/pagination-controls'
 import { Search } from '@/components/search'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { getBlogPostsLength, getBlogPostsWithContent } from '@/lib/blogs'
-import { BLOGS_PER_PAGE_DEFAULT, PAGE_INDEX_DEFAULT } from '@/lib/constants'
+import {
+  BLOGS_PER_PAGE_DEFAULT,
+  DEBOUNCE_TIME_BLOGS,
+  PAGE_INDEX_DEFAULT,
+} from '@/lib/constants'
+import { getBlogPostsCardMeta } from '@/lib/blogs'
+import type { Metadata } from 'next'
+import { getBlogPostsLength } from '@/lib/blogs'
 
-export default function Page({
+export const metadata: Metadata = {
+  title: 'Blogs',
+  description: 'Collection of my blogs fetched through Hashnode Headless CMS',
+}
+
+export default async function Page({
   searchParams,
 }: {
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
   const pageQuery =
     typeof searchParams?.page === 'string'
-      ? Number(searchParams?.page)
+      ? Math.max(Number(searchParams?.page), 1)
       : PAGE_INDEX_DEFAULT
 
   const perPageQuery =
     typeof searchParams?.perPage === 'string'
-      ? Number(searchParams?.perPage)
+      ? Math.max(Number(searchParams?.perPage), 1)
       : BLOGS_PER_PAGE_DEFAULT
 
   const searchQuery =
     typeof searchParams?.q === 'string' ? searchParams?.q.trim() : undefined
 
-  const blogsWithContent = searchQuery
-    ? getBlogPostsWithContent({ all: true })
-    : getBlogPostsWithContent({ page: pageQuery, perPage: perPageQuery })
+  const blogsWithMeta = searchQuery
+    ? await getBlogPostsCardMeta({ all: true })
+    : await getBlogPostsCardMeta({ page: pageQuery, pageSize: perPageQuery })
 
-  const filteredBlogsWithContent = searchQuery
-    ? blogsWithContent.filter(blogWithContent =>
-        blogWithContent.metadata.title
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()),
-      )
-    : blogsWithContent
+  const filteredBlogsWithPageInfo = searchQuery
+    ? {
+        posts: blogsWithMeta.posts.filter(
+          blog =>
+            blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            blog.tags?.some(tag =>
+              tag.name.toLowerCase().includes(searchQuery.toLowerCase()),
+            ),
+        ),
+        pageInfo: blogsWithMeta.pageInfo,
+      }
+    : blogsWithMeta
 
-  const filteredBlogsWithContentLength = filteredBlogsWithContent.length
+  const filteredBlogsWithContentLength = filteredBlogsWithPageInfo.posts.length
 
   const blogslength = searchQuery
     ? filteredBlogsWithContentLength
-    : getBlogPostsLength()
+    : await getBlogPostsLength()
 
   const totalPages = Math.ceil(blogslength / perPageQuery)
 
-  const paginatedFilteredBlogsWithContent = filteredBlogsWithContent.slice(
-    (pageQuery - 1) * perPageQuery,
-    pageQuery * perPageQuery,
-  )
+  const paginatedFilteredBlogsWithContent =
+    filteredBlogsWithPageInfo.posts.slice(
+      (pageQuery - 1) * perPageQuery,
+      pageQuery * perPageQuery,
+    )
 
   const noOfBlogsShownAlready = searchQuery
     ? paginatedFilteredBlogsWithContent.length + (pageQuery - 1) * perPageQuery
@@ -87,7 +104,8 @@ export default function Page({
       <Search
         query={searchQuery}
         endpoint='blogs'
-        placeholder='Search blogs...'
+        debounceTime={DEBOUNCE_TIME_BLOGS}
+        placeholder='Search blogs by title or tags...'
       />
 
       <PaginationControls
@@ -109,8 +127,8 @@ export default function Page({
       </div>
 
       <Blogs
-        blogsWithContent={
-          searchQuery ? paginatedFilteredBlogsWithContent : blogsWithContent
+        blogsWithMeta={
+          searchQuery ? paginatedFilteredBlogsWithContent : blogsWithMeta.posts
         }
       />
     </section>

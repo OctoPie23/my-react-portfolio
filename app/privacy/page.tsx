@@ -1,4 +1,11 @@
+import { PUBLIC_GMAIL } from '@/lib/constants'
+import type { Metadata } from 'next'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description: 'Privacy Policy',
+}
 
 export default function Page() {
   return (
@@ -60,7 +67,7 @@ export default function Page() {
                 href='mailto:shrijalacharya@gmail.com'
                 className='text-default text-foreground underline underline-offset-4'
               >
-                shrijal.acharya@gmail.com
+                {PUBLIC_GMAIL}
               </a>{' '}
               or through the contact form.
             </p>

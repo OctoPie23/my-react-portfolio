@@ -130,8 +130,8 @@ export function getProjectsWithContent({
     )
     .sort(
       (a, b) =>
-        new Date(b.metadata.created_at ?? '').getTime() -
-        new Date(a.metadata.created_at ?? '').getTime(),
+        new Date(b.metadata.created_at).getTime() -
+        new Date(a.metadata.created_at).getTime(),
     )
 
   if (all) return projectsWithContent

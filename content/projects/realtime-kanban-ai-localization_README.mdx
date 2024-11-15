@@ -1,13 +1,16 @@
 ---
-title: "realtime-kanban-ai-localization"
-description: "Real-time Kanban board with websockets 🔗, Tolgee for language detection and translation 🐁, PostgreSQL as DB and Vercel AI SDK for task description 🤖 "
-clone_url: "https://github.com/shricodev/realtime-kanban-ai-localization.git"
-language: "TypeScript"
-homepage: ""
-stargazers_count: "0"
+title: 'realtime-kanban-ai-localization'
+description:
+  'Real-time Kanban board with websockets 🔗, Tolgee for language detection and
+  translation 🐁, PostgreSQL as DB and Vercel AI SDK for task description 🤖 '
+clone_url: 'https://github.com/shricodev/realtime-kanban-ai-localization.git'
+language: 'TypeScript'
+homepage: ''
+stargazers_count: '0'
 topics:
-created_at: "2024-11-08T08:48:15Z"
-updated_at: "2024-11-08T08:51:00Z"
+  - 'showcase'
+created_at: '2024-11-08T08:48:15Z'
+updated_at: '2024-11-08T08:51:00Z'
 ---
 
 # 📝 Kanban Board Realtime with AI & Localization
@@ -21,17 +24,24 @@ updated_at: "2024-11-08T08:51:00Z"
 ![GitHub top language](https://img.shields.io/github/languages/top/shricodev/kanban-ai-realtime-localization?style=plastic)
 ![GitHub last commit](https://img.shields.io/github/last-commit/shricodev/kanban-ai-realtime-localization?color=red&style=plastic)
 
-Welcome to my **Kanban Board** implementation, an advanced task management app that combines real-time collaboration, multi-language support, and AI-generated task descriptions! Built with **Tolgee** for localization, **Vercel AI SDK** for intelligent task descriptions, and **Socket.IO** for seamless real-time updates.
+Welcome to my **Kanban Board** implementation, an advanced task management app
+that combines real-time collaboration, multi-language support, and AI-generated
+task descriptions! Built with **Tolgee** for localization, **Vercel AI SDK** for
+intelligent task descriptions, and **Socket.IO** for seamless real-time updates.
 
 ![Kanban Board Screenshot](https://raw.githubusercontent.com/shricodev/kanban-ai-realtime-localization/main/public/images/readme_cover.png)
 
 ## ✨ Features
 
 - **Localization**: Automatic language detection and translation using Tolgee.
-- **AI-Powered Task Descriptions**: Generate meaningful task descriptions on the fly with OpenAI & Vercel AI SDK.
-- **Real-time Collaboration**: Socket.IO enables live updates for connected clients.
-- **Backend with PostgreSQL & Prisma**: Reliable data storage and easy-to-manage schema with Prisma ORM.
-- **Drag-and-Drop with React-Beautiful-DND**: Smooth and intuitive task management interface.
+- **AI-Powered Task Descriptions**: Generate meaningful task descriptions on the
+  fly with OpenAI & Vercel AI SDK.
+- **Real-time Collaboration**: Socket.IO enables live updates for connected
+  clients.
+- **Backend with PostgreSQL & Prisma**: Reliable data storage and easy-to-manage
+  schema with Prisma ORM.
+- **Drag-and-Drop with React-Beautiful-DND**: Smooth and intuitive task
+  management interface.
 - **Tailwind CSS Styling**: Beautiful and responsive design.
 
 ## 🚀 Tech Stack
@@ -61,7 +71,8 @@ Welcome to my **Kanban Board** implementation, an advanced task management app t
 
 1. **Clone the repository**:
 
-> 💬 If you are using HTTPS protocol instead of SSH, change the git clone command accordingly.
+> 💬 If you are using HTTPS protocol instead of SSH, change the git clone
+> command accordingly.
 
 ```bash
 git clone git@github.com:shricodev/kanban-ai-realtime-localization.git
@@ -74,7 +85,8 @@ cd kanban-ai-realtime-localization
 npm install
 ```
 
-3. **Set up environment variables**: Rename `.env.example` to `.env` and add the required credentials:
+3. **Set up environment variables**: Rename `.env.example` to `.env` and add the
+   required credentials:
 
 ```plaintext
 # If you are using local DB with docker,
@@ -105,11 +117,14 @@ PORT=3000
 
 4. **Initialize the database**:
 
-> 👀 If you wish to test the project right away with PostgreSQL inside your local machine with Docker, I have created a custom script that will initialize the database.
+> 👀 If you wish to test the project right away with PostgreSQL inside your
+> local machine with Docker, I have created a custom script that will initialize
+> the database.
 
 - **Optional: Start the Docker service**:
 
-If the Docker service is not running, you can start it with the following command:
+If the Docker service is not running, you can start it with the following
+command:
 
 ```bash
 sudo systemctl start docker.service
@@ -121,7 +136,8 @@ sudo systemctl start docker.service
 bash src/start-local-db-docker.sh
 ```
 
-This script should start a Docker container with PostgreSQL image. Make sure you have populated the `.env` file with the following `DATABASE_URL`
+This script should start a Docker container with PostgreSQL image. Make sure you
+have populated the `.env` file with the following `DATABASE_URL`
 
 ```plaintext
 DATABASE_URL=postgresql://postgres:password@localhost:5432/kanban-board
@@ -139,7 +155,8 @@ npx prisma migrate dev --name init
 npm run dev
 ```
 
-If you've initialized the project with default values, your Kanban board should be running at `http://localhost:3000`.
+If you've initialized the project with default values, your Kanban board should
+be running at `http://localhost:3000`.
 
 ## 📈 Usage
 
@@ -174,12 +191,18 @@ If you've initialized the project with default values, your Kanban board should 
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please fork this repository and submit a pull request if you’d like to improve the project. Check the [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please fork this repository and submit a pull request
+if you’d like to improve the project. Check the
+[CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 🛡️ License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file
+for more details.
 
 ## 🎉 Acknowledgments
 
-Thanks to [Tolgee](https://tolgee.io/), [OpenAI](https://openai.com/), and [Vercel](https://vercel.com/) for providing incredible APIs to build with. Special thanks to all the open-source projects and libraries that made this project possible.
+Thanks to [Tolgee](https://tolgee.io/), [OpenAI](https://openai.com/), and
+[Vercel](https://vercel.com/) for providing incredible APIs to build with.
+Special thanks to all the open-source projects and libraries that made this
+project possible.

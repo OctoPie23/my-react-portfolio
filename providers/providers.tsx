@@ -1,6 +1,5 @@
 'use client'
 
-import { Toaster } from '@/components/ui/toaster'
 import { DEFAULT_THEME } from '@/lib/constants'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -14,9 +13,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       {children}
-
-      {/* Toaster provider from shadcn/ui */}
-      <Toaster />
 
       {/* Vercel Analytics and Speed Insights */}
       {/* NOTE: Don't edit/remove these components */}

@@ -1,10 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-export const UserAvatar = ({ className }: { className?: string }) => {
+interface UserAvatarProps {
+  src?: string
+  className?: string
+}
+
+export const UserAvatar = ({ className, src }: UserAvatarProps) => {
   return (
     <Avatar className={`size-8 ${className}`}>
       <AvatarImage
-        src='/images/shricodev.jpg'
+        src={src ? src : '/images/shrijal-acharya.jpg'}
         alt='Shrijal Acharya @shricodev'
       />
       <AvatarFallback>SA</AvatarFallback>

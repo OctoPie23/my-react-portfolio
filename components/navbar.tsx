@@ -14,6 +14,9 @@ export const Navbar = () => {
       ? 'underline underline-offset-4 text-foreground capitalize'
       : 'text-muted-foreground capitalize hover:text-zinc-600 dark:hover:text-zinc-500'
 
+  const homeLink =
+    NAV_LINKS.find(link => link.name.toLowerCase() === 'home')?.path ?? '/'
+
   return (
     <header className='container fixed inset-x-0 top-0 z-50 mx-auto max-w-3xl px-4 py-6 backdrop-blur-sm'>
       <nav className='flex items-center justify-between'>
@@ -23,10 +26,10 @@ export const Navbar = () => {
           </div>
 
           <Link
-            href={NAV_LINKS[0].path}
-            className='select-none text-2xl font-bold uppercase'
+            href={homeLink}
+            className='select-none flex-nowrap text-2xl font-medium uppercase'
           >
-            shricodev
+            shrijal.
           </Link>
         </div>
 

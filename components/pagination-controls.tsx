@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import React from 'react'
 
 interface PaginationControlProps {
   searchTerm?: string
@@ -13,7 +12,7 @@ export const PaginationControls = ({
   searchTerm,
   currentPage,
   totalPages,
-  perPage = 10,
+  perPage = 5,
   endpoint,
 }: PaginationControlProps) => {
   return (
