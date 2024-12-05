@@ -1,16 +1,17 @@
 import request, { gql } from 'graphql-request'
-import { env } from './env'
+import { env } from '@/lib/env'
 import {
   TGetBlogsMetadataArgs,
   TGetBlogsLength,
   TSubscribeToNewsletterResponse,
-  TGetBlogPostIDBySlugResponse,
   TGetBlogsMetadata,
   TGetBlogByIDResponse,
+  TGetBlogPostIDBySlugResponse,
+  TBlogCardMetadata,
 } from '@/types/blogs'
 import {
   BLOGS_PER_PAGE_DEFAULT,
-  HASHNODE_POSTS_FETCH_LIMIT,
+  HASHNODE_BLOGS_FETCH_LIMIT,
   HASHNODE_USERNAME,
   PAGE_INDEX_DEFAULT,
 } from '@/lib/constants'
@@ -21,9 +22,9 @@ const publicationHost = env.NEXT_PUBLIC_HASHNODE_PUBLICATION_HOST
 
 export async function getBlogPostsLength(): Promise<number> {
   const query = gql`
-    query getBlogPostsLength($publicationHost: String!) {
-      publication(host: $publicationHost) {
-        posts(first: 0) {
+    query getBlogPostsLength($username: String!) {
+      user(username: $username) {
+        posts(page: 1, pageSize: 1) {
           totalDocuments
         }
       }
@@ -31,10 +32,10 @@ export async function getBlogPostsLength(): Promise<number> {
   `
 
   const response = await request<TGetBlogsLength>(endpoint, query, {
-    publicationHost,
+    username: HASHNODE_USERNAME,
   })
 
-  return response.publication.posts.totalDocuments ?? 0
+  return response.user.posts.totalDocuments ?? 0
 }
 
 export async function getBlogPostByID({
@@ -78,7 +79,7 @@ export async function getBlogPostIDBySlug({
   slug,
 }: {
   slug: string
-}): Promise<string> {
+}): Promise<TGetBlogPostIDBySlugResponse | null> {
   const query = gql`
     query getPostBySlug($publicationHost: String!, $slug: String!) {
       publication(host: $publicationHost) {
@@ -88,23 +89,39 @@ export async function getBlogPostIDBySlug({
       }
     }
   `
-  const response = await request<TGetBlogPostIDBySlugResponse>(
-    endpoint,
-    query,
-    {
-      publicationHost,
-      slug,
-    },
-  )
 
-  return response.publication.post.id
+  const publicationHosts = [
+    publicationHost,
+    ...(env.NEXT_PUBLIC_HASHNODE_ADDITIONAL_PUBLICATION_HOSTS.split(',') || []),
+  ].filter(host => host && host.trim() !== '')
+
+  for (const publicationHost of publicationHosts) {
+    try {
+      const response = await request<TGetBlogPostIDBySlugResponse>(
+        endpoint,
+        query,
+        {
+          publicationHost,
+          slug,
+        },
+      )
+      if (response.publication?.post.id) return response
+    } catch (error) {
+      console.error(
+        `Error querying publication host for post Id: ${publicationHost}`,
+        error,
+      )
+    }
+  }
+
+  return null
 }
 
 export async function getBlogPostsCardMeta({
   pageSize = BLOGS_PER_PAGE_DEFAULT,
   page = PAGE_INDEX_DEFAULT,
   all = false,
-}: TGetBlogsMetadataArgs) {
+}: TGetBlogsMetadataArgs): Promise<{ blogs: TBlogCardMetadata[] }> {
   const query = gql`
     query getPosts($username: String!, $pageSize: Int!, $page: Int!) {
       user(username: $username) {
@@ -130,8 +147,6 @@ export async function getBlogPostsCardMeta({
           }
           pageInfo {
             hasNextPage
-            hasPreviousPage
-            previousPage
             nextPage
           }
         }
@@ -140,7 +155,7 @@ export async function getBlogPostsCardMeta({
   `
 
   if (all) {
-    const allPosts = []
+    const allBlogs = []
     let currentPage = page
     let hasNextPage = true
 
@@ -151,39 +166,37 @@ export async function getBlogPostsCardMeta({
       const response = await request<TGetBlogsMetadata>(endpoint, query, {
         username: HASHNODE_USERNAME,
         pageSize:
-          pageSize < HASHNODE_POSTS_FETCH_LIMIT
+          pageSize < HASHNODE_BLOGS_FETCH_LIMIT
             ? pageSize
-            : HASHNODE_POSTS_FETCH_LIMIT,
+            : HASHNODE_BLOGS_FETCH_LIMIT,
         page: currentPage,
       })
 
-      const posts = response.user.posts.edges.map(edge => edge.node)
-      allPosts.push(...posts)
+      const blogs = response.user.posts.edges.map(edge => edge.node)
+      allBlogs.push(...blogs)
 
       hasNextPage = response.user.posts.pageInfo.hasNextPage
       currentPage = response.user.posts.pageInfo.nextPage ?? currentPage + 1
     }
 
     return {
-      posts: allPosts.filter(post => post.publication.id === publicationId),
-      pageInfo: null,
+      blogs: allBlogs,
     }
   }
 
   const response = await request<TGetBlogsMetadata>(endpoint, query, {
     username: HASHNODE_USERNAME,
     pageSize:
-      pageSize < HASHNODE_POSTS_FETCH_LIMIT
+      pageSize < HASHNODE_BLOGS_FETCH_LIMIT
         ? pageSize
-        : HASHNODE_POSTS_FETCH_LIMIT,
+        : HASHNODE_BLOGS_FETCH_LIMIT,
     page,
   })
 
-  const posts = response.user.posts.edges.map(edge => edge.node)
+  const blogs = response.user.posts.edges.map(edge => edge.node)
 
   return {
-    posts: posts.filter(post => post.publication.id === publicationId),
-    pageInfo: response.user.posts.pageInfo,
+    blogs,
   }
 }
 

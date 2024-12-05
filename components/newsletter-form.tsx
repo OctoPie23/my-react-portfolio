@@ -73,7 +73,7 @@ export const NewsletterForm = () => {
                   name='email'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-xs font-bold uppercase text-zinc-500'>
+                      <FormLabel className='text-xs font-bold uppercase text-zinc-700 dark:text-zinc-400'>
                         Email
                       </FormLabel>
                       <FormControl>

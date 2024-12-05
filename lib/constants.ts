@@ -5,6 +5,13 @@ export const BASE_URL =
 
 export const PUBLIC_GMAIL = 'shrijal.acharya@gmail.com'
 
+export const PER_PAGE_MAX = 100
+export const PAGE_MAX = 500
+
+export const SEARCH_QUERY_PARAM = 'q'
+export const PAGE_QUERY_PARAM = 'page'
+export const PER_PAGE_QUERY_PARAM = 'perPage'
+
 export const PROJECTS_PER_PAGE_DEFAULT = 10
 export const BLOGS_PER_PAGE_DEFAULT = 5
 export const RECENT_BLOGS_DEFAULT = 3
@@ -19,7 +26,7 @@ export const DEBOUNCE_TIME_PROJECTS = 250
 export const DEBOUNCE_TIME_BLOGS = 300
 
 export const HASHNODE_USERNAME = 'shricodev'
-export const HASHNODE_POSTS_FETCH_LIMIT = 15
+export const HASHNODE_BLOGS_FETCH_LIMIT = 15
 
 export const PROJECT_FILTER_TOPIC = 'showcase'
 
@@ -30,6 +37,7 @@ export const ROUTES = [
   '/work',
   '/contact-me',
   '/privacy',
+  '/meet',
 ]
 
 export const NAV_LINKS = [

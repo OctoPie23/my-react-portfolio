@@ -15,7 +15,12 @@ import { formatDate } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { GitHubIcon, StarIcon } from '@/components/icons'
 import { UserAvatar } from './user-avatar'
-import { STARS_COUNT_TO_SHOW_ICON } from '@/lib/constants'
+import {
+  PAGE_QUERY_PARAM,
+  PER_PAGE_QUERY_PARAM,
+  SEARCH_QUERY_PARAM,
+  STARS_COUNT_TO_SHOW_ICON,
+} from '@/lib/constants'
 import { InfoTooltip } from '@/components/info-tooltip'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -42,8 +47,12 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
 
   const formattedCreatedDate = formatDate({ date: created_at, short: true })
 
+  const searchQueryParam = searchParams.get('q')
+  const pageQueryParam = searchParams.get('page')
+  const perPageQueryParam = searchParams.get('perPage')
+
   const handleBadgeClick = (language: string) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams)
     // There is no need to encode the language, router.push does ist for us.
     params.set('q', language)
 
@@ -51,12 +60,25 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
   }
 
   return (
-    <Card className='w-full max-w-3xl border-none bg-zinc-50 dark:bg-zinc-900'>
+    <Card className='w-full border-none bg-zinc-50 dark:bg-zinc-900'>
       <CardHeader>
         <CardTitle className='flex items-center justify-between text-lg font-semibold'>
           <div className='flex items-center gap-2'>
             <Link
-              href={`/projects/${title}`}
+              href={{
+                pathname: `/projects/${title}`,
+                query: {
+                  ...(searchQueryParam
+                    ? { [SEARCH_QUERY_PARAM]: searchQueryParam }
+                    : {}),
+                  ...(pageQueryParam
+                    ? { [PAGE_QUERY_PARAM]: pageQueryParam }
+                    : {}),
+                  ...(perPageQueryParam
+                    ? { [PER_PAGE_QUERY_PARAM]: perPageQueryParam }
+                    : {}),
+                },
+              }}
               className='hover:underline hover:underline-offset-4'
             >
               {title}
@@ -77,7 +99,7 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
             ) : null}
           </div>
 
-          <span className='hidden text-sm font-light text-muted-foreground sm:inline'>
+          <span className='divider hidden text-sm font-light sm:inline'>
             {formattedCreatedDate}
           </span>
         </CardTitle>
@@ -95,9 +117,9 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
             <div className='flex items-center text-sm'>
               {language ? (
                 <>
-                  <span className='mr-1 text-muted-foreground sm:mx-1'>•</span>
+                  <span className='divider mr-1 sm:mx-1'>•</span>
                   <Badge
-                    variant='outline'
+                    variant='secondary'
                     className='ml-1 cursor-pointer text-muted-foreground hover:text-zinc-600 dark:hover:text-zinc-400'
                     onClick={() => handleBadgeClick(language)}
                   >
@@ -110,9 +132,11 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
         </CardDescription>
       </CardHeader>
       {description ? (
-        <CardContent className='prose max-w-full text-zinc-700 dark:text-zinc-400'>
-          {description}
-        </CardContent>
+        <Link href={`/projects/${title}`}>
+          <CardContent className='prose max-w-full text-zinc-700 dark:text-zinc-400'>
+            {description}
+          </CardContent>
+        </Link>
       ) : null}
       <CardFooter className='flex justify-between'>
         <a

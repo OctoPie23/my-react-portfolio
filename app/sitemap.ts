@@ -5,12 +5,12 @@ import { ROUTES, BASE_URL } from '@/lib/constants'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const normalizedBaseUrl = BASE_URL.replace(/\/$/, '')
-  const { posts } = await getBlogPostsCardMeta({ all: true })
+  const { blogs } = await getBlogPostsCardMeta({ all: true })
 
-  const blogPostsMetadata = posts.map(post => {
+  const blogPostsMetadata = blogs.map(blog => {
     return {
-      url: `${normalizedBaseUrl}/blogs/${post.slug}`,
-      lastModified: new Date(post.publishedAt).toISOString(),
+      url: `${normalizedBaseUrl}/blogs/${blog.slug}`,
+      lastModified: new Date(blog.publishedAt).toISOString(),
     }
   })
 

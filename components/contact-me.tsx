@@ -7,7 +7,7 @@ import {
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { sendEmail } from '@/lib/actions'
 import Link from 'next/link'
@@ -45,7 +45,7 @@ export const ContactMe = () => {
   }
 
   return (
-    <section className='relative'>
+    <section className='flex flex-col gap-8'>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleFormSubmit)}
@@ -59,7 +59,7 @@ export const ContactMe = () => {
                 name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-xs font-bold uppercase text-zinc-500'>
+                    <FormLabel className='text-xs font-bold uppercase text-zinc-700 dark:text-zinc-400'>
                       Name
                     </FormLabel>
                     <FormControl>
@@ -82,7 +82,7 @@ export const ContactMe = () => {
                 name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-xs font-bold uppercase text-zinc-500'>
+                    <FormLabel className='text-xs font-bold uppercase text-zinc-700 dark:text-zinc-400'>
                       Email
                     </FormLabel>
                     <FormControl>
@@ -104,7 +104,7 @@ export const ContactMe = () => {
                 name='message'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-xs font-bold uppercase text-zinc-500'>
+                    <FormLabel className='text-xs font-bold uppercase text-zinc-700 dark:text-zinc-400'>
                       Message
                     </FormLabel>
                     <FormControl>
@@ -112,6 +112,7 @@ export const ContactMe = () => {
                         rows={8}
                         id='message'
                         placeholder='Enter your message...'
+                        className='max-h-72'
                         {...field}
                       />
                     </FormControl>
@@ -145,6 +146,22 @@ export const ContactMe = () => {
           </p>
         </form>
       </Form>
+
+      <div className='flex flex-col gap-4'>
+        <p className='text-zinc-800 dark:text-zinc-300'>
+          Interested to chat on your ideas or work with me? Schedule a meeting
+          using the button below.
+        </p>
+        <Link
+          href='/meet'
+          className={buttonVariants({
+            variant: 'secondary',
+            className: 'max-w-fit',
+          })}
+        >
+          Book a meet
+        </Link>
+      </div>
     </section>
   )
 }

@@ -10,26 +10,17 @@ import {
   NewsletterFormSchema,
   TNewsletterFormSchema,
 } from '@/lib/validators/newsletter-form'
-import { env } from './env'
+import { env } from '@/lib/env'
 
 const resend = new Resend(env.RESEND_API_KEY)
 
 type TResponse = {
-  error: Error | null
+  error: { message: string } | null
   success: boolean
 }
 
 type TSendEmailResponse = TResponse
 type TSubscribeNewsletterResponse = TResponse
-
-async function subscribeNewsletterHashnode(
-  data: TNewsletterFormSchema,
-): Promise<TSubscribeNewsletterResponse> {
-  // TODO: Add hashnode newsletter subscription logic here.
-  const { email } = data
-  console.log(email)
-  return { success: true, error: null }
-}
 
 async function saveContactsResend(
   data: TNewsletterFormSchema,
@@ -55,13 +46,13 @@ async function sendEmailResend(data: TContactFormSchema) {
   })
 }
 
-export async function subscribeNewsletter(
+export async function subscribeNewsletterHashnode(
   data: TNewsletterFormSchema,
 ): Promise<TSubscribeNewsletterResponse> {
   const validatedResponse = NewsletterFormSchema.safeParse(data)
   if (!validatedResponse.success) {
     const errorMessage = JSON.stringify(validatedResponse.error.format())
-    return { error: new Error(errorMessage), success: false }
+    return { error: { message: errorMessage }, success: false }
   }
 
   try {
@@ -69,7 +60,7 @@ export async function subscribeNewsletter(
       await subscribeNewsletterHashnode(validatedResponse.data)
 
     if (!hashnodeSuccess || hashnodeError) {
-      return { success: false, error: new Error(String(hashnodeError)) }
+      return { success: false, error: { message: String(hashnodeError) } }
     }
 
     const { data: resendData, error: resendError } = await saveContactsResend(
@@ -77,17 +68,16 @@ export async function subscribeNewsletter(
     )
 
     if (!resendData || resendError) {
-      return { success: false, error: new Error(String(resendError)) }
+      return { success: false, error: { message: String(resendError) } }
     }
 
     return { success: true, error: null }
   } catch (error) {
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error
-          : new Error(String('Something went wrong!')),
+      error: {
+        message: error instanceof Error ? error.message : String(error),
+      },
     }
   }
 }
@@ -98,7 +88,7 @@ export async function sendEmail(
   const validatedResponse = ContactFormSchema.safeParse(data)
   if (!validatedResponse.success) {
     const errorMessage = JSON.stringify(validatedResponse.error.format())
-    return { error: new Error(errorMessage), success: false }
+    return { error: { message: errorMessage }, success: false }
   }
 
   try {
@@ -107,14 +97,16 @@ export async function sendEmail(
     )
 
     if (!resendData || resendError) {
-      return { success: false, error: new Error(String(resendError)) }
+      return { success: false, error: { message: String(resendError) } }
     }
 
     return { success: true, error: null }
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error : new Error(String(error)),
+      error: {
+        message: error instanceof Error ? error.message : String(error),
+      },
     }
   }
 }

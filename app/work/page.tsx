@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <section className='container relative flex max-w-3xl flex-col justify-center'>
+      <section className='relative flex flex-col justify-center'>
         <h1 className='title'>Work</h1>
 
         <p className='prose max-w-full text-zinc-800 dark:text-zinc-300'>

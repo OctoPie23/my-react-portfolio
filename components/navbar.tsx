@@ -18,42 +18,44 @@ export const Navbar = () => {
     NAV_LINKS.find(link => link.name.toLowerCase() === 'home')?.path ?? '/'
 
   return (
-    <header className='container fixed inset-x-0 top-0 z-50 mx-auto max-w-3xl px-4 py-6 backdrop-blur-sm'>
-      <nav className='flex items-center justify-between'>
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center sm:hidden'>
-            <NavDropdown />
+    <header className='fixed inset-x-0 top-0 z-50 backdrop-blur-sm'>
+      <div className='mx-auto max-w-3xl px-4 py-6'>
+        <nav className='flex items-center justify-between'>
+          <div className='flex items-center gap-4'>
+            <div className='flex items-center sm:hidden'>
+              <NavDropdown />
+            </div>
+
+            <Link
+              href={homeLink}
+              className='select-none flex-nowrap text-2xl font-medium uppercase'
+            >
+              shrijal.
+            </Link>
           </div>
 
-          <Link
-            href={homeLink}
-            className='select-none flex-nowrap text-2xl font-medium uppercase'
-          >
-            shrijal.
-          </Link>
-        </div>
+          <div className='ml-0 hidden items-center justify-between gap-6 font-semibold text-muted-foreground sm:ml-auto sm:flex'>
+            <ul className='flex items-center gap-6'>
+              {NAV_LINKS.map(link => (
+                <li key={link.name}>
+                  <Link
+                    href={link.path}
+                    className={getClassnameForLink(link.path)}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
 
-        <div className='ml-0 hidden items-center justify-between gap-6 font-semibold text-muted-foreground sm:ml-auto sm:flex'>
-          <ul className='flex items-center gap-6'>
-            {NAV_LINKS.map(link => (
-              <li key={link.name}>
-                <Link
-                  href={link.path}
-                  className={getClassnameForLink(link.path)}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+            <ThemeToggle />
+          </div>
 
-          <ThemeToggle />
-        </div>
-
-        <div className='ml-auto sm:hidden'>
-          <ThemeToggle />
-        </div>
-      </nav>
+          <div className='ml-auto sm:hidden'>
+            <ThemeToggle />
+          </div>
+        </nav>
+      </div>
     </header>
   )
 }

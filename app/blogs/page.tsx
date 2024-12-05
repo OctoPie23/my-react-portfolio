@@ -11,6 +11,8 @@ import {
 import { getBlogPostsCardMeta } from '@/lib/blogs'
 import type { Metadata } from 'next'
 import { getBlogPostsLength } from '@/lib/blogs'
+import { FilterDropdown } from '@/components/filter-dropdown'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'Blogs',
@@ -22,56 +24,67 @@ export default async function Page({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
+  const pageQueryRaw = searchParams?.page
+  const perPageQueryRaw = searchParams?.perPage
+
   const pageQuery =
-    typeof searchParams?.page === 'string'
-      ? Math.max(Number(searchParams?.page), 1)
+    typeof pageQueryRaw === 'string' && !isNaN(Number(pageQueryRaw))
+      ? Math.max(Number(pageQueryRaw), 1)
       : PAGE_INDEX_DEFAULT
 
   const perPageQuery =
-    typeof searchParams?.perPage === 'string'
-      ? Math.max(Number(searchParams?.perPage), 1)
+    typeof perPageQueryRaw === 'string' && !isNaN(Number(perPageQueryRaw))
+      ? Math.max(Number(perPageQueryRaw), 1)
       : BLOGS_PER_PAGE_DEFAULT
 
   const searchQuery =
     typeof searchParams?.q === 'string' ? searchParams?.q.trim() : undefined
 
-  const blogsWithMeta = searchQuery
+  const { blogs } = searchQuery
     ? await getBlogPostsCardMeta({ all: true })
     : await getBlogPostsCardMeta({ page: pageQuery, pageSize: perPageQuery })
 
-  const filteredBlogsWithPageInfo = searchQuery
+  const filteredBlogs = searchQuery
     ? {
-        posts: blogsWithMeta.posts.filter(
+        blogs: blogs.filter(
           blog =>
             blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             blog.tags?.some(tag =>
               tag.name.toLowerCase().includes(searchQuery.toLowerCase()),
             ),
         ),
-        pageInfo: blogsWithMeta.pageInfo,
       }
-    : blogsWithMeta
+    : { blogs }
 
-  const filteredBlogsWithContentLength = filteredBlogsWithPageInfo.posts.length
+  const filteredBlogsLength = filteredBlogs.blogs.length
 
   const blogslength = searchQuery
-    ? filteredBlogsWithContentLength
+    ? filteredBlogsLength
     : await getBlogPostsLength()
 
-  const totalPages = Math.ceil(blogslength / perPageQuery)
+  const totalPages = Math.max(Math.ceil(blogslength / perPageQuery), 0)
 
-  const paginatedFilteredBlogsWithContent =
-    filteredBlogsWithPageInfo.posts.slice(
-      (pageQuery - 1) * perPageQuery,
-      pageQuery * perPageQuery,
-    )
+  if (totalPages > 0 && pageQuery > totalPages) {
+    const params = new URLSearchParams(searchParams as Record<string, string>)
 
-  const noOfBlogsShownAlready = searchQuery
-    ? paginatedFilteredBlogsWithContent.length + (pageQuery - 1) * perPageQuery
-    : filteredBlogsWithContentLength + (pageQuery - 1) * perPageQuery
+    params.set('page', String(totalPages))
+    redirect(`/blogs?${params.toString()}`)
+  }
+
+  const paginatedFilteredBlogs = filteredBlogs.blogs.slice(
+    (pageQuery - 1) * perPageQuery,
+    pageQuery * perPageQuery,
+  )
+
+  const noOfBlogsShownAlready =
+    filteredBlogsLength === 0
+      ? 0
+      : searchQuery
+        ? paginatedFilteredBlogs.length + (pageQuery - 1) * perPageQuery
+        : filteredBlogsLength + (pageQuery - 1) * perPageQuery
 
   return (
-    <section className='container max-w-3xl'>
+    <section>
       <h1 className='title'>Blogs</h1>
       <Alert className='mb-4'>
         <AlertIcon className='size-5' />
@@ -84,7 +97,7 @@ export default async function Page({
             href='https://dev.to/shricodev'
             target='_blank'
             rel='noreferrer noopener'
-            className='font-semibold text-zinc-400 underline underline-offset-4 hover:text-zinc-500'
+            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground'
           >
             DEV
           </a>{' '}
@@ -93,7 +106,7 @@ export default async function Page({
             href='https://shricodev.hashnode.dev'
             target='_blank'
             rel='noreferrer noopener'
-            className='font-semibold text-zinc-400 underline underline-offset-4 hover:text-zinc-500'
+            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground'
           >
             Hashnode
           </a>{' '}
@@ -108,6 +121,11 @@ export default async function Page({
         placeholder='Search blogs by title or tags...'
       />
 
+      <FilterDropdown
+        endpoint='blogs'
+        defaultPerPage={BLOGS_PER_PAGE_DEFAULT}
+      />
+
       <PaginationControls
         searchTerm={searchQuery}
         currentPage={pageQuery}
@@ -116,21 +134,17 @@ export default async function Page({
         endpoint='blogs'
       />
 
-      <div className='mb-10 mt-5 flex justify-between'>
-        <p className='text-sm font-medium text-muted-foreground'>
+      <div className='mb-10 mt-5 flex justify-between text-sm font-medium text-muted-foreground'>
+        <p>
           Showing {noOfBlogsShownAlready} of{' '}
-          {searchQuery ? filteredBlogsWithContentLength : blogslength} blogs
+          {searchQuery ? filteredBlogsLength : blogslength} blogs
         </p>
-        <p className='text-sm font-medium text-muted-foreground'>
-          page {pageQuery} of {totalPages}
+        <p>
+          Page {totalPages === 0 ? 0 : pageQuery} of {totalPages}
         </p>
       </div>
 
-      <Blogs
-        blogsWithMeta={
-          searchQuery ? paginatedFilteredBlogsWithContent : blogsWithMeta.posts
-        }
-      />
+      <Blogs blogsWithMeta={searchQuery ? paginatedFilteredBlogs : blogs} />
     </section>
   )
 }

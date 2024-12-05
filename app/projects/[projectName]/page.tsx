@@ -1,9 +1,9 @@
-import { AlertIcon, ArrowLeftIcon, StarIcon } from '@/components/icons'
+import { BackButton } from '@/components/back-button'
+import { AlertIcon, ArrowUpRightIcon, StarIcon } from '@/components/icons'
 import { InfoTooltip } from '@/components/info-tooltip'
 import MDXContent from '@/components/mdx-content'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge, badgeVariants } from '@/components/ui/badge'
-import { buttonVariants } from '@/components/ui/button'
 import { UserAvatar } from '@/components/user-avatar'
 import { PROJECT_FILTER_TOPIC, STARS_COUNT_TO_SHOW_ICON } from '@/lib/constants'
 import { getProjectByTitle, getProjectsMetadata } from '@/lib/projects'
@@ -58,17 +58,8 @@ export default function Page({ params: { projectName } }: Props) {
   const starsCount = parseInt(stargazers_count.trim(), 10) ?? 0
 
   return (
-    <section className='container max-w-3xl pb-10'>
-      <Link
-        href='/projects'
-        className={buttonVariants({
-          variant: 'secondary',
-          className: 'flex gap-2',
-        })}
-      >
-        <ArrowLeftIcon className='size-5' />
-        Back to projects
-      </Link>
+    <section className='pb-10'>
+      <BackButton endpoint='projects' />
 
       <header>
         <Alert className='my-8'>
@@ -77,19 +68,20 @@ export default function Page({ params: { projectName } }: Props) {
             Heads up!
           </AlertTitle>
           <AlertDescription className='text-sm text-muted-foreground'>
-            The <span className='font-bold'>README</span> content here can be
-            outdated. To read the latest version, visit my{' '}
+            The README content here can be outdated. To read the latest version,
+            visit my{' '}
             <a
               href='https://github.com/shricodev'
               target='_blank'
               rel='noreferrer noopener'
-              className='font-semibold text-zinc-400 underline underline-offset-4 hover:text-zinc-500'
+              className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground'
             >
               GitHub
             </a>{' '}
             profile.
           </AlertDescription>
         </Alert>
+
         <h1 className='flex items-center gap-2 text-3xl font-bold'>
           <a
             href={clone_url}
@@ -99,47 +91,45 @@ export default function Page({ params: { projectName } }: Props) {
           >
             {title}
           </a>
-          {starsCount > STARS_COUNT_TO_SHOW_ICON ? (
+          {starsCount > STARS_COUNT_TO_SHOW_ICON && (
             <InfoTooltip
               side='top'
               label='Loved by the community'
               className='text-sm'
             >
-              <StarIcon className='size-8 shrink-0 text-orange-300' />
+              <StarIcon className='size-8 text-orange-300' />
             </InfoTooltip>
-          ) : null}
+          )}
         </h1>
+
         <div className='mt-3 flex items-center'>
           <Link href='/contact-me' className='flex items-center'>
-            <UserAvatar className='mr-0 size-8 sm:mr-2' />
-            {author ? (
+            <UserAvatar className='size-8 sm:mr-2' />
+            {author && (
               <span className='hidden text-sm font-semibold text-muted-foreground hover:underline hover:underline-offset-2 sm:inline'>
                 {author}
               </span>
-            ) : null}
+            )}
           </Link>
-          <span className='mx-1 text-muted-foreground'>•</span>
-          <span>
-            <a
-              href={clone_url}
-              target='_blank'
-              rel='noreferrer noopener'
-              className='flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground hover:underline hover:underline-offset-2'
-            >
-              View on GitHub
-            </a>
-          </span>
-          <span className='mx-1 text-muted-foreground'>•</span>
-          {projectCreatedDate ? (
+          <span className='divider mx-1'>•</span>
+          <a
+            href={clone_url}
+            target='_blank'
+            rel='noreferrer noopener'
+            className='flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:underline hover:underline-offset-2'
+          >
+            View on GitHub
+          </a>
+          <span className='divider mx-1'>•</span>
+          {projectCreatedDate && (
             <span className='text-sm text-muted-foreground'>
               {projectCreatedDate}
             </span>
-          ) : null}
+          )}
         </div>
-        {topics &&
-        Array.isArray(topics) &&
-        topics.filter(topic => topic !== PROJECT_FILTER_TOPIC).length > 0 ? (
-          <div className='mt-4 flex flex-row flex-wrap gap-2'>
+
+        {topics && topics?.length > 0 && (
+          <div className='mt-4 flex flex-wrap gap-2'>
             {topics
               .filter(topic => topic !== PROJECT_FILTER_TOPIC)
               .map(topic => (
@@ -151,12 +141,21 @@ export default function Page({ params: { projectName } }: Props) {
                 </Badge>
               ))}
           </div>
-        ) : null}
+        )}
       </header>
 
-      <main className='prose mt-12 max-w-3xl px-4 dark:prose-invert'>
-        <MDXContent source={content} />
+      <main className='prose mt-12 max-w-3xl dark:prose-invert'>
+        <MDXContent projectName={projectName} source={content} />
       </main>
+
+      <div className='mt-10 flex items-center gap-1 text-sm font-medium text-muted-foreground'>
+        <div className='flex items-center gap-1 hover:text-foreground'>
+          <ArrowUpRightIcon className='size-4' />
+          <a href={clone_url} target='_blank' rel='noreferrer noopener'>
+            GitHub
+          </a>
+        </div>
+      </div>
     </section>
   )
 }

@@ -14,7 +14,7 @@ export function NavDropdown() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   return (
-    <Popover open={isOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger
         asChild
         onClick={() => setIsOpen(prev => !prev)}

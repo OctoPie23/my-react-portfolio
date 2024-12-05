@@ -49,11 +49,11 @@ export default function RootLayout({
     // It requires this to be set since, we don't really know the user theme preference on the server side.
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-3xl flex-col bg-white px-4 text-black antialiased dark:bg-black dark:text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-3xl flex-col px-4 antialiased`}
       >
         <Providers>
           <Navbar />
-          <main className='mt-40 max-w-3xl grow'>{children}</main>
+          <main className='mt-40 grow'>{children}</main>
 
           {/* Toaster for notifications from shadcn/ui sonner */}
           <Toaster />

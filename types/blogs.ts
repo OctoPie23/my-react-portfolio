@@ -17,7 +17,7 @@ export type TBlogCardMetadata = {
 }
 
 export type TGetBlogsLength = {
-  publication: {
+  user: {
     posts: {
       totalDocuments: number
     }
@@ -54,8 +54,6 @@ export type TGetBlogsMetadata = {
       }[]
       pageInfo: {
         hasNextPage: boolean
-        hasPreviousPage: boolean
-        previousPage: number
         nextPage: number
       }
     }
@@ -82,6 +80,32 @@ export type TGetBlogPostIDBySlugResponse = {
   publication: {
     post: {
       id: string
+    }
+  }
+}
+
+export type TGetBlogBySlugResponse = {
+  publication: {
+    post: {
+      title: string
+      subtitle?: string
+      readTimeInMinutes: number
+      publishedAt: string
+      seo: {
+        description?: string
+      }
+      tags?: {
+        name: string
+      }[]
+      coverImage: {
+        url?: string
+      }
+      content: {
+        markdown: string
+      }
+      author: {
+        name: string
+      }
     }
   }
 }

@@ -1,5 +1,6 @@
 import { AlertIcon } from '@/components/icons'
 import { PaginationControls } from '@/components/pagination-controls'
+import { FilterDropdown } from '@/components/filter-dropdown'
 import { Projects } from '@/components/projects'
 import { Search } from '@/components/search'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -10,6 +11,7 @@ import {
 } from '@/lib/constants'
 import { getProjectsLength, getProjectsMetadata } from '@/lib/projects'
 import { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -22,14 +24,17 @@ export default function Page({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
+  const pageQueryRaw = searchParams?.page
+  const perPageQueryRaw = searchParams?.perPage
+
   const pageQuery =
-    typeof searchParams?.page === 'string'
-      ? Math.max(Number(searchParams?.page), 1)
+    typeof pageQueryRaw === 'string' && !isNaN(Number(pageQueryRaw))
+      ? Math.max(Number(pageQueryRaw), 1)
       : PAGE_INDEX_DEFAULT
 
   const perPageQuery =
-    typeof searchParams?.perPage === 'string'
-      ? Math.max(Number(searchParams?.perPage), 1)
+    typeof perPageQueryRaw === 'string' && !isNaN(Number(perPageQueryRaw))
+      ? Math.max(Number(perPageQueryRaw), 1)
       : PROJECTS_PER_PAGE_DEFAULT
 
   const searchQuery =
@@ -51,13 +56,18 @@ export default function Page({
 
   const filteredProjectsLength = filteredProjectsMeta.length
 
-  // Update this line to use filteredProjectsLength for total pages when searching
   const projectsLength = searchQuery
     ? filteredProjectsLength
     : getProjectsLength()
 
-  // Calculate total pages based on whether there is a search query or not
-  const totalPages = Math.ceil(projectsLength / perPageQuery)
+  const totalPages = Math.max(Math.ceil(projectsLength / perPageQuery), 0)
+
+  // Redirect if pageQuery exceeds totalPages
+  if (totalPages > 0 && pageQuery > totalPages) {
+    const params = new URLSearchParams(searchParams as Record<string, string>)
+    params.set('page', String(totalPages))
+    redirect(`/projects?${params.toString()}`)
+  }
 
   // Paginate the filtered results
   const paginatedFilteredProjectsMeta = filteredProjectsMeta.slice(
@@ -66,12 +76,15 @@ export default function Page({
   )
 
   // Update the count displayed to the user
-  const noOfPostsShownAlready = searchQuery
-    ? paginatedFilteredProjectsMeta.length + (pageQuery - 1) * perPageQuery
-    : filteredProjectsLength + (pageQuery - 1) * perPageQuery
+  const noOfPostsShownAlready =
+    filteredProjectsLength === 0
+      ? 0
+      : searchQuery
+        ? paginatedFilteredProjectsMeta.length + (pageQuery - 1) * perPageQuery
+        : filteredProjectsLength + (pageQuery - 1) * perPageQuery
 
   return (
-    <section className='container max-w-3xl'>
+    <section>
       <h1 className='title'>Projects</h1>
       <Alert className='mb-4'>
         <AlertIcon className='size-5' />
@@ -79,12 +92,12 @@ export default function Page({
           Heads up!
         </AlertTitle>
         <AlertDescription className='text-sm text-muted-foreground'>
-          It does not lists all of my projects. To view them all, check out my{' '}
+          It does not list all of my projects. To view them all, check out my{' '}
           <a
             href='https://github.com/shricodev'
             target='_blank'
             rel='noreferrer noopener'
-            className='font-semibold text-zinc-400 underline underline-offset-4 hover:text-zinc-500'
+            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground'
           >
             GitHub
           </a>{' '}
@@ -99,6 +112,11 @@ export default function Page({
         placeholder='Search projects by name or language...'
       />
 
+      <FilterDropdown
+        endpoint='projects'
+        defaultPerPage={PROJECTS_PER_PAGE_DEFAULT}
+      />
+
       <PaginationControls
         searchTerm={searchQuery}
         currentPage={pageQuery}
@@ -107,13 +125,13 @@ export default function Page({
         endpoint='projects'
       />
 
-      <div className='mb-10 mt-5 flex justify-between'>
-        <p className='text-sm font-medium text-muted-foreground'>
+      <div className='mb-10 mt-5 flex justify-between text-sm font-medium text-muted-foreground'>
+        <p>
           Showing {noOfPostsShownAlready} of{' '}
           {searchQuery ? filteredProjectsLength : projectsLength} projects
         </p>
-        <p className='text-sm font-medium text-muted-foreground'>
-          page {pageQuery} of {totalPages}
+        <p>
+          Page {totalPages === 0 ? 0 : pageQuery} of {totalPages}
         </p>
       </div>
 

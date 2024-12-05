@@ -91,6 +91,10 @@
     @apply mb-10 text-balance text-3xl font-bold underline decoration-border/75 decoration-2 underline-offset-8;
   }
 
+  span.divider {
+    @apply text-muted-foreground;
+  }
+
   .prose pre {
     @apply overflow-x-auto rounded-lg bg-accent px-5 py-4 text-sm;
   }

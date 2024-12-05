@@ -1,3 +1,8 @@
+import {
+  PAGE_QUERY_PARAM,
+  PER_PAGE_QUERY_PARAM,
+  SEARCH_QUERY_PARAM,
+} from '@/lib/constants'
 import Link from 'next/link'
 
 interface PaginationControlProps {
@@ -22,11 +27,12 @@ export const PaginationControls = ({
           href={{
             pathname: endpoint,
             query: {
-              ...(searchTerm ? { q: searchTerm } : {}),
-              page: currentPage - 1,
-              perPage,
+              ...(searchTerm ? { [SEARCH_QUERY_PARAM]: searchTerm } : {}),
+              [PAGE_QUERY_PARAM]: currentPage - 1,
+              [PER_PAGE_QUERY_PARAM]: perPage,
             },
           }}
+          scroll={false}
           className='inline-flex items-center text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-zinc-500'
         >
           Previous
@@ -46,11 +52,12 @@ export const PaginationControls = ({
           href={{
             pathname: endpoint,
             query: {
-              ...(searchTerm ? { q: searchTerm } : {}),
-              page: currentPage + 1,
-              perPage,
+              ...(searchTerm ? { [SEARCH_QUERY_PARAM]: searchTerm } : {}),
+              [PAGE_QUERY_PARAM]: currentPage + 1,
+              [PER_PAGE_QUERY_PARAM]: perPage,
             },
           }}
+          scroll={false}
           className='inline-flex items-center text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-zinc-500'
         >
           Next

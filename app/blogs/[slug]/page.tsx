@@ -1,15 +1,15 @@
-import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeftIcon, ArrowUpRightIcon } from '@/components/icons'
+import { ArrowUpRightIcon } from '@/components/icons'
 import { formatDate, parseMDX } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
 import { Badge, badgeVariants } from '@/components/ui/badge'
 import MDXContent from '@/components/mdx-content'
 import { UserAvatar } from '@/components/user-avatar'
 import { getBlogPostByID, getBlogPostIDBySlug } from '@/lib/blogs'
 import type { Metadata } from 'next'
 import { BASE_URL } from '@/lib/constants'
+import { notFound } from 'next/navigation'
+import { BackButton } from '@/components/back-button'
 
 interface Props {
   params: {
@@ -20,11 +20,19 @@ interface Props {
 export async function generateMetadata({
   params: { slug },
 }: Props): Promise<Metadata | null> {
-  const postId = await getBlogPostIDBySlug({ slug })
-  if (!postId) return null
+  const getBlogIDResponse = await getBlogPostIDBySlug({ slug })
+  if (!getBlogIDResponse) notFound()
 
-  const { post } = await getBlogPostByID({ id: postId })
-  if (!post) return null
+  const {
+    publication: {
+      post: { id },
+    },
+  } = getBlogIDResponse
+
+  const getBlogPostByIdResponse = await getBlogPostByID({ id })
+  if (!getBlogPostByIdResponse) notFound()
+
+  const { post } = getBlogPostByIdResponse
 
   return {
     title: post.title,
@@ -51,47 +59,50 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params: { slug } }: Props) {
-  const postId = await getBlogPostIDBySlug({ slug })
-  console.log(postId)
-  if (!postId) notFound()
+  // NOTE: I am fetching the postId by slug but not the post by id here, because
+  // I don't want to pollute the URL by including the postId anywhere like in the path or
+  // in the query params.
+  const getBlogIDResponse = await getBlogPostIDBySlug({ slug })
+  if (!getBlogIDResponse) notFound()
 
-  const { post } = await getBlogPostByID({ id: postId })
-  if (!post) notFound()
+  const {
+    publication: {
+      post: { id },
+    },
+  } = getBlogIDResponse
+
+  const getBlogPostByIdResponse = await getBlogPostByID({ id })
+  if (!getBlogPostByIdResponse) notFound()
+
+  const { post } = getBlogPostByIdResponse
 
   const postContent = parseMDX({ markdown: post.content.markdown })
 
   return (
-    <section className='container max-w-3xl pb-10'>
-      <Link
-        href='/blogs'
-        className={buttonVariants({
-          variant: 'secondary',
-          className: 'mb-8 flex gap-2',
-        })}
-      >
-        <ArrowLeftIcon className='size-5' />
-        Back to blogs
-      </Link>
+    <section className='pb-10'>
+      <BackButton endpoint='blogs' />
 
       {post.coverImage && post.coverImage.url ? (
         post.coverImage.url.endsWith('.gif') ? (
-          <div className='relative mb-6 w-full overflow-hidden rounded-lg'>
+          <div className='relative mb-6 w-full overflow-hidden'>
             <Image
               src={post.coverImage.url}
               alt={post.title}
               width={700}
-              height={365}
+              height={400}
               // Ensure GIFs are rendered properly.
               unoptimized={true}
+              className='rounded-sm'
             />
           </div>
         ) : (
-          <div className='relative mb-6 w-full overflow-hidden rounded-lg'>
+          <div className='relative mb-6 w-full overflow-hidden'>
             <Image
               src={post.coverImage.url}
               alt={post.title}
               width={700}
-              height={365}
+              height={400}
+              className='rounded-sm'
             />
           </div>
         )
@@ -116,7 +127,7 @@ export default async function Page({ params: { slug } }: Props) {
                 {post.author?.name}
               </span>
             ) : null}
-            <span className='mr-1 text-muted-foreground sm:mx-1'>•</span>
+            <span className='divider mr-1 sm:mx-1'>•</span>
           </Link>
           {post.publishedAt ? (
             <span className='text-sm text-muted-foreground'>
@@ -139,12 +150,12 @@ export default async function Page({ params: { slug } }: Props) {
         ) : null}
       </header>
 
-      <main className='prose mt-12 max-w-3xl px-4 dark:prose-invert'>
+      <main className='prose mt-12 max-w-3xl dark:prose-invert'>
         <MDXContent source={postContent} />
       </main>
 
-      <div className='mt-10 flex gap-4 text-sm text-muted-foreground'>
-        <div className='flex items-center gap-1 font-medium text-zinc-500 hover:text-zinc-600 dark:text-zinc-300 dark:hover:text-zinc-400'>
+      <div className='mt-10 flex items-center gap-4 text-sm font-medium text-muted-foreground'>
+        <div className='flex items-center gap-1 hover:text-foreground'>
           <ArrowUpRightIcon className='size-4' />
           <a
             href='https://dev.to/shricodev'
@@ -155,7 +166,7 @@ export default async function Page({ params: { slug } }: Props) {
           </a>
         </div>
 
-        <div className='flex items-center gap-1 font-medium text-zinc-500 hover:text-zinc-600 dark:text-zinc-300 dark:hover:text-zinc-400'>
+        <div className='flex items-center gap-1 hover:text-foreground'>
           <ArrowUpRightIcon className='size-4' />
           <a
             href='https://shricodev.hashnode.dev'

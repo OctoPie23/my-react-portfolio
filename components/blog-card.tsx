@@ -14,6 +14,11 @@ import { UserAvatar } from '@/components/user-avatar'
 import { Badge } from '@/components/ui/badge'
 import { BookIcon } from '@/components/icons'
 import { useRouter, useSearchParams } from 'next/navigation'
+import {
+  PAGE_QUERY_PARAM,
+  PER_PAGE_QUERY_PARAM,
+  SEARCH_QUERY_PARAM,
+} from '@/lib/constants'
 
 interface BlogCardProps {
   blogWithMeta: TBlogCardMetadata
@@ -26,8 +31,12 @@ export const BlogCard = ({ blogWithMeta }: BlogCardProps) => {
   const { title, author, tags, brief, slug, readTimeInMinutes, publishedAt } =
     blogWithMeta
 
+  const searchQueryParam = searchParams.get(SEARCH_QUERY_PARAM)
+  const pageQueryParam = searchParams.get(PAGE_QUERY_PARAM)
+  const perPageQueryParam = searchParams.get(PER_PAGE_QUERY_PARAM)
+
   const handleBadgeClick = (tag: string) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams)
     // There is no need to encode the tag, router.push does ist for us.
     params.set('q', tag)
 
@@ -35,10 +44,26 @@ export const BlogCard = ({ blogWithMeta }: BlogCardProps) => {
   }
 
   return (
-    <Card className='w-full max-w-3xl border-none bg-zinc-50 dark:bg-zinc-900'>
+    <Card className='w-full border-none bg-zinc-50 dark:bg-zinc-900'>
       <div className='flex flex-1 flex-col justify-between'>
         <CardHeader>
-          <Link className='flex flex-col' href={`/blogs/${slug}`}>
+          <Link
+            className='flex flex-col'
+            href={{
+              pathname: `/blogs/${slug}`,
+              query: {
+                ...(searchQueryParam
+                  ? { [SEARCH_QUERY_PARAM]: searchQueryParam }
+                  : {}),
+                ...(pageQueryParam
+                  ? { [PAGE_QUERY_PARAM]: pageQueryParam }
+                  : {}),
+                ...(perPageQueryParam
+                  ? { [PER_PAGE_QUERY_PARAM]: perPageQueryParam }
+                  : {}),
+              },
+            }}
+          >
             <CardTitle className='text-lg font-semibold hover:underline hover:underline-offset-4'>
               {title}
             </CardTitle>
@@ -75,14 +100,14 @@ export const BlogCard = ({ blogWithMeta }: BlogCardProps) => {
             ) : null}
           </Link>
 
-          <span className='mx-1'>•</span>
+          <span className='divider mx-1'>•</span>
 
           <span className='flex items-center gap-1'>
             <BookIcon className='size-4' />
             {`${readTimeInMinutes} min read`}
           </span>
 
-          <span className='mx-1 text-muted-foreground'>•</span>
+          <span className='divider mx-1'>•</span>
 
           <span>{formatDate({ date: publishedAt, short: true })}</span>
         </CardFooter>

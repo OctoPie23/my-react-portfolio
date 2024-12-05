@@ -96,7 +96,7 @@ const socialCategories = [
 
 export const Socials = () => {
   return (
-    <div className='my-8 w-full space-y-5'>
+    <section className='my-8 w-full space-y-5'>
       {socialCategories.map(category => (
         <div key={category.name} className='space-y-2'>
           <h3 className='text-lg font-semibold capitalize text-muted-foreground'>
@@ -123,6 +123,6 @@ export const Socials = () => {
           </div>
         </div>
       ))}
-    </div>
+    </section>
   )
 }

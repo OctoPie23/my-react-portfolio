@@ -22,15 +22,15 @@ export async function GET() {
     ttl: 60,
   })
 
-  const { posts } = await getBlogPostsCardMeta({ all: true })
+  const { blogs } = await getBlogPostsCardMeta({ all: true })
 
-  for (const post of posts) {
+  for (const blog of blogs) {
     rss.item({
-      title: post.title,
-      description: post.brief,
-      url: `${BASE_URL}/blogs/${post.slug}`,
-      date: new Date(post.publishedAt),
-      author: post.author.name,
+      title: blog.title,
+      description: blog.brief,
+      url: `${BASE_URL}/blogs/${blog.slug}`,
+      date: new Date(blog.publishedAt),
+      author: blog.author.name,
       categories: ['Blogs'],
     })
   }
@@ -40,7 +40,7 @@ export async function GET() {
   for (const project of projectsMetadata) {
     rss.item({
       title: project.title,
-      description: project.description || '',
+      description: project.description ?? '',
       url: `${BASE_URL}/projects/${project.title}`,
       date: new Date(project.updated_at),
       author: project.author ?? 'Shrijal Acharya',

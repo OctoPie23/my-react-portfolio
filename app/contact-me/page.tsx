@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <section className='container max-w-3xl'>
+    <section>
       <h2 className='title'>Get in touch</h2>
       <p className='text-zinc-800 dark:text-zinc-300'>
         Lorem ipsum dolor, sit amet consectetur adipisicing elit. Deserunt

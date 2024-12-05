@@ -10,9 +10,25 @@ import {
 } from '@/lib/constants'
 import { getBlogPostsCardMeta } from '@/lib/blogs'
 import { getProjectsMetadata } from '@/lib/projects'
+import type { Metadata } from 'next'
+
+export function generateMetadata(): Metadata {
+  return {
+    title: 'Shrijal Acharya',
+    description: 'Shrijal Acharya',
+    openGraph: {
+      title: 'Shrijal Acharya',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Shrijal Acharya',
+      description: 'Shrijal Acharya',
+    },
+  }
+}
 
 export default async function Home() {
-  const { posts } = await getBlogPostsCardMeta({
+  const { blogs } = await getBlogPostsCardMeta({
     page: PAGE_INDEX_DEFAULT,
     pageSize: RECENT_BLOGS_DEFAULT,
   })
@@ -23,16 +39,16 @@ export default async function Home() {
   })
 
   return (
-    <section className='container max-w-3xl'>
+    <>
       <HeroIntro />
 
-      <RecentBlogs blogPosts={posts} />
+      <RecentBlogs blogPosts={blogs} />
 
       <RecentProjects projectsMeta={recentPosts} />
 
       <Socials />
 
       <NewsletterForm />
-    </section>
+    </>
   )
 }

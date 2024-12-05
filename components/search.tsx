@@ -31,7 +31,7 @@ export const Search = ({
   useEffect(() => {
     if (query === userQuery) return
 
-    const newSearchParams = new URLSearchParams(searchParams.toString())
+    const newSearchParams = new URLSearchParams(searchParams)
     if (userQuery) {
       newSearchParams.set('q', userQuery)
     } else {
@@ -45,7 +45,7 @@ export const Search = ({
   const resetFilter = () => setFilterText('')
 
   return (
-    <div className='mb-10 flex items-center gap-3'>
+    <div className='mb-4 flex items-center gap-3'>
       <Input
         autoFocus
         type='text'
@@ -60,7 +60,7 @@ export const Search = ({
           size='default'
           variant='secondary'
           onClick={resetFilter}
-          className='h-8 px-2 lg:px-3'
+          className='h-8 px-2 text-zinc-800 dark:text-zinc-300 lg:px-3'
         >
           Reset
           <CrossIcon className='size-5' />
