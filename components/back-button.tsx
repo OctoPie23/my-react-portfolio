@@ -17,9 +17,9 @@ interface BackButtonProps {
 export const BackButton = ({ endpoint }: BackButtonProps) => {
   const searchParams = useSearchParams()
 
-  const pageQueryParam = searchParams.get('page')
-  const perPageQueryParam = searchParams.get('perPage')
-  const searchQueryParam = searchParams.get('q')
+  const pageQueryParam = searchParams.get(PAGE_QUERY_PARAM)
+  const perPageQueryParam = searchParams.get(PER_PAGE_QUERY_PARAM)
+  const searchQueryParam = searchParams.get(SEARCH_QUERY_PARAM)
 
   return (
     <Link

@@ -148,8 +148,8 @@ export function ArrowLeftIcon(
 ) {
   return (
     <svg
-      xmlns='http://www.w3.org/2000/svg'
       fill='currentColor'
+      xmlns='http://www.w3.org/2000/svg'
       viewBox='0 0 24 24'
       {...props}
     >
@@ -159,6 +159,27 @@ export function ArrowLeftIcon(
         strokeLinejoin='round'
         strokeWidth='2'
         d='M5 12h14M5 12l4-4m-4 4 4 4'
+      />
+    </svg>
+  )
+}
+
+export function CalendarIcon(
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
+) {
+  return (
+    <svg
+      fill='none'
+      viewBox='0 0 24 24'
+      xmlns='http://www.w3.org/2000/svg'
+      {...props}
+    >
+      <path
+        stroke='currentColor'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        strokeWidth='2'
+        d='M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z'
       />
     </svg>
   )
@@ -175,6 +196,46 @@ export function CrossIcon(
       {...props}
     >
       <path d='M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z'></path>
+    </svg>
+  )
+}
+
+export function ChartIcon(
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
+) {
+  return (
+    <svg
+      fill='none'
+      viewBox='0 0 24 24'
+      xmlns='http://www.w3.org/2000/svg'
+      {...props}
+    >
+      <path
+        stroke='currentColor'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        strokeWidth='2'
+        d='M4 4.5V19a1 1 0 0 0 1 1h15M7 14l4-4 4 4 5-5m0 0h-3.207M20 9v3.207'
+      />
+    </svg>
+  )
+}
+
+export function UsersGroup(
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
+) {
+  return (
+    <svg
+      fill='currentColor'
+      viewBox='0 0 24 24'
+      xmlns='http://www.w3.org/2000/svg'
+      {...props}
+    >
+      <path
+        fillRule='evenodd'
+        d='M12 6a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm-1.5 8a4 4 0 0 0-4 4 2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-3Zm6.82-3.096a5.51 5.51 0 0 0-2.797-6.293 3.5 3.5 0 1 1 2.796 6.292ZM19.5 18h.5a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-1.1a5.503 5.503 0 0 1-.471.762A5.998 5.998 0 0 1 19.5 18ZM4 7.5a3.5 3.5 0 0 1 5.477-2.889 5.5 5.5 0 0 0-2.796 6.293A3.501 3.501 0 0 1 4 7.5ZM7.1 12H6a4 4 0 0 0-4 4 2 2 0 0 0 2 2h.5a5.998 5.998 0 0 1 3.071-5.238A5.505 5.505 0 0 1 7.1 12Z'
+        clipRule='evenodd'
+      />
     </svg>
   )
 }
@@ -200,7 +261,7 @@ export function AlertIcon(
   )
 }
 
-export function HambugerMenuIcon(
+export function HamburgerMenuIcon(
   props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
 ) {
   return (

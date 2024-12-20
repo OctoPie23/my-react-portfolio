@@ -13,7 +13,7 @@ import { TBlogCardMetadata } from '@/types/blogs'
 import { UserAvatar } from '@/components/user-avatar'
 import { Badge } from '@/components/ui/badge'
 import { BookIcon } from '@/components/icons'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import {
   PAGE_QUERY_PARAM,
   PER_PAGE_QUERY_PARAM,
@@ -22,23 +22,23 @@ import {
 
 interface BlogCardProps {
   blogWithMeta: TBlogCardMetadata
+  searchParams?: {
+    [SEARCH_QUERY_PARAM]?: string
+    [PAGE_QUERY_PARAM]?: string
+    [PER_PAGE_QUERY_PARAM]?: string
+  }
 }
 
-export const BlogCard = ({ blogWithMeta }: BlogCardProps) => {
+export const BlogCard = ({ blogWithMeta, searchParams }: BlogCardProps) => {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const { title, author, tags, brief, slug, readTimeInMinutes, publishedAt } =
     blogWithMeta
 
-  const searchQueryParam = searchParams.get(SEARCH_QUERY_PARAM)
-  const pageQueryParam = searchParams.get(PAGE_QUERY_PARAM)
-  const perPageQueryParam = searchParams.get(PER_PAGE_QUERY_PARAM)
-
   const handleBadgeClick = (tag: string) => {
     const params = new URLSearchParams(searchParams)
     // There is no need to encode the tag, router.push does ist for us.
-    params.set('q', tag)
+    params.set(SEARCH_QUERY_PARAM, tag)
 
     router.push(`/blogs?${params.toString()}`)
   }
@@ -51,17 +51,19 @@ export const BlogCard = ({ blogWithMeta }: BlogCardProps) => {
             className='flex flex-col'
             href={{
               pathname: `/blogs/${slug}`,
-              query: {
-                ...(searchQueryParam
-                  ? { [SEARCH_QUERY_PARAM]: searchQueryParam }
-                  : {}),
-                ...(pageQueryParam
-                  ? { [PAGE_QUERY_PARAM]: pageQueryParam }
-                  : {}),
-                ...(perPageQueryParam
-                  ? { [PER_PAGE_QUERY_PARAM]: perPageQueryParam }
-                  : {}),
-              },
+              ...(searchParams && {
+                query: {
+                  ...(searchParams.q
+                    ? { [SEARCH_QUERY_PARAM]: searchParams.q }
+                    : {}),
+                  ...(searchParams.page
+                    ? { [PAGE_QUERY_PARAM]: searchParams.page }
+                    : {}),
+                  ...(searchParams.perPage
+                    ? { [PER_PAGE_QUERY_PARAM]: searchParams.perPage }
+                    : {}),
+                },
+              }),
             }}
           >
             <CardTitle className='text-lg font-semibold hover:underline hover:underline-offset-4'>
@@ -74,7 +76,7 @@ export const BlogCard = ({ blogWithMeta }: BlogCardProps) => {
                 <Badge
                   key={tag.name}
                   variant='secondary'
-                  className='cursor-pointer text-zinc-500 hover:text-zinc-600 dark:text-zinc-300 dark:hover:text-zinc-400'
+                  className='cursor-pointer text-zinc-600 hover:text-zinc-800 dark:text-zinc-300 dark:hover:text-zinc-400'
                   onClick={() => handleBadgeClick(tag.name)}
                 >
                   {tag.name}
@@ -91,7 +93,7 @@ export const BlogCard = ({ blogWithMeta }: BlogCardProps) => {
         </Link>
 
         <CardFooter className='text-sm text-muted-foreground'>
-          <Link href='/contact-me' className='flex items-center'>
+          <Link href='/contact' className='flex items-center'>
             <UserAvatar className='size-7 sm:mr-2' />
             {author ? (
               <span className='hidden text-sm hover:underline hover:underline-offset-2 sm:inline'>

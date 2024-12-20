@@ -22,15 +22,22 @@ import {
   STARS_COUNT_TO_SHOW_ICON,
 } from '@/lib/constants'
 import { InfoTooltip } from '@/components/info-tooltip'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 interface ProjectCardProps {
   projectMetadata: TProjectMetadata
+  searchParams?: {
+    [SEARCH_QUERY_PARAM]?: string
+    [PAGE_QUERY_PARAM]?: string
+    [PER_PAGE_QUERY_PARAM]?: string
+  }
 }
 
-export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
+export const ProjectCard = ({
+  projectMetadata,
+  searchParams,
+}: ProjectCardProps) => {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const {
     title,
@@ -47,14 +54,10 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
 
   const formattedCreatedDate = formatDate({ date: created_at, short: true })
 
-  const searchQueryParam = searchParams.get('q')
-  const pageQueryParam = searchParams.get('page')
-  const perPageQueryParam = searchParams.get('perPage')
-
   const handleBadgeClick = (language: string) => {
     const params = new URLSearchParams(searchParams)
-    // There is no need to encode the language, router.push does ist for us.
-    params.set('q', language)
+    // There is no need to encode the language, router.push does it for us.
+    params.set(SEARCH_QUERY_PARAM, language)
 
     router.push(`/projects?${params.toString()}`)
   }
@@ -67,17 +70,19 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
             <Link
               href={{
                 pathname: `/projects/${title}`,
-                query: {
-                  ...(searchQueryParam
-                    ? { [SEARCH_QUERY_PARAM]: searchQueryParam }
-                    : {}),
-                  ...(pageQueryParam
-                    ? { [PAGE_QUERY_PARAM]: pageQueryParam }
-                    : {}),
-                  ...(perPageQueryParam
-                    ? { [PER_PAGE_QUERY_PARAM]: perPageQueryParam }
-                    : {}),
-                },
+                ...(searchParams && {
+                  query: {
+                    ...(searchParams.q
+                      ? { [SEARCH_QUERY_PARAM]: searchParams.q }
+                      : {}),
+                    ...(searchParams.page
+                      ? { [PAGE_QUERY_PARAM]: searchParams.page }
+                      : {}),
+                    ...(searchParams.perPage
+                      ? { [PER_PAGE_QUERY_PARAM]: searchParams.perPage }
+                      : {}),
+                  },
+                }),
               }}
               className='hover:underline hover:underline-offset-4'
             >
@@ -105,7 +110,7 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
         </CardTitle>
         <CardDescription className='flex text-sm text-zinc-700 dark:text-zinc-400'>
           <div className='mt-3 flex items-center'>
-            <Link href='/contact-me' className='flex items-center'>
+            <Link href='/contact' className='flex items-center'>
               <UserAvatar className='mr-2 size-8' />
               {author ? (
                 <span className='hidden font-semibold hover:underline hover:underline-offset-2 sm:inline'>
@@ -120,7 +125,7 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
                   <span className='divider mr-1 sm:mx-1'>•</span>
                   <Badge
                     variant='secondary'
-                    className='ml-1 cursor-pointer text-muted-foreground hover:text-zinc-600 dark:hover:text-zinc-400'
+                    className='ml-1 cursor-pointer text-zinc-600 hover:text-zinc-800 dark:text-zinc-300 dark:hover:text-zinc-400'
                     onClick={() => handleBadgeClick(language)}
                   >
                     {language}
@@ -143,6 +148,7 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
           href={clone_url}
           target='_blank'
           rel='noreferrer noopener'
+          aria-label='View project on GitHub'
           className={buttonVariants({
             variant: 'outline',
           })}
@@ -156,6 +162,7 @@ export const ProjectCard = ({ projectMetadata }: ProjectCardProps) => {
             href={homepage}
             target='_blank'
             rel='noreferrer noopener'
+            aria-label='View live demo of the project'
             className={buttonVariants({
               variant: 'default',
             })}

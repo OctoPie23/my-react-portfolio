@@ -109,7 +109,7 @@ export const NewsletterForm = () => {
                 I never share your email. Read our{' '}
                 <Link
                   href='/privacy'
-                  className='font-bold hover:underline hover:underline-offset-2'
+                  className='font-bold hover:text-foreground hover:underline hover:underline-offset-2 hover:transition'
                   target='_blank'
                 >
                   privacy&nbsp;policy.

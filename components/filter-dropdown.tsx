@@ -22,7 +22,13 @@ import {
   FilterFormSchema,
   TFilterFormSchema,
 } from '@/lib/validators/filter-form'
-import { PAGE_INDEX_DEFAULT, PAGE_MAX, PER_PAGE_MAX } from '@/lib/constants'
+import {
+  PAGE_INDEX_DEFAULT,
+  PAGE_MAX,
+  PAGE_QUERY_PARAM,
+  PER_PAGE_MAX,
+  PER_PAGE_QUERY_PARAM,
+} from '@/lib/constants'
 import { useState } from 'react'
 import { FilterIcon } from '@/components/icons'
 
@@ -40,8 +46,8 @@ export const FilterDropdown = ({
 
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  const perPageSearchParamRaw = searchParams.get('perPage')
-  const pageSearchParamRaw = searchParams.get('page')
+  const perPageSearchParamRaw = searchParams.get(PER_PAGE_QUERY_PARAM)
+  const pageSearchParamRaw = searchParams.get(PAGE_QUERY_PARAM)
 
   const perPageSearchParam = perPageSearchParamRaw ?? defaultPerPage.toString()
   const pageSearchParam = pageSearchParamRaw ?? PAGE_INDEX_DEFAULT.toString()
@@ -60,7 +66,7 @@ export const FilterDropdown = ({
 
   const isFormDisabled =
     !form.formState.isValid ||
-    (!form.getValues('perPage') && !form.getValues('page'))
+    (!form.getValues(PER_PAGE_QUERY_PARAM) && !form.getValues(PAGE_QUERY_PARAM))
 
   const handleFormSubmit: SubmitHandler<TFilterFormSchema> = async (
     data: TFilterFormSchema,
@@ -68,8 +74,8 @@ export const FilterDropdown = ({
     const { perPage, page } = data
 
     const newSearchParams = new URLSearchParams(searchParams)
-    if (perPage) newSearchParams.set('perPage', perPage)
-    if (page) newSearchParams.set('page', page)
+    if (perPage) newSearchParams.set(PER_PAGE_QUERY_PARAM, perPage)
+    if (page) newSearchParams.set(PAGE_QUERY_PARAM, page)
     setIsOpen(false)
     router.push(`/${endpoint}?${newSearchParams.toString()}`)
   }
@@ -101,7 +107,7 @@ export const FilterDropdown = ({
             >
               <FormField
                 control={form.control}
-                name='perPage'
+                name={PER_PAGE_QUERY_PARAM}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='text-xs font-bold uppercase text-zinc-700 dark:text-zinc-400'>
@@ -121,7 +127,7 @@ export const FilterDropdown = ({
               />
               <FormField
                 control={form.control}
-                name='page'
+                name={PAGE_QUERY_PARAM}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='text-xs font-bold uppercase text-zinc-700 dark:text-zinc-400'>

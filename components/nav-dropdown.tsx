@@ -5,7 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { HambugerMenuIcon } from '@/components/icons'
+import { HamburgerMenuIcon } from '@/components/icons'
 import Link from 'next/link'
 import { useState } from 'react'
 import { NAV_LINKS } from '@/lib/constants'
@@ -16,13 +16,13 @@ export function NavDropdown() {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger
-        asChild
         onClick={() => setIsOpen(prev => !prev)}
         className='flex-shrink-0'
       >
-        <div className='flex items-center justify-center'>
-          <HambugerMenuIcon className='size-6 font-bold' />
-        </div>
+        <HamburgerMenuIcon
+          aria-label='Menu Icon'
+          className='size-6 font-bold'
+        />
       </PopoverTrigger>
 
       <PopoverContent

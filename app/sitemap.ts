@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogPostsMetadata = blogs.map(blog => {
     return {
       url: `${normalizedBaseUrl}/blogs/${blog.slug}`,
-      lastModified: new Date(blog.publishedAt).toISOString(),
+      lastModified: new Date(blog.updatedAt ?? blog.publishedAt).toISOString(),
     }
   })
 
@@ -24,8 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = ROUTES.map(route => {
     const normalizedRoute = `/${route.replace(/^\/|\/$/g, '')}`
     return {
-      url: `${normalizedBaseUrl}${normalizedRoute}`,
-      lastModified: new Date().toISOString().split('T')[0],
+      url: `${normalizedBaseUrl}${normalizedRoute.replace(/\/+$/, '')}`,
+      lastModified: new Date('2024-12-04T00:00:00Z').toISOString(),
     }
   })
 

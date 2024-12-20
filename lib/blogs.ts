@@ -8,6 +8,7 @@ import {
   TGetBlogByIDResponse,
   TGetBlogPostIDBySlugResponse,
   TBlogCardMetadata,
+  TGetBlogsSlugs,
 } from '@/types/blogs'
 import {
   BLOGS_PER_PAGE_DEFAULT,
@@ -49,6 +50,7 @@ export async function getBlogPostByID({
         title
         subtitle
         readTimeInMinutes
+        brief
         publishedAt
         seo {
           description
@@ -117,6 +119,57 @@ export async function getBlogPostIDBySlug({
   return null
 }
 
+export async function getAllBlogPostsSlug({
+  pageSize = BLOGS_PER_PAGE_DEFAULT,
+  page = PAGE_INDEX_DEFAULT,
+}: TGetBlogsMetadataArgs): Promise<{ slugs: { slug: string }[] }> {
+  const query = gql`
+    query getPosts($username: String!, $pageSize: Int!, $page: Int!) {
+      user(username: $username) {
+        posts(pageSize: $pageSize, page: $page, sortBy: DATE_PUBLISHED_DESC) {
+          edges {
+            node {
+              slug
+            }
+          }
+          pageInfo {
+            hasNextPage
+            nextPage
+          }
+        }
+      }
+    }
+  `
+
+  const slugs = []
+  let currentPage = page
+  let hasNextPage = true
+
+  while (hasNextPage) {
+    // Fetch all posts in the chunk of 10. NOTE: The upper limit from hashnode is 20
+    // Don't pass the pageSizeQuery in the pageSize field to this function. If the user
+    // requests for more than 20 posts, the API will throw an error
+    const response = await request<TGetBlogsSlugs>(endpoint, query, {
+      username: HASHNODE_USERNAME,
+      pageSize:
+        pageSize < HASHNODE_BLOGS_FETCH_LIMIT
+          ? pageSize
+          : HASHNODE_BLOGS_FETCH_LIMIT,
+      page: currentPage,
+    })
+
+    const blogs = response.user.posts.edges.map(edge => edge.node)
+    slugs.push(...blogs)
+
+    hasNextPage = response.user.posts.pageInfo.hasNextPage
+    currentPage = response.user.posts.pageInfo.nextPage ?? currentPage + 1
+  }
+
+  return {
+    slugs,
+  }
+}
+
 export async function getBlogPostsCardMeta({
   pageSize = BLOGS_PER_PAGE_DEFAULT,
   page = PAGE_INDEX_DEFAULT,
@@ -132,6 +185,7 @@ export async function getBlogPostsCardMeta({
               title
               readTimeInMinutes
               publishedAt
+              updatedAt
               publication {
                 id
               }

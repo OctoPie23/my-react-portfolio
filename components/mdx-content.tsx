@@ -53,6 +53,7 @@ function CustomImage({ ...props }: any) {
     <Image
       width={700}
       height={400}
+      unoptimized={imageSrc.toLowerCase().endsWith('.gif')}
       alt={props.alt ?? 'Image from MDX'}
       className='mx-auto rounded-md'
       {...props}

@@ -88,7 +88,7 @@
   }
 
   .title {
-    @apply mb-10 text-balance text-3xl font-bold underline decoration-border/75 decoration-2 underline-offset-8;
+    @apply mb-10 text-balance text-3xl font-bold text-foreground underline decoration-border/75 decoration-2 underline-offset-8;
   }
 
   span.divider {

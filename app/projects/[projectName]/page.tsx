@@ -11,6 +11,7 @@ import { formatDate } from '@/lib/utils'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 
 interface Props {
   params: {
@@ -59,7 +60,9 @@ export default function Page({ params: { projectName } }: Props) {
 
   return (
     <section className='pb-10'>
-      <BackButton endpoint='projects' />
+      <Suspense fallback={null}>
+        <BackButton endpoint='projects' />
+      </Suspense>
 
       <header>
         <Alert className='my-8'>
@@ -103,7 +106,7 @@ export default function Page({ params: { projectName } }: Props) {
         </h1>
 
         <div className='mt-3 flex items-center'>
-          <Link href='/contact-me' className='flex items-center'>
+          <Link href='/contact' className='flex items-center'>
             <UserAvatar className='size-8 sm:mr-2' />
             {author && (
               <span className='hidden text-sm font-semibold text-muted-foreground hover:underline hover:underline-offset-2 sm:inline'>
@@ -149,7 +152,7 @@ export default function Page({ params: { projectName } }: Props) {
       </main>
 
       <div className='mt-10 flex items-center gap-1 text-sm font-medium text-muted-foreground'>
-        <div className='flex items-center gap-1 hover:text-foreground'>
+        <div className='flex items-center gap-1 hover:text-foreground hover:transition'>
           <ArrowUpRightIcon className='size-4' />
           <a href={clone_url} target='_blank' rel='noreferrer noopener'>
             GitHub

@@ -4,7 +4,14 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'Privacy Policy',
+  description:
+    'Learn how I collect, use, and protect your personal information.',
+  robots: {
+    // We don't want the crawlers to index this page, but we want them to follow
+    // any url on this page.
+    index: false,
+    follow: true,
+  },
 }
 
 export default function Page() {
@@ -13,59 +20,45 @@ export default function Page() {
       <div className='mb-5'>
         <h1 className='title'>Privacy Policy</h1>
         <p className='text-muted-foreground'>
-          We are committed to protecting your privacy and safeguarding the
-          information you share with us. This privacy policy explains how we
-          collect, use, and protect your personal data. By using our services or
-          submitting any forms on this website, you consent to the practices
-          described here.
+          I am committed to protecting your privacy and safeguarding the
+          information you share with me. This privacy policy explains how I
+          collect, use, and protect your personal data.
         </p>
       </div>
 
       <div className='mb-8 space-y-5'>
         <div>
-          <h2 className='text-xl font-bold'>Information We Collect</h2>
+          <h2 className='text-xl font-bold'>Information I Collect</h2>
           <p className='text-muted-foreground'>
-            We may collect certain personal information that you provide,
+            I may collect certain personal information that you provide,
             including your name, email address, and any additional details
-            submitted through our forms. Additionally, we may automatically
-            gather certain usage data, such as your IP address, browser type,
-            and pages visited.
+            submitted through the forms.
           </p>
         </div>
         <div>
-          <h2 className='text-xl font-bold'>How We Use Your Information</h2>
+          <h2 className='text-xl font-bold'>How I Use Your Information</h2>
           <p className='text-muted-foreground'>
-            The information collected is used to provide and improve our
-            services, communicate with you, and meet any legal requirements. By
-            submitting a form, you consent to our use of your information as
+            The information collected is used to communicate with you. By
+            submitting a form, you consent to the use of your information as
             outlined in this policy.
           </p>
         </div>
         <div>
           <h2 className='text-xl font-bold'>Data Sharing and Protection</h2>
           <p className='text-muted-foreground'>
-            We do not sell or rent your personal information to any third
-            parties. We employ security measures to protect your data from
+            I do not sell or rent your personal information to any third
+            parties. I employ security measures to protect your data from
             unauthorized access or misuse.
-          </p>
-        </div>
-        <div>
-          <h2 className='text-xl font-bold'>Your Rights</h2>
-          <p className='text-muted-foreground'>
-            You have the right to access, correct, or delete your personal
-            information. You may also choose to opt out of certain data
-            processing activities. If you wish to exercise these rights, please
-            reach out to us using the contact details below.
           </p>
         </div>
         <div>
           <h2 className='text-xl font-bold'>Contact Details</h2>
           <p className='text-muted-foreground'>
-            If you have any questions or concerns about our privacy policy,
+            If you have any questions or concerns about the privacy policy,
             please contact us at this email address:{' '}
             <a
               href={`mailto:${PUBLIC_GMAIL}`}
-              className='text-foreground underline underline-offset-4'
+              className='font-medium text-muted-foreground underline underline-offset-4 hover:text-foreground hover:transition'
             >
               {PUBLIC_GMAIL}
             </a>{' '}
@@ -75,7 +68,7 @@ export default function Page() {
       </div>
 
       <Link
-        href='/contact-me'
+        href='/contact'
         className='inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
         prefetch={false}
       >

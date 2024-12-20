@@ -7,6 +7,9 @@ import {
   BLOGS_PER_PAGE_DEFAULT,
   DEBOUNCE_TIME_BLOGS,
   PAGE_INDEX_DEFAULT,
+  PAGE_QUERY_PARAM,
+  PER_PAGE_QUERY_PARAM,
+  SEARCH_QUERY_PARAM,
 } from '@/lib/constants'
 import { getBlogPostsCardMeta } from '@/lib/blogs'
 import type { Metadata } from 'next'
@@ -66,8 +69,7 @@ export default async function Page({
 
   if (totalPages > 0 && pageQuery > totalPages) {
     const params = new URLSearchParams(searchParams as Record<string, string>)
-
-    params.set('page', String(totalPages))
+    params.set(PAGE_QUERY_PARAM, String(totalPages))
     redirect(`/blogs?${params.toString()}`)
   }
 
@@ -97,7 +99,7 @@ export default async function Page({
             href='https://dev.to/shricodev'
             target='_blank'
             rel='noreferrer noopener'
-            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground'
+            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground hover:transition'
           >
             DEV
           </a>{' '}
@@ -106,7 +108,7 @@ export default async function Page({
             href='https://shricodev.hashnode.dev'
             target='_blank'
             rel='noreferrer noopener'
-            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground'
+            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground hover:transition'
           >
             Hashnode
           </a>{' '}
@@ -144,7 +146,14 @@ export default async function Page({
         </p>
       </div>
 
-      <Blogs blogsWithMeta={searchQuery ? paginatedFilteredBlogs : blogs} />
+      <Blogs
+        blogsWithMeta={searchQuery ? paginatedFilteredBlogs : blogs}
+        searchParams={{
+          [SEARCH_QUERY_PARAM]: searchQuery,
+          [PAGE_QUERY_PARAM]: pageQuery.toString(),
+          [PER_PAGE_QUERY_PARAM]: perPageQuery.toString(),
+        }}
+      />
     </section>
   )
 }

@@ -2,19 +2,33 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpRightIcon } from '@/components/icons'
 import { formatDate, parseMDX } from '@/lib/utils'
-import { Badge, badgeVariants } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge'
 import MDXContent from '@/components/mdx-content'
 import { UserAvatar } from '@/components/user-avatar'
-import { getBlogPostByID, getBlogPostIDBySlug } from '@/lib/blogs'
+import {
+  getAllBlogPostsSlug,
+  getBlogPostByID,
+  getBlogPostIDBySlug,
+} from '@/lib/blogs'
 import type { Metadata } from 'next'
 import { BASE_URL } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import { BackButton } from '@/components/back-button'
+import { Suspense } from 'react'
 
 interface Props {
   params: {
     slug: string
   }
+}
+
+// Static Site Generation (SSG) to improve performance on static contents.
+export async function generateStaticParams() {
+  const response = await getAllBlogPostsSlug({})
+  const slugs = response?.slugs.map(blogSlug => ({
+    slug: blogSlug.slug,
+  }))
+  return slugs
 }
 
 export async function generateMetadata({
@@ -36,10 +50,10 @@ export async function generateMetadata({
 
   return {
     title: post.title,
-    ...(post.seo.description && { description: post.seo.description }),
+    description: post.seo.description || post.brief,
     openGraph: {
       title: post.title,
-      description: post.seo.description,
+      description: post.seo.description || post.brief,
       url: `${BASE_URL}/blogs/${slug}`,
       ...(post.coverImage?.url && {
         images: [
@@ -52,8 +66,8 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       title: post.title,
-      ...(post.seo.description && { description: post.seo.description }),
-      ...(post.coverImage?.url && { images: [post.coverImage.url] }),
+      description: post.seo.description || post.brief,
+      ...(post.coverImage?.url && { images: [{ url: post.coverImage.url }] }),
     },
   }
 }
@@ -80,32 +94,22 @@ export default async function Page({ params: { slug } }: Props) {
 
   return (
     <section className='pb-10'>
-      <BackButton endpoint='blogs' />
+      <Suspense fallback={null}>
+        <BackButton endpoint='blogs' />
+      </Suspense>
 
       {post.coverImage && post.coverImage.url ? (
-        post.coverImage.url.endsWith('.gif') ? (
-          <div className='relative mb-6 w-full overflow-hidden'>
-            <Image
-              src={post.coverImage.url}
-              alt={post.title}
-              width={700}
-              height={400}
-              // Ensure GIFs are rendered properly.
-              unoptimized={true}
-              className='rounded-sm'
-            />
-          </div>
-        ) : (
-          <div className='relative mb-6 w-full overflow-hidden'>
-            <Image
-              src={post.coverImage.url}
-              alt={post.title}
-              width={700}
-              height={400}
-              className='rounded-sm'
-            />
-          </div>
-        )
+        <div className='relative mb-6 h-[380px] w-full'>
+          <Image
+            src={post.coverImage.url}
+            alt={post.title}
+            fill
+            className='rounded-md object-cover'
+            priority
+            // Make sure that GIFs are set to unoptimized else the animation will not work.
+            unoptimized={post.coverImage.url.toLowerCase().endsWith('.gif')}
+          />
+        </div>
       ) : null}
 
       <header>
@@ -114,13 +118,13 @@ export default async function Page({ params: { slug } }: Props) {
         </h1>
 
         {post.subtitle ? (
-          <h2 className='py-3 text-xl font-semibold text-muted-foreground'>
+          <p className='py-3 text-xl font-semibold text-muted-foreground'>
             {post.subtitle}
-          </h2>
+          </p>
         ) : null}
 
         <div className='mt-3 flex items-center'>
-          <Link href='/contact-me' className='flex items-center'>
+          <Link href='/contact' className='flex items-center'>
             <UserAvatar className='mr-2 size-8' />
             {post.author?.name ? (
               <span className='text-sm font-semibold text-muted-foreground hover:underline hover:underline-offset-2'>
@@ -141,7 +145,8 @@ export default async function Page({ params: { slug } }: Props) {
             {post.tags.map(tag => (
               <Badge
                 key={tag.name}
-                className={badgeVariants({ variant: 'secondary' })}
+                variant='secondary'
+                className={'text-zinc-600 dark:text-zinc-300'}
               >
                 {tag.name}
               </Badge>
@@ -149,13 +154,11 @@ export default async function Page({ params: { slug } }: Props) {
           </div>
         ) : null}
       </header>
-
       <main className='prose mt-12 max-w-3xl dark:prose-invert'>
         <MDXContent source={postContent} />
       </main>
-
       <div className='mt-10 flex items-center gap-4 text-sm font-medium text-muted-foreground'>
-        <div className='flex items-center gap-1 hover:text-foreground'>
+        <div className='flex items-center gap-1 hover:text-foreground hover:transition'>
           <ArrowUpRightIcon className='size-4' />
           <a
             href='https://dev.to/shricodev'
@@ -166,7 +169,7 @@ export default async function Page({ params: { slug } }: Props) {
           </a>
         </div>
 
-        <div className='flex items-center gap-1 hover:text-foreground'>
+        <div className='flex items-center gap-1 hover:text-foreground hover:transition'>
           <ArrowUpRightIcon className='size-4' />
           <a
             href='https://shricodev.hashnode.dev'

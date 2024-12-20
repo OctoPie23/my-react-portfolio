@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/form'
 import { toast } from 'sonner'
 
-export const ContactMe = () => {
+export const Contact = () => {
   const form = useForm<TContactFormSchema>({
     resolver: zodResolver(ContactFormSchema),
     defaultValues: {
@@ -138,7 +138,7 @@ export const ContactMe = () => {
             By submitting this form, I agree to the{' '}
             <Link
               href='/privacy'
-              className='font-bold hover:underline hover:underline-offset-2'
+              className='font-bold hover:text-foreground hover:underline hover:underline-offset-2 hover:transition'
               target='_blank'
             >
               privacy&nbsp;policy.

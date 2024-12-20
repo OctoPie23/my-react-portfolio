@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useDebounce } from 'use-debounce'
 import { Button } from '@/components/ui/button'
 import { CrossIcon } from '@/components/icons'
-import { DEBOUNCE_TIME_DEFAULT } from '@/lib/constants'
+import { DEBOUNCE_TIME_DEFAULT, SEARCH_QUERY_PARAM } from '@/lib/constants'
 
 interface SearchProps {
   endpoint: 'projects' | 'blogs'
@@ -33,9 +33,9 @@ export const Search = ({
 
     const newSearchParams = new URLSearchParams(searchParams)
     if (userQuery) {
-      newSearchParams.set('q', userQuery)
+      newSearchParams.set(SEARCH_QUERY_PARAM, userQuery)
     } else {
-      newSearchParams.delete('q')
+      newSearchParams.delete(SEARCH_QUERY_PARAM)
     }
 
     router.push(`/${endpoint}?${newSearchParams.toString()}`)

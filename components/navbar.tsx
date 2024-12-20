@@ -5,6 +5,14 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { usePathname } from 'next/navigation'
 import { NavDropdown } from '@/components/nav-dropdown'
 import { NAV_LINKS } from '@/lib/constants'
+import { Poppins } from 'next/font/google'
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-poppins',
+  weight: ['700'],
+})
 
 export const Navbar = () => {
   const pathName = usePathname()
@@ -28,7 +36,7 @@ export const Navbar = () => {
 
             <Link
               href={homeLink}
-              className='select-none flex-nowrap text-2xl font-medium uppercase'
+              className={`${poppins.className} select-none flex-nowrap text-2xl font-bold uppercase`}
             >
               shrijal.
             </Link>

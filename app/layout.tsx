@@ -5,6 +5,8 @@ import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { BASE_URL } from '@/lib/constants'
 import { Toaster } from '@/components/ui/sonner'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 const geistSans = localFont({
@@ -24,6 +26,9 @@ export function generateMetadata(): Metadata {
     title: {
       default: 'Shrijal Acharya',
       template: '%s • Shrijal Acharya',
+    },
+    twitter: {
+      card: 'summary_large_image',
     },
     robots: {
       index: true,
@@ -59,6 +64,10 @@ export default function RootLayout({
           <Toaster />
 
           <Footer />
+
+          {/* Vercel Analytics and Speed Insights. Don't remove this provider. */}
+          <Analytics />
+          <SpeedInsights />
         </Providers>
       </body>
     </html>

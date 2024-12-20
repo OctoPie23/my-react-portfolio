@@ -35,7 +35,7 @@ export const ROUTES = [
   '/blogs',
   '/projects',
   '/work',
-  '/contact-me',
+  '/contact',
   '/privacy',
   '/meet',
 ]
@@ -45,5 +45,5 @@ export const NAV_LINKS = [
   { name: 'Blogs', path: '/blogs' },
   { name: 'Projects', path: '/projects' },
   { name: 'Work', path: '/work' },
-  { name: 'Contact me', path: '/contact-me' },
+  { name: 'Contact', path: '/contact' },
 ]

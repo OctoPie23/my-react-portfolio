@@ -10,7 +10,7 @@ export async function GET() {
       'Stay Updated with the latest selected public GitHub repositories and blog posts from Shrijal Acharya.',
     site_url: BASE_URL,
     feed_url: `${BASE_URL}/rss.xml`,
-    image_url: `${BASE_URL}/images/shrijal-acharya.jpg`,
+    image_url: `${BASE_URL}/images/shrijal-acharya.webp`,
     managingEditor: `${PUBLIC_GMAIL} (Shrijal Acharya)`,
     webMaster: `${PUBLIC_GMAIL} (Shrijal Acharya)`,
     copyright: `${new Date().getFullYear()} Shrijal Acharya. All rights reserved.`,

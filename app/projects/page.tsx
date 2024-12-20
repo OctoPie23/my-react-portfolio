@@ -7,7 +7,10 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   DEBOUNCE_TIME_PROJECTS,
   PAGE_INDEX_DEFAULT,
+  PAGE_QUERY_PARAM,
+  PER_PAGE_QUERY_PARAM,
   PROJECTS_PER_PAGE_DEFAULT,
+  SEARCH_QUERY_PARAM,
 } from '@/lib/constants'
 import { getProjectsLength, getProjectsMetadata } from '@/lib/projects'
 import { Metadata } from 'next'
@@ -65,7 +68,7 @@ export default function Page({
   // Redirect if pageQuery exceeds totalPages
   if (totalPages > 0 && pageQuery > totalPages) {
     const params = new URLSearchParams(searchParams as Record<string, string>)
-    params.set('page', String(totalPages))
+    params.set(PAGE_QUERY_PARAM, String(totalPages))
     redirect(`/projects?${params.toString()}`)
   }
 
@@ -97,7 +100,7 @@ export default function Page({
             href='https://github.com/shricodev'
             target='_blank'
             rel='noreferrer noopener'
-            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground'
+            className='font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground hover:transition'
           >
             GitHub
           </a>{' '}
@@ -139,6 +142,11 @@ export default function Page({
         projectsMeta={
           searchQuery ? paginatedFilteredProjectsMeta : projectsMeta
         }
+        searchParams={{
+          [SEARCH_QUERY_PARAM]: searchQuery,
+          [PAGE_QUERY_PARAM]: pageQuery.toString(),
+          [PER_PAGE_QUERY_PARAM]: perPageQuery.toString(),
+        }}
       />
     </section>
   )

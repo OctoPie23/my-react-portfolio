@@ -7,6 +7,7 @@ export type TBlogCardMetadata = {
     id: string
   }
   publishedAt: string
+  updatedAt?: string
   slug: string
   tags?: {
     name: string
@@ -42,6 +43,22 @@ export type TGetPostsResponse = {
         node: TPostMetadata
         cursor: string
       }[]
+    }
+  }
+}
+
+export type TGetBlogsSlugs = {
+  user: {
+    posts: {
+      edges: {
+        node: {
+          slug: string
+        }
+      }[]
+      pageInfo: {
+        hasNextPage: boolean
+        nextPage: number
+      }
     }
   }
 }
@@ -114,6 +131,7 @@ export type TGetBlogByIDResponse = {
   post: {
     title: string
     subtitle?: string
+    brief: string
     readTimeInMinutes: number
     publishedAt: string
     seo: {
