@@ -41,7 +41,6 @@ async function sendEmailResend(data: TContactFormSchema) {
     to: email,
     cc: senderEmail,
     subject: 'Portfolio: New Message from Contact Form',
-    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
     react: ContactFormEmailTemplate({ name, email, message }),
   })
 }

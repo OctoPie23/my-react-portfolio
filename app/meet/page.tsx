@@ -1,10 +1,9 @@
 import { CalMeet } from '@/components/cal-meet'
+import { Metadata } from 'next'
 
-export function generateMetadata() {
-  return {
-    title: 'Meeting',
-    description: 'Schedule a meet with Shrijal Acharya',
-  }
+export const metadata: Metadata = {
+  title: 'Meeting',
+  description: 'Schedule a meet with Shrijal Acharya',
 }
 
 export default function Page() {

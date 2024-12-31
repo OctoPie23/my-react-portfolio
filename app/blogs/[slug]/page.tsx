@@ -127,7 +127,7 @@ export default async function Page({ params: { slug } }: Props) {
           <Link href='/contact' className='flex items-center'>
             <UserAvatar className='mr-2 size-8' />
             {post.author?.name ? (
-              <span className='text-sm font-semibold text-muted-foreground hover:underline hover:underline-offset-2'>
+              <span className='hidden text-sm font-semibold text-muted-foreground hover:underline hover:underline-offset-2 sm:inline'>
                 {post.author?.name}
               </span>
             ) : null}

@@ -40,7 +40,9 @@ export function generateMetadata({ params: { projectName } }: Props): Metadata {
     twitter: {
       card: 'summary_large_image',
       title: project?.metadata.title,
-      description: project?.metadata.description,
+      ...(project?.metadata.description && {
+        description: project.metadata.description,
+      }),
     },
   }
 }

@@ -35,9 +35,9 @@ export const Contact = () => {
   const handleFormSubmit: SubmitHandler<TContactFormSchema> = async (
     data: TContactFormSchema,
   ) => {
-    const { success, error } = await sendEmail(data)
+    const { success } = await sendEmail(data)
 
-    if (!success || error) return toast.error('Something went wrong!')
+    if (!success) return toast.error('Something went wrong!')
 
     toast.success('Message sent successfully!')
 
@@ -131,7 +131,7 @@ export const Contact = () => {
               {form.formState.isSubmitting ? (
                 <Loader className='mr-2 size-5 animate-spin' />
               ) : null}
-              Contact Me
+              Contact me
             </Button>
           </div>
           <p className='mt-4 text-xs text-muted-foreground'>

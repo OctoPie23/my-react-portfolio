@@ -5,7 +5,7 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Contact',
-  description: 'Get in touch with me',
+  description: 'Reach out to connect, work or collaborate with me.',
 }
 
 export default function Page() {

@@ -1,7 +1,7 @@
 export const BASE_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : 'https://techwithshrijal.com'
+    : 'https://www.techwithshrijal.com'
 
 export const PUBLIC_GMAIL = 'shrijal.acharya@gmail.com'
 

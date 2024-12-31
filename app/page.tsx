@@ -15,7 +15,8 @@ import type { Metadata } from 'next'
 export function generateMetadata(): Metadata {
   return {
     title: 'Shrijal Acharya',
-    description: 'Shrijal Acharya',
+    description: `Explore my collection of GitHub projects, read my blog posts,
+    and stay updated by subscribing to my newsletter for project and blog updates.`,
     openGraph: {
       title: 'Shrijal Acharya',
     },
