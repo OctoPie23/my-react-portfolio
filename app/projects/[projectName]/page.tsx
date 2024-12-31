@@ -1,11 +1,11 @@
 import { BackButton } from '@/components/back-button'
-import { AlertIcon, ArrowUpRightIcon, StarIcon } from '@/components/icons'
-import { InfoTooltip } from '@/components/info-tooltip'
+import { AlertIcon, ArrowLeftIcon, ArrowUpRightIcon } from '@/components/icons'
 import MDXContent from '@/components/mdx-content'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge, badgeVariants } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/user-avatar'
-import { PROJECT_FILTER_TOPIC, STARS_COUNT_TO_SHOW_ICON } from '@/lib/constants'
+import { PROJECT_FILTER_TOPIC } from '@/lib/constants'
 import { getProjectByTitle, getProjectsMetadata } from '@/lib/projects'
 import { formatDate } from '@/lib/utils'
 import type { Metadata } from 'next'
@@ -53,21 +53,25 @@ export default function Page({ params: { projectName } }: Props) {
 
   const { metadata, content } = project
 
-  const { title, author, clone_url, topics, created_at, stargazers_count } =
-    metadata
+  const { title, author, clone_url, topics, created_at } = metadata
 
   const projectCreatedDate = formatDate({ date: created_at, short: true })
 
-  const starsCount = parseInt(stargazers_count.trim(), 10) ?? 0
-
   return (
     <section className='pb-10'>
-      <Suspense fallback={null}>
+      <Suspense
+        fallback={
+          <Button disabled variant='secondary' className='mb-8 flex gap-2'>
+            <ArrowLeftIcon className='size-5' />
+            Back to projects
+          </Button>
+        }
+      >
         <BackButton endpoint='projects' />
       </Suspense>
 
       <header>
-        <Alert className='my-8'>
+        <Alert className='mb-8'>
           <AlertIcon className='size-5' />
           <AlertTitle className='text-sm font-semibold uppercase'>
             Heads up!
@@ -96,15 +100,6 @@ export default function Page({ params: { projectName } }: Props) {
           >
             {title}
           </a>
-          {starsCount > STARS_COUNT_TO_SHOW_ICON && (
-            <InfoTooltip
-              side='top'
-              label='Loved by the community'
-              className='text-sm'
-            >
-              <StarIcon className='size-8 text-orange-300' />
-            </InfoTooltip>
-          )}
         </h1>
 
         <div className='mt-3 flex items-center'>
@@ -150,7 +145,20 @@ export default function Page({ params: { projectName } }: Props) {
       </header>
 
       <main className='prose mt-12 max-w-3xl dark:prose-invert'>
-        <MDXContent projectName={projectName} source={content} />
+        {content.trim().length > 0 ? (
+          <MDXContent projectName={projectName} source={content} />
+        ) : (
+          <div className='flex flex-col items-center justify-center gap-4 py-10 text-center'>
+            <AlertIcon className='size-12 text-muted-foreground' />
+            <div className='flex flex-col gap-4'>
+              <h2 className='m-0 text-xl font-semibold'>No README Content</h2>
+              <p className='text-muted-foreground'>
+                This project doesn&apos;t have a README file yet or the file has
+                no content. Check the GitHub repository for more information.
+              </p>
+            </div>
+          </div>
+        )}
       </main>
 
       <div className='mt-10 flex items-center gap-1 text-sm font-medium text-muted-foreground'>

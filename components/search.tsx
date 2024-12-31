@@ -29,6 +29,11 @@ export const Search = ({
   const [userQuery] = useDebounce(filterText, debounceTime)
 
   useEffect(() => {
+    if (filterText !== query) setFilterText(query ?? '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
+
+  useEffect(() => {
     if (query === userQuery) return
 
     const newSearchParams = new URLSearchParams(searchParams)
@@ -60,7 +65,7 @@ export const Search = ({
           size='default'
           variant='secondary'
           onClick={resetFilter}
-          className='h-8 px-2 text-zinc-800 dark:text-zinc-300 lg:px-3'
+          className='h-8 px-2 text-zinc-700 dark:text-zinc-400 lg:px-3'
         >
           Reset
           <CrossIcon className='size-5' />

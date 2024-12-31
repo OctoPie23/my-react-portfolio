@@ -15,13 +15,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
-          repository: shricodev/test-gh-actions-portfolio
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'npm'
+          repository: shricodev/portfolio
 
       - name: Fetch repository list and README's with metadata
         env:
@@ -50,7 +44,6 @@ jobs:
             clone_url=$(echo "$repo_metadata" | jq -r '.clone_url')
             language=$(echo "$repo_metadata" | jq -r '.language // ""')
             homepage=$(echo "$repo_metadata" | jq -r '.homepage // ""')
-            stargazers_count=$(echo "$repo_metadata" | jq -r '.stargazers_count')
             topics=$(echo "$repo_metadata" | jq -r '.topics | join(", ")')
             created_at=$(echo "$repo_metadata" | jq -r '.created_at')
             updated_at=$(echo "$repo_metadata" | jq -r '.updated_at')
@@ -70,7 +63,6 @@ jobs:
                 echo "clone_url: \"$clone_url\""
                 echo "language: \"$language\""
                 echo "homepage: \"$homepage\""
-                echo "stargazers_count: \"$stargazers_count\""
                 echo "topics:"
                 for topic in $(echo "$topics" | tr ',' '\n'); do
                   echo "  - \"$topic\""
@@ -95,5 +87,5 @@ jobs:
           else
             git add .
             git commit -m "Update READMEs with meta and content from public repos"
-            git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/shricodev/my-react-portfolio.git HEAD:next-migration
+            git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/shricodev/portfolio.git HEAD:main
           fi

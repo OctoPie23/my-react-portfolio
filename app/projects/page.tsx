@@ -1,4 +1,4 @@
-import { AlertIcon } from '@/components/icons'
+import { AlertIcon, FilterIcon } from '@/components/icons'
 import { PaginationControls } from '@/components/pagination-controls'
 import { FilterDropdown } from '@/components/filter-dropdown'
 import { Projects } from '@/components/projects'
@@ -15,6 +15,9 @@ import {
 import { getProjectsLength, getProjectsMetadata } from '@/lib/projects'
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -108,17 +111,41 @@ export default function Page({
         </AlertDescription>
       </Alert>
 
-      <Search
-        query={searchQuery}
-        debounceTime={DEBOUNCE_TIME_PROJECTS}
-        endpoint='projects'
-        placeholder='Search projects by name or language...'
-      />
+      <Suspense
+        fallback={
+          <Input
+            disabled
+            type='text'
+            placeholder='Loading..'
+            className='mb-4 h-9 w-full sm:w-1/2'
+          />
+        }
+      >
+        <Search
+          query={searchQuery}
+          debounceTime={DEBOUNCE_TIME_PROJECTS}
+          endpoint='projects'
+          placeholder='Search projects by name or language...'
+        />
+      </Suspense>
 
-      <FilterDropdown
-        endpoint='projects'
-        defaultPerPage={PROJECTS_PER_PAGE_DEFAULT}
-      />
+      <Suspense
+        fallback={
+          <Button
+            disabled
+            variant='outline'
+            className='flex items-center gap-1 text-zinc-700 dark:text-zinc-400'
+          >
+            Filter
+            <FilterIcon className='size-4' />
+          </Button>
+        }
+      >
+        <FilterDropdown
+          endpoint='projects'
+          defaultPerPage={PROJECTS_PER_PAGE_DEFAULT}
+        />
+      </Suspense>
 
       <PaginationControls
         searchTerm={searchQuery}

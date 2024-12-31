@@ -51,6 +51,8 @@ export default function Page() {
               <HoverCard>
                 <HoverCardTrigger
                   asChild
+                  // Hack to make the hover card working in mobile phones.
+                  tabIndex={0}
                   className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
                 >
                   <span>Microsoft</span>
@@ -121,6 +123,7 @@ export default function Page() {
               <HoverCard>
                 <HoverCardTrigger
                   asChild
+                  tabIndex={0}
                   className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
                 >
                   <span>Microsoft</span>
@@ -191,6 +194,7 @@ export default function Page() {
               <HoverCard>
                 <HoverCardTrigger
                   asChild
+                  tabIndex={0}
                   className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
                 >
                   <span>Microsoft</span>

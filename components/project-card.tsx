@@ -10,18 +10,17 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { TProjectMetadata } from '@/types/projects'
-import { Badge } from './ui/badge'
+import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
-import { GitHubIcon, StarIcon } from '@/components/icons'
-import { UserAvatar } from './user-avatar'
+import { GitHubIcon } from '@/components/icons'
+import { UserAvatar } from '@/components/user-avatar'
 import {
+  PAGE_INDEX_DEFAULT,
   PAGE_QUERY_PARAM,
   PER_PAGE_QUERY_PARAM,
   SEARCH_QUERY_PARAM,
-  STARS_COUNT_TO_SHOW_ICON,
 } from '@/lib/constants'
-import { InfoTooltip } from '@/components/info-tooltip'
 import { useRouter } from 'next/navigation'
 
 interface ProjectCardProps {
@@ -43,21 +42,22 @@ export const ProjectCard = ({
     title,
     author,
     clone_url,
-    stargazers_count,
     homepage,
     description,
     language,
     created_at,
   } = projectMetadata
 
-  const starsCount = parseInt(stargazers_count.trim(), 10)
-
   const formattedCreatedDate = formatDate({ date: created_at, short: true })
 
   const handleBadgeClick = (language: string) => {
     const params = new URLSearchParams(searchParams)
-    // There is no need to encode the language, router.push does it for us.
+
+    // Set the new search query
     params.set(SEARCH_QUERY_PARAM, language)
+
+    // Reset page to 1 when applying a new search
+    params.set(PAGE_QUERY_PARAM, PAGE_INDEX_DEFAULT.toString())
 
     router.push(`/projects?${params.toString()}`)
   }
@@ -72,14 +72,20 @@ export const ProjectCard = ({
                 pathname: `/projects/${title}`,
                 ...(searchParams && {
                   query: {
-                    ...(searchParams.q
-                      ? { [SEARCH_QUERY_PARAM]: searchParams.q }
+                    ...(searchParams[SEARCH_QUERY_PARAM]
+                      ? {
+                          [SEARCH_QUERY_PARAM]:
+                            searchParams[SEARCH_QUERY_PARAM],
+                        }
                       : {}),
-                    ...(searchParams.page
-                      ? { [PAGE_QUERY_PARAM]: searchParams.page }
+                    ...(searchParams[PAGE_QUERY_PARAM]
+                      ? { [PAGE_QUERY_PARAM]: searchParams[PAGE_QUERY_PARAM] }
                       : {}),
-                    ...(searchParams.perPage
-                      ? { [PER_PAGE_QUERY_PARAM]: searchParams.perPage }
+                    ...(searchParams[PER_PAGE_QUERY_PARAM]
+                      ? {
+                          [PER_PAGE_QUERY_PARAM]:
+                            searchParams[PER_PAGE_QUERY_PARAM],
+                        }
                       : {}),
                   },
                 }),
@@ -88,20 +94,6 @@ export const ProjectCard = ({
             >
               {title}
             </Link>
-
-            {starsCount > STARS_COUNT_TO_SHOW_ICON ? (
-              <InfoTooltip
-                side='top'
-                label='Loved by the community'
-                className='text-xs'
-              >
-                {/* As this is a client component, the tooltip required the children to accept the ref property*/}
-                {/* So we have to wrap it inside a html tag. */}
-                <span>
-                  <StarIcon className='size-5 shrink-0 text-orange-300' />
-                </span>
-              </InfoTooltip>
-            ) : null}
           </div>
 
           <span className='divider hidden text-sm font-light sm:inline'>

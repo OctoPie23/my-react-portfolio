@@ -9,10 +9,11 @@ export const ContactFormEmailTemplate: React.FC<
 > = ({ name, email, message }) => (
   <div>
     <h1>Portfolio: Contact Form Submission</h1>
+    <p>New contact from submission with the following details: </p>
     <p>
-      New contact from submission with the following details: From{' '}
-      <strong>{name}</strong> at {email}
+      From: <strong>{name}</strong>, Email: {email}
     </p>
+
     <h2>Message:</h2>
     <p>{message}</p>
   </div>

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowUpRightIcon } from '@/components/icons'
+import { ArrowLeftIcon, ArrowUpRightIcon } from '@/components/icons'
 import { formatDate, parseMDX } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import MDXContent from '@/components/mdx-content'
@@ -15,6 +15,7 @@ import { BASE_URL } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import { BackButton } from '@/components/back-button'
 import { Suspense } from 'react'
+import { Button } from '@/components/ui/button'
 
 interface Props {
   params: {
@@ -24,7 +25,7 @@ interface Props {
 
 // Static Site Generation (SSG) to improve performance on static contents.
 export async function generateStaticParams() {
-  const response = await getAllBlogPostsSlug({})
+  const response = await getAllBlogPostsSlug()
   const slugs = response?.slugs.map(blogSlug => ({
     slug: blogSlug.slug,
   }))
@@ -94,16 +95,24 @@ export default async function Page({ params: { slug } }: Props) {
 
   return (
     <section className='pb-10'>
-      <Suspense fallback={null}>
+      <Suspense
+        fallback={
+          <Button disabled variant='secondary' className='mb-8 flex gap-2'>
+            <ArrowLeftIcon className='size-5' />
+            Back to blogs
+          </Button>
+        }
+      >
         <BackButton endpoint='blogs' />
       </Suspense>
 
       {post.coverImage && post.coverImage.url ? (
-        <div className='relative mb-6 h-[380px] w-full'>
+        <div className='relative mb-6 w-full'>
           <Image
             src={post.coverImage.url}
             alt={post.title}
-            fill
+            width={750}
+            height={380}
             className='rounded-md object-cover'
             priority
             // Make sure that GIFs are set to unoptimized else the animation will not work.

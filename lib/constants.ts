@@ -3,7 +3,8 @@ export const BASE_URL =
     ? 'http://localhost:3000'
     : 'https://www.techwithshrijal.com'
 
-export const PUBLIC_GMAIL = 'shrijal.acharya@gmail.com'
+export const PUBLIC_GMAIL = 'contact@techwithshrijal.com'
+export const OTHER_EMAIL = 'shrijal.acharya@gmail.com'
 
 export const PER_PAGE_MAX = 100
 export const PAGE_MAX = 500
@@ -12,10 +13,10 @@ export const SEARCH_QUERY_PARAM = 'q'
 export const PAGE_QUERY_PARAM = 'page'
 export const PER_PAGE_QUERY_PARAM = 'perPage'
 
-export const PROJECTS_PER_PAGE_DEFAULT = 10
+export const PROJECTS_PER_PAGE_DEFAULT = 5
 export const BLOGS_PER_PAGE_DEFAULT = 5
-export const RECENT_BLOGS_DEFAULT = 3
-export const RECENT_PROJECTS_DEFAULT = 4
+export const RECENT_BLOGS_DEFAULT = 4
+export const RECENT_PROJECTS_DEFAULT = 5
 export const PAGE_INDEX_DEFAULT = 1
 export const WORDS_PER_MINUTE_DEFAULT = 250
 export const STARS_COUNT_TO_SHOW_ICON = 7

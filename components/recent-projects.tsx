@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { TProjectMetadata } from '@/types/projects'
-import { Projects } from './projects'
+import { Projects } from '@/components/projects'
 
 interface RecentProjectsProps {
   projectsMeta: TProjectMetadata[]

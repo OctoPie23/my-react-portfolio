@@ -107,10 +107,10 @@ export async function getBlogPostIDBySlug({
           slug,
         },
       )
-      if (response.publication?.post.id) return response
+      if (response.publication?.post?.id) return response
     } catch (error) {
       console.error(
-        `Error querying publication host for post Id: ${publicationHost}`,
+        `Error querying publication host: ${publicationHost} for slug: ${slug}`,
         error,
       )
     }
@@ -119,10 +119,10 @@ export async function getBlogPostIDBySlug({
   return null
 }
 
-export async function getAllBlogPostsSlug({
+export async function getAllBlogPostsSlug(
   pageSize = BLOGS_PER_PAGE_DEFAULT,
   page = PAGE_INDEX_DEFAULT,
-}: TGetBlogsMetadataArgs): Promise<{ slugs: { slug: string }[] }> {
+): Promise<{ slugs: { slug: string }[] }> {
   const query = gql`
     query getPosts($username: String!, $pageSize: Int!, $page: Int!) {
       user(username: $username) {

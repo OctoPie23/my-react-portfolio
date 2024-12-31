@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/icons'
 import { subscribeToNewsletter } from '@/lib/blogs'
 import { toast } from 'sonner'
+import { saveContactsResend } from '@/lib/actions'
 
 export const NewsletterForm = () => {
   const form = useForm<TNewsletterFormSchema>({
@@ -37,6 +38,19 @@ export const NewsletterForm = () => {
 
     try {
       await subscribeToNewsletter({ email })
+
+      const { data: resendData, error: resendError } = await saveContactsResend(
+        {
+          email,
+        },
+      )
+
+      // We don't want to return success of false even if saving contact failed
+      // Because if the email was sent successfully, we don't want to show an error
+      // to the user.
+      if (!resendData || resendError) {
+        console.error('Error saving contact to Resend:', resendError)
+      }
 
       toast.success('Check your email to confirm your subscription!', {
         description: 'Make sure to check your spam folder.',

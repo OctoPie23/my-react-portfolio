@@ -1,5 +1,5 @@
 import { Blogs } from '@/components/blogs'
-import { AlertIcon } from '@/components/icons'
+import { AlertIcon, FilterIcon } from '@/components/icons'
 import { PaginationControls } from '@/components/pagination-controls'
 import { Search } from '@/components/search'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -16,6 +16,9 @@ import type { Metadata } from 'next'
 import { getBlogPostsLength } from '@/lib/blogs'
 import { FilterDropdown } from '@/components/filter-dropdown'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Blogs',
@@ -116,17 +119,41 @@ export default async function Page({
         </AlertDescription>
       </Alert>
 
-      <Search
-        query={searchQuery}
-        endpoint='blogs'
-        debounceTime={DEBOUNCE_TIME_BLOGS}
-        placeholder='Search blogs by title or tags...'
-      />
+      <Suspense
+        fallback={
+          <Input
+            disabled
+            type='text'
+            placeholder='Loading...'
+            className='mb-4 h-9 w-full sm:w-1/2'
+          />
+        }
+      >
+        <Search
+          query={searchQuery}
+          endpoint='blogs'
+          debounceTime={DEBOUNCE_TIME_BLOGS}
+          placeholder='Search blogs by title or tags...'
+        />
+      </Suspense>
 
-      <FilterDropdown
-        endpoint='blogs'
-        defaultPerPage={BLOGS_PER_PAGE_DEFAULT}
-      />
+      <Suspense
+        fallback={
+          <Button
+            disabled
+            variant='outline'
+            className='flex items-center gap-1 text-zinc-700 dark:text-zinc-400'
+          >
+            Filter
+            <FilterIcon className='size-4' />
+          </Button>
+        }
+      >
+        <FilterDropdown
+          endpoint='blogs'
+          defaultPerPage={BLOGS_PER_PAGE_DEFAULT}
+        />
+      </Suspense>
 
       <PaginationControls
         searchTerm={searchQuery}

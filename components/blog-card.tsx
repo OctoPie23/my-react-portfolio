@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { BookIcon } from '@/components/icons'
 import { useRouter } from 'next/navigation'
 import {
+  PAGE_INDEX_DEFAULT,
   PAGE_QUERY_PARAM,
   PER_PAGE_QUERY_PARAM,
   SEARCH_QUERY_PARAM,
@@ -35,10 +36,14 @@ export const BlogCard = ({ blogWithMeta, searchParams }: BlogCardProps) => {
   const { title, author, tags, brief, slug, readTimeInMinutes, publishedAt } =
     blogWithMeta
 
-  const handleBadgeClick = (tag: string) => {
+  const handleBadgeClick = (language: string) => {
     const params = new URLSearchParams(searchParams)
-    // There is no need to encode the tag, router.push does ist for us.
-    params.set(SEARCH_QUERY_PARAM, tag)
+
+    // Set the new search query
+    params.set(SEARCH_QUERY_PARAM, language)
+
+    // Reset page to 1 when applying a new search
+    params.set(PAGE_QUERY_PARAM, PAGE_INDEX_DEFAULT.toString())
 
     router.push(`/blogs?${params.toString()}`)
   }
@@ -53,14 +58,17 @@ export const BlogCard = ({ blogWithMeta, searchParams }: BlogCardProps) => {
               pathname: `/blogs/${slug}`,
               ...(searchParams && {
                 query: {
-                  ...(searchParams.q
-                    ? { [SEARCH_QUERY_PARAM]: searchParams.q }
+                  ...(searchParams[SEARCH_QUERY_PARAM]
+                    ? { [SEARCH_QUERY_PARAM]: searchParams[SEARCH_QUERY_PARAM] }
                     : {}),
-                  ...(searchParams.page
-                    ? { [PAGE_QUERY_PARAM]: searchParams.page }
+                  ...(searchParams[PAGE_QUERY_PARAM]
+                    ? { [PAGE_QUERY_PARAM]: searchParams[PAGE_QUERY_PARAM] }
                     : {}),
-                  ...(searchParams.perPage
-                    ? { [PER_PAGE_QUERY_PARAM]: searchParams.perPage }
+                  ...(searchParams[PER_PAGE_QUERY_PARAM]
+                    ? {
+                        [PER_PAGE_QUERY_PARAM]:
+                          searchParams[PER_PAGE_QUERY_PARAM],
+                      }
                     : {}),
                 },
               }),

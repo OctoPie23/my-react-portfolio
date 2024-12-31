@@ -10,7 +10,6 @@ export type TProjectMetadata = {
   clone_url: string
   language?: string
   homepage?: string
-  stargazers_count: string
   topics?: string[]
   created_at: string
   updated_at: string

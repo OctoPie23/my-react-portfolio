@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { buttonVariants } from './ui/button'
-import { ArrowLeftIcon } from './icons'
+import { buttonVariants } from '@/components/ui/button'
+import { ArrowLeftIcon } from '@/components/icons'
 import { useSearchParams } from 'next/navigation'
 import {
   PAGE_QUERY_PARAM,
