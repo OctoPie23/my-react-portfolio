@@ -13,17 +13,20 @@ import { getProjectsMetadata } from '@/lib/projects'
 import type { Metadata } from 'next'
 
 export function generateMetadata(): Metadata {
-  return {
+  const baseMetadata = {
     title: 'Shrijal Acharya',
-    description: `Explore my collection of GitHub projects, read my blog posts,
-    and stay updated by subscribing to my newsletter for project and blog updates.`,
+    description:
+      'Explore my collection of GitHub projects, read my blog posts, and stay updated by subscribing to my newsletter for project and blog updates.',
+  }
+
+  return {
+    ...baseMetadata,
     openGraph: {
-      title: 'Shrijal Acharya',
+      title: baseMetadata.title,
     },
     twitter: {
+      ...baseMetadata,
       card: 'summary_large_image',
-      title: 'Shrijal Acharya',
-      description: 'Shrijal Acharya',
     },
   }
 }

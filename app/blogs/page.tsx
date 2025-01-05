@@ -22,7 +22,8 @@ import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Blogs',
-  description: 'Collection of my blogs fetched through Hashnode Headless CMS',
+  description:
+    'Explore my collection of blog posts, where I share my ideas on coding, DevOps, cloud and more, powered by Hashnode Headless CMS.',
 }
 
 export default async function Page({

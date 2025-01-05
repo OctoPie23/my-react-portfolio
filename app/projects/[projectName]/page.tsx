@@ -30,19 +30,25 @@ export async function generateStaticParams() {
 
 export function generateMetadata({ params: { projectName } }: Props): Metadata {
   const project = getProjectByTitle({ title: projectName })
+
+  const defaultTitle = 'Project by Shrijal Acharya'
+  const defaultDescription = (title: string) =>
+    `${title} project by Shrijal Acharya`
+
+  const title = project?.metadata.title || defaultTitle
+  const description = project?.metadata.description || defaultDescription(title)
+
   return {
-    title: project?.metadata.title,
-    description: project?.metadata.description,
+    title,
+    description,
     openGraph: {
-      title: project?.metadata.title,
-      description: project?.metadata.description,
+      title,
+      description,
     },
     twitter: {
       card: 'summary_large_image',
-      title: project?.metadata.title,
-      ...(project?.metadata.description && {
-        description: project.metadata.description,
-      }),
+      title,
+      description,
     },
   }
 }

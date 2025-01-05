@@ -5,7 +5,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
-    'Learn how I collect, use, and protect your personal information.',
+    'Find out how I collect, use, and protect your personal information to ensure your privacy is respected.',
   robots: {
     // We don't want the crawlers to index this page, but we want them to follow
     // any url on this page.

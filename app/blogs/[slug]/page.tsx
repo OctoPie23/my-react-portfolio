@@ -35,40 +35,42 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params: { slug },
 }: Props): Promise<Metadata | null> {
-  const getBlogIDResponse = await getBlogPostIDBySlug({ slug })
-  if (!getBlogIDResponse) notFound()
+  const blogIdResponse = await getBlogPostIDBySlug({ slug })
+  if (!blogIdResponse) notFound()
 
   const {
     publication: {
       post: { id },
     },
-  } = getBlogIDResponse
+  } = blogIdResponse
 
-  const getBlogPostByIdResponse = await getBlogPostByID({ id })
-  if (!getBlogPostByIdResponse) notFound()
+  const blogPostResponse = await getBlogPostByID({ id })
+  if (!blogPostResponse) notFound()
 
-  const { post } = getBlogPostByIdResponse
+  const { post } = blogPostResponse
+
+  const { title, seo, brief, coverImage } = post
+  const description = seo.description || brief
+  const imageData = coverImage?.url && {
+    images: [{ url: coverImage.url }],
+  }
+
+  const baseMetadata = {
+    title,
+    description,
+  }
 
   return {
-    title: post.title,
-    description: post.seo.description || post.brief,
+    ...baseMetadata,
     openGraph: {
-      title: post.title,
-      description: post.seo.description || post.brief,
+      ...baseMetadata,
       url: `${BASE_URL}/blogs/${slug}`,
-      ...(post.coverImage?.url && {
-        images: [
-          {
-            url: post.coverImage.url,
-          },
-        ],
-      }),
+      ...imageData,
     },
     twitter: {
+      ...baseMetadata,
       card: 'summary_large_image',
-      title: post.title,
-      description: post.seo.description || post.brief,
-      ...(post.coverImage?.url && { images: [{ url: post.coverImage.url }] }),
+      ...imageData,
     },
   }
 }

@@ -5,7 +5,8 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Contact',
-  description: 'Reach out to connect, work or collaborate with me.',
+  description:
+    'Let’s connect! Whether you want to discuss a project, collaborate, or just say hi, feel free to reach out.',
 }
 
 export default function Page() {

@@ -3,7 +3,8 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Meeting',
-  description: 'Schedule a meet with Shrijal Acharya',
+  description:
+    'Let’s set up a time to chat! Schedule a meeting with me, Shrijal Acharya, and we can discuss your ideas or projects.',
 }
 
 export default function Page() {

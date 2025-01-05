@@ -1,5 +1,17 @@
 import Image from 'next/image'
-import { AlertIcon, BookIcon, ChartIcon, UsersGroup } from '@/components/icons'
+import {
+  AlertIcon,
+  BookIcon,
+  CalendarIcon,
+  ChartIcon,
+  UsersGroup,
+} from '@/components/icons'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export const HeroIntro = () => {
   return (
@@ -15,11 +27,103 @@ export const HeroIntro = () => {
           <p className='subtitle mb-6 text-xl font-semibold text-muted-foreground'>
             Web Dev, Cloud, and DevOps Engineer
           </p>
-          <p className='prose my-2 text-pretty font-medium text-zinc-800 dark:text-zinc-300'>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit,
-            quam voluptas dolores autem consectetur voluptatem cum quia vero
-            voluptatibus iste odit necessitatibus quaerat beatae enim tempora.
-          </p>
+
+          <div className='my-2 text-pretty font-medium leading-7 text-zinc-800 dark:text-zinc-300'>
+            I&apos;m a full-stack developer and DevOps engineer working as a
+            freelancer. I also contribute to
+            <HoverCard>
+              <HoverCardTrigger
+                asChild
+                tabIndex={0}
+                className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
+              >
+                <span>freeCodeCamp</span>
+              </HoverCardTrigger>
+              <HoverCardContent className='w-80 font-medium'>
+                <div className='flex justify-between space-x-4'>
+                  <Avatar>
+                    <AvatarImage src='/images/freeCodeCamp.svg' />
+                    <AvatarFallback>FCC</AvatarFallback>
+                  </Avatar>
+                  <div className='space-y-1'>
+                    <h4 className='text-sm font-semibold'>freeCodeCamp</h4>
+                    <p className='m-0 text-pretty text-sm'>
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                    </p>
+                    <div className='flex items-center pt-2'>
+                      <CalendarIcon className='mr-2 size-4' />
+                      <span className='text-xs text-muted-foreground'>
+                        Joined April 2024
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+            and as a Lead Collaborator at
+            <HoverCard>
+              <HoverCardTrigger
+                asChild
+                tabIndex={0}
+                className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
+              >
+                <span>Oppia Foundation.</span>
+              </HoverCardTrigger>
+              <HoverCardContent className='w-80 font-medium'>
+                <div className='flex justify-between space-x-4'>
+                  <Avatar>
+                    <AvatarImage src='/images/oppia.svg' />
+                    <AvatarFallback>O</AvatarFallback>
+                  </Avatar>
+                  <div className='space-y-1'>
+                    <h4 className='text-sm font-semibold'>Oppia Foundation</h4>
+                    <p className='m-0 text-pretty text-sm'>
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                    </p>
+                    <div className='flex items-center pt-2'>
+                      <CalendarIcon className='mr-2 size-4' />
+                      <span className='text-xs text-muted-foreground'>
+                        Joined April 2024
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+            As an
+            <HoverCard>
+              <HoverCardTrigger
+                asChild
+                tabIndex={0}
+                className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
+              >
+                <span>MLSA</span>
+              </HoverCardTrigger>
+              <HoverCardContent className='w-96 font-medium'>
+                <div className='flex justify-between space-x-4'>
+                  <Avatar>
+                    <AvatarImage src='/images/microsoft.svg' />
+                    <AvatarFallback>MS</AvatarFallback>
+                  </Avatar>
+                  <div className='space-y-1'>
+                    <h4 className='text-sm font-semibold'>
+                      Microsoft Learn Student Ambassador
+                    </h4>
+                    <p className='m-0 text-pretty text-sm'>
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                    </p>
+                    <div className='flex items-center pt-2'>
+                      <CalendarIcon className='mr-2 size-4' />
+                      <span className='text-xs text-muted-foreground'>
+                        Joined April 2024
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+            , I organize a number of online events to grow with the community.
+          </div>
         </div>
 
         {/* Desktop Profile Image */}
@@ -84,10 +188,16 @@ export const HeroIntro = () => {
         </div>
       </div>
 
-      <p className='prose mt-3 max-w-full text-pretty font-medium text-zinc-800 dark:text-zinc-300'>
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione quo
-        ducimus asperiores eveniet consectetur velit mollitia unde minus
-        molestias, quisquam cupiditate.
+      <p className='mt-3 max-w-full text-pretty font-medium leading-7 text-zinc-800 dark:text-zinc-300'>
+        I enjoy building side projects in my free time that help me automate a
+        lot of my stuffs. I love writing about my projects, cloud, web, and
+        DevOps.{' '}
+        <span className='mr-1 opacity-70 dark:opacity-70'>
+          (Oh, and yes, I use Vim and Arch, btw)
+        </span>
+        <span role='img' aria-label='wink'>
+          😉
+        </span>
       </p>
     </section>
   )

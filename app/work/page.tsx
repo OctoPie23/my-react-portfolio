@@ -11,7 +11,8 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Work',
-  description: 'My work experiences and engagement with the community.',
+  description:
+    'Take a look at my professional journey, projects I’ve worked on, and my involvement with the community.',
 }
 
 export default function Page() {
