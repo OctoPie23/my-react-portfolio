@@ -6,19 +6,19 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   BLOGS_PER_PAGE_DEFAULT,
   DEBOUNCE_TIME_BLOGS,
-  PAGE_INDEX_DEFAULT,
   PAGE_QUERY_PARAM,
   PER_PAGE_QUERY_PARAM,
   SEARCH_QUERY_PARAM,
 } from '@/lib/constants'
 import { getBlogPostsCardMeta } from '@/lib/blogs'
 import type { Metadata } from 'next'
-import { getBlogPostsLength } from '@/lib/blogs'
+import { getBlogPostsCount } from '@/lib/blogs'
 import { FilterDropdown } from '@/components/filter-dropdown'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { parseQueryParams } from '@/lib/query-params'
 
 export const metadata: Metadata = {
   title: 'Blogs',
@@ -31,21 +31,11 @@ export default async function Page({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
-  const pageQueryRaw = searchParams?.page
-  const perPageQueryRaw = searchParams?.perPage
-
-  const pageQuery =
-    typeof pageQueryRaw === 'string' && !isNaN(Number(pageQueryRaw))
-      ? Math.max(Number(pageQueryRaw), 1)
-      : PAGE_INDEX_DEFAULT
-
-  const perPageQuery =
-    typeof perPageQueryRaw === 'string' && !isNaN(Number(perPageQueryRaw))
-      ? Math.max(Number(perPageQueryRaw), 1)
-      : BLOGS_PER_PAGE_DEFAULT
-
-  const searchQuery =
-    typeof searchParams?.q === 'string' ? searchParams?.q.trim() : undefined
+  const { perPageQuery, pageQuery, searchQuery } = parseQueryParams({
+    searchParams,
+    defaultPerPage: BLOGS_PER_PAGE_DEFAULT,
+    endpoint: 'blogs',
+  })
 
   const { blogs } = searchQuery
     ? await getBlogPostsCardMeta({ all: true })
@@ -67,7 +57,7 @@ export default async function Page({
 
   const blogslength = searchQuery
     ? filteredBlogsLength
-    : await getBlogPostsLength()
+    : await getBlogPostsCount()
 
   const totalPages = Math.max(Math.ceil(blogslength / perPageQuery), 0)
 

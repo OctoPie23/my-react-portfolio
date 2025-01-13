@@ -8,9 +8,7 @@ discuss potential opportunities, or schedule a 1:1 meeting.
 [Report Bug](https://github.com/shricodev/portfolio/issues) ·
 [Request Feature](https://github.com/shricodev/portfolio/issues)
 
-![Hero Page of Shrijal Acharya](https://github.com/user-attachments/assets/fb4ebf6e-7e1b-4582-bdea-827940840d46)
-![Blogs and Projects page of Shrijal Acharya](https://github.com/user-attachments/assets/94c4fcc7-31b8-4bd6-96e0-10e0b5620a14)
-![Schedule a 1:1 Meeting with Shrijal Acharya](https://github.com/user-attachments/assets/72f3c8ce-4d1e-4ca3-96bd-b39c2d64636d)
+![Hero Page of Shrijal Acharya](https://github.com/user-attachments/assets/bfb2b98e-7f65-46d5-ae05-548b25745f7c)
 
 ## 🪄 Tech Stacks
 
@@ -73,14 +71,19 @@ discuss potential opportunities, or schedule a 1:1 meeting.
   npm run dev
   ```
 
+## 🚀 Showcase
+
+![Blogs and Projects page of Shrijal Acharya](https://github.com/user-attachments/assets/94c4fcc7-31b8-4bd6-96e0-10e0b5620a14)
+![Schedule a 1:1 Meeting with Shrijal Acharya](https://github.com/user-attachments/assets/72f3c8ce-4d1e-4ca3-96bd-b39c2d64636d)
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 - Fork the Project
-- Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-- Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-- Push to the Branch (`git push origin feature/AmazingFeature`)
+- Create your Feature Branch (`git checkout -b feature/amazing-feature`)
+- Commit your Changes (`git commit -m 'Add some amazing-feature'`)
+- Push to the Branch (`git push origin feature/amazing-feature`)
 - Open a Pull Request
 
 ## 💬 Contact

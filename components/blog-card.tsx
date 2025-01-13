@@ -94,11 +94,13 @@ export const BlogCard = ({ blogWithMeta, searchParams }: BlogCardProps) => {
           ) : null}
         </CardHeader>
 
-        <Link className='flex flex-col' href={`/blogs/${slug}`}>
-          <CardContent className='prose max-w-full text-zinc-700 dark:text-zinc-400'>
-            {brief}
-          </CardContent>
-        </Link>
+        {brief && (
+          <Link className='flex flex-col' href={`/blogs/${slug}`}>
+            <CardContent className='prose max-w-full text-zinc-700 dark:text-zinc-400'>
+              {brief}
+            </CardContent>
+          </Link>
+        )}
 
         <CardFooter className='text-sm text-muted-foreground'>
           <Link href='/contact' className='flex items-center'>

@@ -37,7 +37,7 @@ export const NewsletterForm = () => {
     const { email } = data
 
     try {
-      await subscribeToNewsletter({ email })
+      await subscribeToNewsletter(email)
 
       const { data: resendData, error: resendError } = await saveContactsResend(
         {

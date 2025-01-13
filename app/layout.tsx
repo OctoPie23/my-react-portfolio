@@ -5,8 +5,6 @@ import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { BASE_URL } from '@/lib/constants'
 import { Toaster } from '@/components/ui/sonner'
-import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 const geistSans = localFont({
@@ -51,7 +49,8 @@ export default function RootLayout({
 }>) {
   return (
     // We suppress the Hydration warning because of the next-themes package.
-    // It requires this to be set since, we don't really know the user theme preference on the server side.
+    // It requires this to be set since, we don't really know the user theme
+    // preference on the server side.
     <html lang='en' suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-3xl flex-col px-4 antialiased`}
@@ -64,10 +63,6 @@ export default function RootLayout({
           <Toaster />
 
           <Footer />
-
-          {/* Vercel Analytics and Speed Insights. Don't remove this provider. */}
-          <Analytics />
-          <SpeedInsights />
         </Providers>
       </body>
     </html>
