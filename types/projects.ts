@@ -12,5 +12,5 @@ export type TProjectMetadata = {
   homepage?: string
   topics?: string[]
   created_at: string
-  updated_at: string
+  updated_at?: string
 }

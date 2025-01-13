@@ -6,18 +6,18 @@ import { Search } from '@/components/search'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   DEBOUNCE_TIME_PROJECTS,
-  PAGE_INDEX_DEFAULT,
   PAGE_QUERY_PARAM,
   PER_PAGE_QUERY_PARAM,
   PROJECTS_PER_PAGE_DEFAULT,
   SEARCH_QUERY_PARAM,
 } from '@/lib/constants'
-import { getProjectsLength, getProjectsMetadata } from '@/lib/projects'
-import { Metadata } from 'next'
+import { getProjectsCount, getProjectsMetadata } from '@/lib/projects'
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { parseQueryParams } from '@/lib/query-params'
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -30,21 +30,11 @@ export default function Page({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
-  const pageQueryRaw = searchParams?.page
-  const perPageQueryRaw = searchParams?.perPage
-
-  const pageQuery =
-    typeof pageQueryRaw === 'string' && !isNaN(Number(pageQueryRaw))
-      ? Math.max(Number(pageQueryRaw), 1)
-      : PAGE_INDEX_DEFAULT
-
-  const perPageQuery =
-    typeof perPageQueryRaw === 'string' && !isNaN(Number(perPageQueryRaw))
-      ? Math.max(Number(perPageQueryRaw), 1)
-      : PROJECTS_PER_PAGE_DEFAULT
-
-  const searchQuery =
-    typeof searchParams?.q === 'string' ? searchParams?.q.trim() : undefined
+  const { perPageQuery, pageQuery, searchQuery } = parseQueryParams({
+    searchParams,
+    defaultPerPage: PROJECTS_PER_PAGE_DEFAULT,
+    endpoint: 'projects',
+  })
 
   const projectsMeta = searchQuery
     ? getProjectsMetadata({ all: true })
@@ -64,7 +54,7 @@ export default function Page({
 
   const projectsLength = searchQuery
     ? filteredProjectsLength
-    : getProjectsLength()
+    : getProjectsCount()
 
   const totalPages = Math.max(Math.ceil(projectsLength / perPageQuery), 0)
 

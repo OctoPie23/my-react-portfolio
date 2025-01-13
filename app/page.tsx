@@ -4,6 +4,7 @@ import RecentBlogs from '@/components/recent-blogs'
 import RecentProjects from '@/components/recent-projects'
 import { Socials } from '@/components/socials'
 import {
+  BASE_URL,
   PAGE_INDEX_DEFAULT,
   RECENT_BLOGS_DEFAULT,
   RECENT_PROJECTS_DEFAULT,
@@ -22,7 +23,8 @@ export function generateMetadata(): Metadata {
   return {
     ...baseMetadata,
     openGraph: {
-      title: baseMetadata.title,
+      ...baseMetadata,
+      url: new URL(BASE_URL).toString(),
     },
     twitter: {
       ...baseMetadata,

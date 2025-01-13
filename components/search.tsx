@@ -6,7 +6,13 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useDebounce } from 'use-debounce'
 import { Button } from '@/components/ui/button'
 import { CrossIcon } from '@/components/icons'
-import { DEBOUNCE_TIME_DEFAULT, SEARCH_QUERY_PARAM } from '@/lib/constants'
+import {
+  DEBOUNCE_TIME_DEFAULT,
+  PAGE_INDEX_DEFAULT,
+  PAGE_QUERY_PARAM,
+  SEARCH_QUERY_PARAM,
+} from '@/lib/constants'
+import { useMediaQuery } from 'react-responsive'
 
 interface SearchProps {
   endpoint: 'projects' | 'blogs'
@@ -24,9 +30,18 @@ export const Search = ({
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  const [isMounted, setIsMounted] = useState<boolean>(false)
   const [filterText, setFilterText] = useState<string>(query ?? '')
 
   const [userQuery] = useDebounce(filterText, debounceTime)
+
+  const isDesktopOrLaptop = useMediaQuery({
+    query: '(min-width: 1224px)',
+  })
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     if (filterText !== query) setFilterText(query ?? '')
@@ -34,10 +49,13 @@ export const Search = ({
   }, [query])
 
   useEffect(() => {
-    if (query === userQuery) return
+    if (!isMounted || query === userQuery) return
 
     const newSearchParams = new URLSearchParams(searchParams)
+
     if (userQuery) {
+      // Reset to first page whenever search query changes
+      newSearchParams.set(PAGE_QUERY_PARAM, PAGE_INDEX_DEFAULT.toString())
       newSearchParams.set(SEARCH_QUERY_PARAM, userQuery)
     } else {
       newSearchParams.delete(SEARCH_QUERY_PARAM)
@@ -52,7 +70,8 @@ export const Search = ({
   return (
     <div className='mb-4 flex items-center gap-3'>
       <Input
-        autoFocus
+        // Apply autoFocus only on client-side and in bigger screens
+        autoFocus={isMounted && isDesktopOrLaptop}
         type='text'
         placeholder={placeholder}
         className='h-9 w-full sm:w-1/2'

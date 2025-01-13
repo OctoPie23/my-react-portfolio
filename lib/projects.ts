@@ -8,24 +8,60 @@ import {
   PROJECTS_PER_PAGE_DEFAULT,
 } from '@/lib/constants'
 
-const projectsDirectory = path.resolve(process.cwd(), 'content', 'projects')
-
-function getMDXFiles({ dir }: { dir: string }): string[] {
-  return fs
-    .readdirSync(dir, { withFileTypes: true })
-    .filter(dirent => dirent.isFile() && path.extname(dirent.name) === '.mdx')
-    .map(dirent => dirent.name)
+class ProjectError extends Error {
+  constructor(
+    message: string,
+    public readonly originalError?: unknown,
+  ) {
+    super(
+      originalError instanceof Error
+        ? `${message}: ${originalError.message}`
+        : message,
+    )
+    this.name = 'ProjectError'
+  }
 }
 
-export function getProjectsLength(): number {
-  const projectFiles = getMDXFiles({ dir: projectsDirectory })
-  return projectFiles.filter(file => {
-    const metadata = getProjectMetadata({ projectFilePath: file })
-    return (
-      metadata !== null &&
-      metadata.topics?.includes(PROJECT_FILTER_TOPIC) === true
+const projectsDirectory = path.resolve(process.cwd(), 'content', 'projects')
+
+function validateDirectory(dir: string) {
+  try {
+    fs.accessSync(dir, fs.constants.R_OK)
+  } catch (error) {
+    throw new ProjectError(
+      `Directory ${dir} does not exist or is not accessible`,
+      error,
     )
-  }).length
+  }
+}
+
+function getMDXFiles({ dir }: { dir: string }): string[] {
+  validateDirectory(dir)
+
+  try {
+    return fs
+      .readdirSync(dir, { withFileTypes: true })
+      .filter(dirent => dirent.isFile() && path.extname(dirent.name) === '.mdx')
+      .map(dirent => dirent.name)
+  } catch (error) {
+    throw new ProjectError(
+      `Failed to read MDX files from directory: ${dir}`,
+      error,
+    )
+  }
+}
+
+export function getProjectsCount(): number {
+  try {
+    const projectFiles = getMDXFiles({ dir: projectsDirectory })
+    return projectFiles.filter(file => {
+      const metadata = getProjectMetadata({ projectFilePath: file })
+      return metadata?.topics?.includes(PROJECT_FILTER_TOPIC) === true
+    }).length
+  } catch (error) {
+    if (error instanceof ProjectError) throw error
+    throw new ProjectError('Failed to get projects length', error)
+  }
 }
 
 export function getProjectByTitle({
@@ -45,12 +81,18 @@ export function getProjectByTitle({
       metadata: {
         ...data,
         author: 'Shrijal Acharya',
-      },
+      } as TProjectMetadata,
       content,
-    } as TProject
+    }
   } catch (error) {
-    console.error(`Error reading project file: ${projectFilePath}`, error)
-    return null
+    if (error instanceof ProjectError) throw error
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return null
+    }
+    throw new ProjectError(
+      `Error reading project file: ${projectFilePath}`,
+      error,
+    )
   }
 }
 
@@ -62,19 +104,24 @@ export function getProjectMetadata({
   const projectAbsFilePath = path.join(projectsDirectory, projectFilePath)
 
   try {
-    const projectFileContent = fs.readFileSync(projectAbsFilePath, 'utf-8')
-    const { data } = matter(projectFileContent)
+    const projectFileContent = fs.readFileSync(projectAbsFilePath, {
+      encoding: 'utf-8',
+    })
 
+    const { data } = matter(projectFileContent)
     return {
       ...data,
       author: 'Shrijal Acharya',
     } as TProjectMetadata
   } catch (error) {
-    console.error(
+    if (error instanceof ProjectError) throw error
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return null
+    }
+    throw new ProjectError(
       `Error reading metadata for file: ${projectAbsFilePath}`,
       error,
     )
-    return null
   }
 }
 
@@ -87,24 +134,28 @@ export function getProjectsMetadata({
   perPage?: number
   all?: boolean
 }): TProjectMetadata[] {
-  const projectFiles = getMDXFiles({ dir: projectsDirectory })
+  try {
+    const projectFiles = getMDXFiles({ dir: projectsDirectory })
+    const projectsWithMetadata = projectFiles
+      .map(file => getProjectMetadata({ projectFilePath: file }))
+      .filter(
+        (metadata): metadata is TProjectMetadata =>
+          metadata !== null &&
+          metadata.topics?.includes(PROJECT_FILTER_TOPIC) === true,
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      )
 
-  const projectsWithMetadata = projectFiles
-    .map(file => getProjectMetadata({ projectFilePath: file }))
-    .filter(
-      (metadata): metadata is TProjectMetadata =>
-        metadata !== null &&
-        metadata.topics?.includes(PROJECT_FILTER_TOPIC) === true,
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    )
+    if (all) return projectsWithMetadata
 
-  if (all) return projectsWithMetadata
-
-  const start = (page - 1) * perPage
-  return projectsWithMetadata.slice(start, start + perPage)
+    const start = (page - 1) * perPage
+    return projectsWithMetadata.slice(start, start + perPage)
+  } catch (error) {
+    if (error instanceof ProjectError) throw error
+    throw new ProjectError('Failed to get projects metadata', error)
+  }
 }
 
 export function getProjectsWithContent({
@@ -115,27 +166,31 @@ export function getProjectsWithContent({
   page?: number
   perPage?: number
   all?: boolean
-}) {
-  const projectFiles = getMDXFiles({ dir: projectsDirectory })
+}): TProject[] {
+  try {
+    const projectFiles = getMDXFiles({ dir: projectsDirectory })
+    const projectsWithContent = projectFiles
+      .map(file => {
+        const slug = file.replace(/_README\.mdx$/, '')
+        return getProjectByTitle({ title: slug })
+      })
+      .filter(
+        (project): project is TProject =>
+          project !== null &&
+          project.metadata.topics?.includes(PROJECT_FILTER_TOPIC) === true,
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.metadata.created_at).getTime() -
+          new Date(a.metadata.created_at).getTime(),
+      )
 
-  const projectsWithContent = projectFiles
-    .map(file => {
-      const slug = file.replace(/_README\.mdx$/, '')
-      return getProjectByTitle({ title: slug })
-    })
-    .filter(
-      (project): project is TProject =>
-        project !== null &&
-        project.metadata.topics?.includes(PROJECT_FILTER_TOPIC) === true,
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.metadata.created_at).getTime() -
-        new Date(a.metadata.created_at).getTime(),
-    )
+    if (all) return projectsWithContent
 
-  if (all) return projectsWithContent
-
-  const start = (page - 1) * perPage
-  return projectsWithContent.slice(start, start + perPage)
+    const start = (page - 1) * perPage
+    return projectsWithContent.slice(start, start + perPage)
+  } catch (error) {
+    if (error instanceof ProjectError) throw error
+    throw new ProjectError('Failed to get projects with content', error)
+  }
 }

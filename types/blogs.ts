@@ -2,7 +2,7 @@ export type TBlogCardMetadata = {
   id: string
   title: string
   readTimeInMinutes: number
-  brief: string
+  brief?: string
   publication: {
     id: string
   }
@@ -17,45 +17,23 @@ export type TBlogCardMetadata = {
   }
 }
 
-export type TGetBlogsLength = {
-  user: {
-    posts: {
+export type TGetBlogsCount = {
+  user?: {
+    posts?: {
       totalDocuments: number
     }
   }
 }
 
-export type TPostMetadata = {
-  id: string
-  title: string
-  readTimeInMinutes: number
-  publishedAt: string
-  brief: string
-  slug: string
-  tags: { name: string }[]
-  author: { name: string }
-}
-
-export type TGetPostsResponse = {
-  publication: {
-    posts: {
-      edges: {
-        node: TPostMetadata
-        cursor: string
-      }[]
-    }
-  }
-}
-
 export type TGetBlogsSlugs = {
-  user: {
-    posts: {
-      edges: {
-        node: {
+  user?: {
+    posts?: {
+      edges?: {
+        node?: {
           slug: string
         }
       }[]
-      pageInfo: {
+      pageInfo?: {
         hasNextPage: boolean
         nextPage: number
       }
@@ -64,12 +42,12 @@ export type TGetBlogsSlugs = {
 }
 
 export type TGetBlogsMetadata = {
-  user: {
-    posts: {
-      edges: {
-        node: TBlogCardMetadata
+  user?: {
+    posts?: {
+      edges?: {
+        node?: TBlogCardMetadata
       }[]
-      pageInfo: {
+      pageInfo?: {
         hasNextPage: boolean
         nextPage: number
       }
@@ -77,15 +55,9 @@ export type TGetBlogsMetadata = {
   }
 }
 
-export type TGetBlogsMetadataArgs = {
-  pageSize?: number
-  page?: number
-  all?: boolean
-}
-
 export type TSubscribeToNewsletterResponse = {
   data?: {
-    subscribeToNewsletter: {
+    subscribeToNewsletter?: {
       status: string
     }
   }
@@ -94,53 +66,27 @@ export type TSubscribeToNewsletterResponse = {
 }
 
 export type TGetBlogPostIDBySlugResponse = {
-  publication: {
-    post: {
+  publication?: {
+    post?: {
       id: string
     }
   }
 }
 
-export type TGetBlogBySlugResponse = {
-  publication: {
-    post: {
-      title: string
-      subtitle?: string
-      readTimeInMinutes: number
-      publishedAt: string
-      seo: {
-        description?: string
-      }
-      tags?: {
-        name: string
-      }[]
-      coverImage: {
-        url?: string
-      }
-      content: {
-        markdown: string
-      }
-      author: {
-        name: string
-      }
-    }
-  }
-}
-
 export type TGetBlogByIDResponse = {
-  post: {
+  post?: {
     title: string
     subtitle?: string
-    brief: string
+    brief?: string
     readTimeInMinutes: number
     publishedAt: string
-    seo: {
+    seo?: {
       description?: string
     }
     tags?: {
       name: string
     }[]
-    coverImage: {
+    coverImage?: {
       url?: string
     }
     content: {

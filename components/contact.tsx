@@ -21,8 +21,12 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { toast } from 'sonner'
+import { useMediaQuery } from 'react-responsive'
 
 export const Contact = () => {
+  const isDesktopOrLaptop = useMediaQuery({
+    query: '(min-width: 1224px)',
+  })
   const form = useForm<TContactFormSchema>({
     resolver: zodResolver(ContactFormSchema),
     defaultValues: {
@@ -65,7 +69,7 @@ export const Contact = () => {
                     <FormControl>
                       <Input
                         id='name'
-                        autoFocus
+                        autoFocus={isDesktopOrLaptop}
                         placeholder='Enter your name'
                         {...field}
                       />
@@ -148,7 +152,7 @@ export const Contact = () => {
       </Form>
 
       <div className='flex flex-col gap-4'>
-        <p className='text-zinc-800 dark:text-zinc-300'>
+        <p className='font-medium text-zinc-800 dark:text-zinc-300'>
           Interested to chat on your ideas or work with me? Schedule a meeting
           using the button below.
         </p>

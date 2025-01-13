@@ -25,7 +25,7 @@ export const InfoTooltip = ({
 }: InfoTooltipProps) => {
   return (
     <TooltipProvider>
-      <Tooltip delayDuration={100}>
+      <Tooltip delayDuration={150}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
         <TooltipContent side={side} align={align}>
           <p className={cn('text-sm font-semibold', className)}>{label}</p>

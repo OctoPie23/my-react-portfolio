@@ -1,7 +1,10 @@
+// NOTE: Make sure there is no trailing space in the end
 export const BASE_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
     : 'https://www.techwithshrijal.com'
+
+export const EXPERIENCE_YEARS = 4
 
 export const PUBLIC_GMAIL = 'contact@techwithshrijal.com'
 export const OTHER_EMAIL = 'shrijal.acharya@gmail.com'
