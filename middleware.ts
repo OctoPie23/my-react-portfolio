@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
     url.endsWith('/rss2.xml') ||
     url.endsWith('/feed')
   ) {
-    return NextResponse.redirect(`${BASE_URL}/rss.xml`)
+    return NextResponse.redirect(new URL('/rss.xml', BASE_URL).toString(), 308)
   }
 
   return NextResponse.next()

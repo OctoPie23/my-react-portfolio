@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { TOOLTIP_DELAY_DURATION } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { HTMLAttributes } from 'react'
 
@@ -25,7 +26,7 @@ export const InfoTooltip = ({
 }: InfoTooltipProps) => {
   return (
     <TooltipProvider>
-      <Tooltip delayDuration={100}>
+      <Tooltip delayDuration={TOOLTIP_DELAY_DURATION}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
         <TooltipContent side={side} align={align}>
           <p className={cn('text-sm font-semibold', className)}>{label}</p>

@@ -82,10 +82,13 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet; then
-            echo "No changes to commit."
-          else
-            git add .
+
+          git add -A
+
+          # Commit if there are any changes
+          if ! git diff --cached --quiet; then
             git commit -m "Update READMEs with meta and content from public repos"
             git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/shricodev/portfolio.git HEAD:main
+          else
+            echo "No changes to commit."
           fi

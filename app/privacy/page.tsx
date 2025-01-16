@@ -1,3 +1,4 @@
+import { buttonVariants } from '@/components/ui/button'
 import { PUBLIC_GMAIL } from '@/lib/constants'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -6,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
     'Find out how I collect, use, and protect your personal information to ensure your privacy is respected.',
-  robots: {
-    // We don't want the crawlers to index this page, but we want them to follow
-    // any url on this page.
-    index: false,
-    follow: true,
-  },
+  //robots: {
+  //  // If no longer want the crawlers to index this page, but we want them to follow
+  //  // any url on this page.
+  //  // index: false,
+  //  follow: true,
+  //},
 }
 
 export default function Page() {
@@ -69,10 +70,11 @@ export default function Page() {
 
       <Link
         href='/contact'
-        className='inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
-        prefetch={false}
+        className={buttonVariants({
+          variant: 'secondary',
+        })}
       >
-        Contact Us
+        Contact me
       </Link>
     </section>
   )

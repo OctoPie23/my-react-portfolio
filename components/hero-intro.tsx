@@ -1,17 +1,7 @@
 import Image from 'next/image'
-import {
-  AlertIcon,
-  BookIcon,
-  CalendarIcon,
-  ChartIcon,
-  UsersGroup,
-} from '@/components/icons'
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { AlertIcon, BookIcon, ChartIcon, UsersGroup } from '@/components/icons'
+import { CustomHoverCard } from '@/components/custom-hover-card'
+import { EXPERIENCE_YEARS } from '@/lib/constants'
 
 export const HeroIntro = () => {
   return (
@@ -29,99 +19,34 @@ export const HeroIntro = () => {
           </p>
 
           <div className='my-2 text-pretty font-medium leading-7 text-zinc-800 dark:text-zinc-300'>
-            I&apos;m a full-stack developer and DevOps engineer working as a
-            freelancer. I also contribute to
-            <HoverCard>
-              <HoverCardTrigger
-                asChild
-                tabIndex={0}
-                className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
-              >
-                <span>freeCodeCamp</span>
-              </HoverCardTrigger>
-              <HoverCardContent className='w-80 font-medium'>
-                <div className='flex justify-between space-x-4'>
-                  <Avatar>
-                    <AvatarImage src='/images/freeCodeCamp.svg' />
-                    <AvatarFallback>FCC</AvatarFallback>
-                  </Avatar>
-                  <div className='space-y-1'>
-                    <h4 className='text-sm font-semibold'>freeCodeCamp</h4>
-                    <p className='m-0 text-pretty text-sm'>
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                    </p>
-                    <div className='flex items-center pt-2'>
-                      <CalendarIcon className='mr-2 size-4' />
-                      <span className='text-xs text-muted-foreground'>
-                        Joined April 2024
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
+            I&apos;m a full-stack developer and DevOps engineer currently
+            working as a freelancer. I also contribute to
+            <CustomHoverCard
+              triggerText='freeCodeCamp'
+              title='freeCodeCamp'
+              description='An organization that offers free online resources to help people learn to code.'
+              dateText='Joined April 2024'
+              avatarSrc='/images/freeCodeCamp.svg'
+              avatarFallback='FCC'
+            />
             and as a Lead Collaborator at
-            <HoverCard>
-              <HoverCardTrigger
-                asChild
-                tabIndex={0}
-                className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
-              >
-                <span>Oppia Foundation.</span>
-              </HoverCardTrigger>
-              <HoverCardContent className='w-80 font-medium'>
-                <div className='flex justify-between space-x-4'>
-                  <Avatar>
-                    <AvatarImage src='/images/oppia.svg' />
-                    <AvatarFallback>O</AvatarFallback>
-                  </Avatar>
-                  <div className='space-y-1'>
-                    <h4 className='text-sm font-semibold'>Oppia Foundation</h4>
-                    <p className='m-0 text-pretty text-sm'>
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                    </p>
-                    <div className='flex items-center pt-2'>
-                      <CalendarIcon className='mr-2 size-4' />
-                      <span className='text-xs text-muted-foreground'>
-                        Joined April 2024
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
+            <CustomHoverCard
+              triggerText='Oppia Foundation'
+              title='Oppia Foundation'
+              description='An organization empowering learners across the globe by providing them with equitable access to high-quality basic education.'
+              dateText='Joined May 2023'
+              avatarSrc='/images/oppia.svg'
+              avatarFallback='O'
+            />
             As an
-            <HoverCard>
-              <HoverCardTrigger
-                asChild
-                tabIndex={0}
-                className='mx-1 cursor-pointer underline decoration-zinc-400 decoration-2 underline-offset-4'
-              >
-                <span>MLSA</span>
-              </HoverCardTrigger>
-              <HoverCardContent className='w-96 font-medium'>
-                <div className='flex justify-between space-x-4'>
-                  <Avatar>
-                    <AvatarImage src='/images/microsoft.svg' />
-                    <AvatarFallback>MS</AvatarFallback>
-                  </Avatar>
-                  <div className='space-y-1'>
-                    <h4 className='text-sm font-semibold'>
-                      Microsoft Learn Student Ambassador
-                    </h4>
-                    <p className='m-0 text-pretty text-sm'>
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                    </p>
-                    <div className='flex items-center pt-2'>
-                      <CalendarIcon className='mr-2 size-4' />
-                      <span className='text-xs text-muted-foreground'>
-                        Joined April 2024
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
+            <CustomHoverCard
+              triggerText='MLSA'
+              title='Microsoft Learn Student Ambassador'
+              description='Global group of campus leaders who are eager to help fellow students, lead in their tech community.'
+              dateText='Joined April 2024'
+              avatarSrc='/images/microsoft.svg'
+              avatarFallback='MS'
+            />
             , I organize a number of online events to grow with the community.
           </div>
         </div>
@@ -139,6 +64,14 @@ export const HeroIntro = () => {
           />
         </div>
       </div>
+
+      <p className='mt-3 max-w-full text-pretty font-medium leading-7 text-zinc-800 dark:text-zinc-300'>
+        I have <strong>{EXPERIENCE_YEARS}+</strong> years of experience, and I
+        primarily work with <strong>TypeScript</strong>, <strong>Python</strong>
+        , <strong>Golang</strong>, <strong>Docker</strong>, and{' '}
+        <strong>Kubernetes</strong>. I also do work with cloud platforms, mainly{' '}
+        <strong>GCP</strong> and <strong>AWS</strong>.
+      </p>
 
       <div className='my-6 rounded-lg border-none bg-zinc-50 p-4 shadow-sm dark:bg-zinc-900 md:flex md:items-center'>
         <div className='flex items-center'>
