@@ -34,7 +34,6 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.53.2",
-    "react-responsive": "^10.0.0",
     "resend": "^4.0.1-alpha.0",
     "rss": "^1.2.2",
     "sharp": "^0.33.5",

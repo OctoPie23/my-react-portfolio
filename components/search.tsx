@@ -12,7 +12,6 @@ import {
   PAGE_QUERY_PARAM,
   SEARCH_QUERY_PARAM,
 } from '@/lib/constants'
-import { useMediaQuery } from 'react-responsive'
 
 interface SearchProps {
   endpoint: 'projects' | 'blogs'
@@ -30,18 +29,9 @@ export const Search = ({
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [isMounted, setIsMounted] = useState<boolean>(false)
   const [filterText, setFilterText] = useState<string>(query ?? '')
 
   const [userQuery] = useDebounce(filterText, debounceTime)
-
-  const isDesktopOrLaptop = useMediaQuery({
-    query: '(min-width: 1224px)',
-  })
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   useEffect(() => {
     if (filterText !== query) setFilterText(query ?? '')
@@ -49,7 +39,7 @@ export const Search = ({
   }, [query])
 
   useEffect(() => {
-    if (!isMounted || query === userQuery) return
+    if (query === userQuery) return
 
     const newSearchParams = new URLSearchParams(searchParams)
 
@@ -70,8 +60,6 @@ export const Search = ({
   return (
     <div className='mb-4 flex items-center gap-3'>
       <Input
-        // Apply autoFocus only on client-side and in bigger screens
-        autoFocus={isMounted && isDesktopOrLaptop}
         type='text'
         placeholder={placeholder}
         className='h-9 w-full sm:w-1/2'
